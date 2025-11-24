@@ -170,6 +170,10 @@
 - 📄 **[SecRandom 官方文檔](https://secrandom.netlify.app)**
 - [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/SECTL/SecRandom)
 
+## 📖 GitHub 貢獻教程
+
+針對繁體中文貢獻教程的翻譯仍然在進行中。您可以先查看簡體中文的版本：[貢獻教程（簡體中文）](../CONTRIBUTING.md)
+
 ## ✨ Star 歷程
 
 <picture>
@@ -177,125 +181,5 @@
   <img alt="Star History" src="https://api.star-history.com/svg?repos=SECTL/SecRandom&type=Date">
 </picture>
 
-## 📖 GitHub 貢獻教程
-
-<details>
-<summary>點擊查看詳情</summary>
-
-### 🚀 快速開始
-
-在向 SecRandom 項目貢獻代碼之前，請確保您已完成以下準備工作：
-
-1. **Fork 項目**
-   - 訪問 [SecRandom GitHub 倉庫](https://github.com/SECTL/SecRandom)
-   - 點擊右上角的 "Fork" 按鈕，創建您自己的倉庫副本
-
-2. **克隆倉庫**
-   ```bash
-   git clone https://github.com/YourUsername/SecRandom.git
-   cd SecRandom
-   ```
-
-3. **添加上游倉庫**
-   ```bash
-   git remote add upstream https://github.com/SECTL/SecRandom.git
-   ```
-
-### 📤 提交您的貢獻
-
-1. **創建功能分支**
-   ```bash
-   git checkout -b feature/YourFeatureName
-   ```
-
-2. **進行更改**
-   - 編寫您的代碼
-   - 添加必要的註釋（請使用中文）
-   - 確保遵循項目的代碼標準
-
-3. **提交更改**
-   ```bash
-   git add .
-   git commit -m "描述您的更改"
-   ```
-
-4. **同步上游更改**
-   ```bash
-   git fetch upstream
-   git rebase upstream/master
-   ```
-
-5. **推送並創建 Pull Request**
-   ```bash
-   git push origin feature/YourFeatureName
-   ```
-   - 訪問您的 GitHub 倉庫
-   - 點擊 "Compare & pull request" 按鈕
-   - 填寫 PR 描述並提交
-
-### 📋 貢獻指南
-
-#### 代碼標準
-- 使用中文編寫代碼註釋
-- 遵循項目現有的代碼風格
-- 確保所有使用的 Qt 類都已導入
-- 驗證第三方 UI 組件是否存在
-
-#### 提交信息標準
-- 使用清晰、簡潔的提交信息
-- 以動詞開頭（例如：Add、Fix、Update 等）
-- 避免過於簡單的描述（例如："fix bug"）
-
-#### Pull Request 要求
-- PR 標題應清晰簡潔地描述更改
-- 提供詳細的更改描述
-- 確保所有測試通過
-- 鏈接相關的 Issues（如果有）
-
-</details>
-
-## 📖 使用教程
-
-### 🚀 GitHub Actions 統一構建工作流使用指南
-
-SecRandom 項目使用統一的 GitHub Actions 工作流進行構建和發布，位於 `.github/workflows/build-unified.yml`。該工作流支持多種觸發方式和配置選項。
-
-<details>
-<summary>查看更多信息</summary>
-
-#### 通過提交消息觸發特定構建
-
-您可以通過在 git 提交消息中包含特定關鍵字來觸發不同的構建行為：
-
-1. **觸發打包構建**
-   - 在提交消息中包含 `打包` 關鍵字
-   - 例如：`git commit -m "新功能 打包"`
-
-2. **指定構建平台**
-   - `win` - Windows 平台
-   - `linux` - Linux 平台
-   - `all` - 所有平台
-   - 例如：`git commit -m "修復 bug 打包 linux"`
-
-3. **觸發所有平台構建**
-   - 創建遵循版本號格式的標籤（格式：`v數字.數字.數字.數字`）
-   - 例如：`git tag v1.2.3.4 && git push origin v1.2.3.4`
-
-#### 構建參數關鍵字說明
-
-提交消息可以包含以下關鍵字來控制構建行為：
-
-| 關鍵字 | 含義 | 示例 |
-|---------|--------|--------|
-| `打包` | 通用打包觸發 | `git commit -m "新功能 打包"` |
-| `win` | Windows 平台 | `git commit -m "修復 UI 打包 win"` |
-| `linux` | Linux 平台 | `git commit -m "優化性能 打包 linux"` |
-| `all` | 所有平台 | `git commit -m "重大更新 打包 all"` |
-
-**組合使用示例：**
-- `git commit -m "優化性能 打包 pi"` - 使用 PyInstaller 構建 Windows 平台
-- `git commit -m "修復 bug 打包 pi"` - 使用 PyInstaller 構建 Linux 平台
-
-</details>
 
 **Copyright © 2025 SECTL**
