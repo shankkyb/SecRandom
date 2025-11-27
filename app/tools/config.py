@@ -2,6 +2,7 @@ import os
 import json
 import glob
 import shutil
+import zipfile
 from typing import Optional, Union
 from loguru import logger
 from pathlib import Path
@@ -476,21 +477,36 @@ def export_diagnostic_data(parent: Optional[QWidget] = None) -> None:
         parent: 父窗口组件，用于对话框的模态显示
     """
     try:
-        cancelled = False
-        def _apply_diag_warning():
-            nonlocal cancelled
-            warning_dialog = MessageBox(
-                get_any_position_value_async("basic_settings", "diagnostic_data_export", "export_warning_title", "name"),
-                get_any_position_value_async("basic_settings", "diagnostic_data_export", "export_warning_content", "name"),
-                parent
-            )
-            warning_dialog.yesButton.setText(get_any_position_value_async("basic_settings", "diagnostic_data_export", "export_confirm_button", "name"))
-            warning_dialog.cancelButton.setText(get_any_position_value_async("basic_settings", "diagnostic_data_export", "export_cancel_button", "name"))
-            if not warning_dialog.exec():
-                cancelled = True
-        require_and_run("diagnostic_export", parent, _apply_diag_warning)
-        if cancelled:
-            return
+        # 先显示导出警告对话框
+        warning_dialog = MessageBox(
+            get_any_position_value_async("basic_settings", "diagnostic_data_export", "export_warning_title", "name"),
+            get_any_position_value_async("basic_settings", "diagnostic_data_export", "export_warning_content", "name"),
+            parent
+        )
+        warning_dialog.yesButton.setText(get_any_position_value_async("basic_settings", "diagnostic_data_export", "export_confirm_button", "name"))
+        warning_dialog.cancelButton.setText(get_any_position_value_async("basic_settings", "diagnostic_data_export", "export_cancel_button", "name"))
+        
+        if not warning_dialog.exec():
+            return  # 用户取消操作
+            
+        # 获取软件安装路径
+        app_dir = get_app_root()
+        
+        # 获取版本信息
+        version_text = VERSION if VERSION != "v0.0.0.0" else f"Dev Version-{NEXT_VERSION}"
+        
+        # 打开文件保存对话框
+        file_path, _ = QFileDialog.getSaveFileName(
+            parent,
+            get_content_pushbutton_name_async("basic_settings", "export_diagnostic_data"),
+            f"SecRandom_{version_text}_diagnostic_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip",
+            "ZIP Files (*.zip);;All Files (*)"
+        )
+        
+        if file_path:
+            # 确保文件路径以.zip结尾
+            if not file_path.endswith('.zip'):
+                file_path += '.zip'
             
             # 创建需要导出的目录列表
             export_folders = [
@@ -503,8 +519,7 @@ def export_diagnostic_data(parent: Optional[QWidget] = None) -> None:
             
             # 统计导出的文件数量
             exported_count = 0
-            
-            # 创建zip文件
+
             with zipfile.ZipFile(file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
                 # 添加各个文件夹中的文件
                 for folder_path in export_folders:
@@ -795,11 +810,11 @@ def export_all_data(parent: Optional[QWidget] = None) -> None:
                 get_any_position_value_async("basic_settings", "data_import_export", "export_warning_content", "name"),
                 parent
             )
-            warning_dialog.yesButton.setText(get_any_position_value_async("basic_settings", "data_import_export", "import_confirm_button", "name"))
-            warning_dialog.cancelButton.setText(get_any_position_value_async("basic_settings", "data_import_export", "import_cancel_button", "name"))
+            warning_dialog.yesButton.setText(get_any_position_value_async("basic_settings", "data_import_export", "export_confirm_button", "name"))
+            warning_dialog.cancelButton.setText(get_any_position_value_async("basic_settings", "data_import_export", "export_cancel_button", "name"))
             if not warning_dialog.exec():
                 cancelled = True
-        require_and_run("data_export", parent, _apply_export_all_warning)
+        _apply_export_all_warning()
         if cancelled:
             return
 

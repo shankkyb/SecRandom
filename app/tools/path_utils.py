@@ -152,10 +152,10 @@ class PathGetter:
         """
         if filename:
             return self._path_manager.get_absolute_path(
-                f"app/config/{config_type}/{filename}"
+                f"config/{config_type}/{filename}"
             )
         else:
-            return self._path_manager.get_absolute_path(f"app/config/{config_type}")
+            return self._path_manager.get_absolute_path(f"config/{config_type}")
 
     def get_temp_path(self, filename: str = "") -> Path:
         """获取临时文件路径

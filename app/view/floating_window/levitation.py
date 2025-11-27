@@ -56,21 +56,82 @@ class LevitationWindow(QWidget):
         self._apply_position()
         self._install_drag_filters()
         get_settings_signals().settingChanged.connect(self._on_setting_changed)
+        # 连接主题变更信号
+        try:
+            qconfig.themeChanged.connect(self._on_theme_changed)
+        except Exception as e:
+            logger.exception("连接 themeChanged 信号时出错（已忽略）: {}", e)
         self._apply_theme_style()
 
+    def rebuild_ui(self):
+        """
+        重新构建浮窗UI
+        删除当前布局并创建新的布局
+        """
+        # 清除现有按钮
+        self._clear_buttons()
+        
+        # 重新创建容器布局
+        container_layout = self._create_container_layout()
+        
+        # 设置新的布局
+        old_layout = self._container.layout()
+        if old_layout:
+            QWidget().setLayout(old_layout)  # 从容器中移除旧布局
+            
+        self._container.setLayout(container_layout)
+        
+        # 重新添加按钮
+        for i, spec in enumerate(self._buttons_spec):
+            btn = self._create_button(spec)
+            self._add_button(btn, i, len(self._buttons_spec))
+            
+        self._container.adjustSize()
+        self.adjustSize()
+        self._install_drag_filters()
+
+    def _clear_buttons(self):
+        """清除所有按钮"""
+        # 清除顶层和底层的按钮
+        if hasattr(self, '_top') and self._top and self._top.layout():
+            top_layout = self._top.layout()
+            while top_layout.count():
+                item = top_layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.deleteLater()
+                    
+        if hasattr(self, '_bottom') and self._bottom and self._bottom.layout():
+            bottom_layout = self._bottom.layout()
+            while bottom_layout.count():
+                item = bottom_layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.deleteLater()
+                    
+        # 清除容器直接包含的按钮
+        container_layout = self._container.layout()
+        if container_layout:
+            while container_layout.count():
+                item = container_layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.deleteLater()
+                    
     def _font(self, size):
         s = int(size) if size and int(size) > 0 else 8
         if s <= 0:
             s = 8
         f = QFont(self._font_family) if self._font_family else QFont()
-        f.setPointSize(s)
+        if s > 0:  # 确保字体大小大于0
+            f.setPointSize(s)
         return f
 
     def _apply_theme_style(self):
         # 主题样式应用：深色/浅色配色修正
         dark = is_dark_theme(qconfig)
         self._container.setAttribute(Qt.WA_StyledBackground, True)
-        if not dark:
+        if dark:
             self._container.setStyleSheet("background-color: rgba(32,32,32,180); border-radius: 12px; border: 1px solid rgba(255,255,255,20);")
         else:
             self._container.setStyleSheet("background-color: rgba(255,255,255,220); border-radius: 12px; border: 1px solid rgba(0,0,0,12);")
@@ -145,6 +206,12 @@ class LevitationWindow(QWidget):
         return cx, cy
 
     def _create_container_layout(self):
+        if hasattr(self, '_top') and self._top:
+            self._top.deleteLater()
+            self._top = None
+        if hasattr(self, '_bottom') and self._bottom:
+            self._bottom.deleteLater()
+            self._bottom = None
         if self._placement == 1:
             lay = QVBoxLayout()
             lay.setContentsMargins(self._margins, self._margins, self._margins, self._margins)
@@ -447,10 +514,10 @@ class LevitationWindow(QWidget):
                 self.setWindowOpacity(self._opacity)
             elif second == "floating_window_placement":
                 self._placement = int(value or 0)
-                self._build_ui()
+                self.rebuild_ui()
             elif second == "floating_window_display_style":
                 self._display_style = int(value or 0)
-                self._build_ui()
+                self.rebuild_ui()
             elif second == "floating_window_stick_to_edge":
                 self._stick_to_edge = bool(value)
             elif second == "floating_window_stick_to_edge_recover_seconds":
@@ -461,7 +528,9 @@ class LevitationWindow(QWidget):
                 self._stick_indicator_style = int(value or 0)
             elif second == "floating_window_button_control":
                 self._buttons_spec = self._map_button_control(int(value or 0))
-                self._build_ui()
+                self.rebuild_ui()
+            # 当任何影响外观的设置改变时，重新应用主题样式
+            self._apply_theme_style()
         elif first == "float_position":
             if second == "x":
                 x = int(value or 0)
@@ -471,6 +540,10 @@ class LevitationWindow(QWidget):
                 y = int(value or 0)
                 nx, ny = self._clamp_to_screen(self.x(), y)
                 self.move(nx, ny)
+
+    def _on_theme_changed(self):
+        """当系统主题变更时调用"""
+        self._apply_theme_style()
 
     def _map_button_control(self, idx):
         combos = [

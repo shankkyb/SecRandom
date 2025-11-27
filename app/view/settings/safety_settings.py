@@ -289,12 +289,22 @@ class basic_safety_verification_method(GroupHeaderCardWidget):
             update_settings("basic_safety_settings", "safety_switch", False)
             self._notify_error(get_content_name_async("basic_safety_settings","error_set_password_first"))
             return
-        self._set_switch(self.safety_switch, "safety_switch", bool(self.safety_switch.isChecked()))
-        try:
-            self._persist_basic_safety("safety_switch", bool(self.safety_switch.isChecked()))
-        except Exception:
-            pass
-        logger.debug(f"安全总开关状态：{bool(self.safety_switch.isChecked())}")
+        
+        desired = bool(self.safety_switch.isChecked())
+        prev = bool(readme_settings_async("basic_safety_settings", "safety_switch"))
+        
+        # 恢复之前的状态，等待验证通过后再执行实际变更
+        self._set_switch(self.safety_switch, "safety_switch", prev)
+        
+        def apply():
+            self._set_switch(self.safety_switch, "safety_switch", desired)
+            try:
+                self._persist_basic_safety("safety_switch", desired)
+            except Exception:
+                pass
+            logger.debug(f"安全总开关状态：{bool(desired)}")
+        
+        require_and_run("toggle_safety", self, apply)
 
     def __on_totp_switch_changed(self):
         if self._busy:
@@ -306,13 +316,22 @@ class basic_safety_verification_method(GroupHeaderCardWidget):
                 self._set_switch(self.totp_switch, "totp_switch", False)
                 self._notify_error(get_content_name_async("basic_safety_settings","error_set_totp_first"))
                 return
-            self._set_switch(self.totp_switch, "totp_switch", desired)
-            self._persist_basic_safety("totp_switch", desired)
-            if desired:
-                self._notify_success(get_content_name_async("basic_safety_settings","totp_switch") + "：已开启TOTP验证", duration=2000)
-            else:
-                InfoBar.info(title=get_content_name_async("basic_safety_settings","totp_switch"), content="已关闭TOTP验证", position=InfoBarPosition.TOP, duration=2000, parent=self)
-            logger.debug(f"TOTP开关状态：{bool(desired)}")
+            
+            prev = bool(readme_settings_async("basic_safety_settings", "totp_switch"))
+            
+            # 恢复之前的状态，等待验证通过后再执行实际变更
+            self._set_switch(self.totp_switch, "totp_switch", prev)
+            
+            def apply():
+                self._set_switch(self.totp_switch, "totp_switch", desired)
+                self._persist_basic_safety("totp_switch", desired)
+                if desired:
+                    self._notify_success(get_content_name_async("basic_safety_settings","totp_switch") + "：已开启TOTP验证", duration=2000)
+                else:
+                    InfoBar.info(title=get_content_name_async("basic_safety_settings","totp_switch"), content="已关闭TOTP验证", position=InfoBarPosition.TOP, duration=2000, parent=self)
+                logger.debug(f"TOTP开关状态：{bool(desired)}")
+            
+            require_and_run("toggle_totp", self, apply)
         finally:
             self._busy = False
 
@@ -330,13 +349,22 @@ class basic_safety_verification_method(GroupHeaderCardWidget):
                 self._set_switch(self.usb_switch, "usb_switch", False)
                 self._notify_error(get_content_name_async("basic_safety_settings","error_bind_usb_first"))
                 return
-            self._set_switch(self.usb_switch, "usb_switch", desired)
-            self._persist_basic_safety("usb_switch", desired)
-            if desired:
-                self._notify_success(get_content_name_async("basic_safety_settings","usb_switch") + "：已开启U盘验证", duration=2000)
-            else:
-                InfoBar.info(title=get_content_name_async("basic_safety_settings","usb_switch"), content="已关闭U盘验证", position=InfoBarPosition.TOP, duration=2000, parent=self)
-            logger.debug(f"U盘验证开关状态：{bool(desired)}")
+            
+            prev = bool(readme_settings_async("basic_safety_settings", "usb_switch"))
+            
+            # 恢复之前的状态，等待验证通过后再执行实际变更
+            self._set_switch(self.usb_switch, "usb_switch", prev)
+            
+            def apply():
+                self._set_switch(self.usb_switch, "usb_switch", desired)
+                self._persist_basic_safety("usb_switch", desired)
+                if desired:
+                    self._notify_success(get_content_name_async("basic_safety_settings","usb_switch") + "：已开启U盘验证", duration=2000)
+                else:
+                    InfoBar.info(title=get_content_name_async("basic_safety_settings","usb_switch"), content="已关闭U盘验证", position=InfoBarPosition.TOP, duration=2000, parent=self)
+                logger.debug(f"U盘验证开关状态：{bool(desired)}")
+            
+            require_and_run("toggle_usb", self, apply)
         finally:
             self._busy = False
 

@@ -11,6 +11,7 @@ from app.tools.variable import MENU_AUTO_CLOSE_TIMEOUT
 from app.common.safety.verify_ops import require_and_run
 from app.tools.path_utils import get_resources_path
 from app.Language.obtain_language import readme_settings_async, get_content_name_async
+from app.common.IPC_URL.url_command_handler import URLCommandHandler
 
 
 # ==================================================
@@ -23,12 +24,14 @@ class Tray(QSystemTrayIcon):
     继承自QSystemTrayIcon以简化实现。
     """
 
-    showSettingsRequested = Signal()
+    showSettingsRequested = Signal(str)  # 请求显示设置页面
     showSettingsRequestedAbout = Signal()
     showFloatWindowRequested = Signal()
+    showTrayActionRequested = Signal(str)  # 请求执行托盘操作
 
     def __init__(self, parent=None):
-        """初始化系统托盘图标
+        """
+        初始化系统托盘图标
 
         Args:
             parent: 父窗口对象，通常为主窗口
@@ -41,8 +44,15 @@ class Tray(QSystemTrayIcon):
         self.setToolTip("SecRandom")
         self.activated.connect(self._on_tray_activated)
 
+        # 初始化URL命令处理器
+        self.url_command_handler = URLCommandHandler(self)
+        self.url_command_handler.showTrayActionRequested.connect(self._handle_tray_action_requested)
+
         # 初始化菜单自动关闭定时器
         self._init_menu_timer()
+
+        # 连接信号
+        self.showTrayActionRequested.connect(self._handle_tray_action_requested)
 
     def _init_menu_timer(self):
         """初始化菜单自动关闭定时器"""
@@ -92,7 +102,7 @@ class Tray(QSystemTrayIcon):
 
         # 关于SecRandom
         self.about_action = Action(
-            "SecRandom", triggered=self.showSettingsRequestedAbout.emit
+            "SecRandom", triggered=lambda: self.showSettingsRequestedAbout.emit()
         )
         self.tray_menu.addAction(self.about_action)
 
@@ -117,7 +127,7 @@ class Tray(QSystemTrayIcon):
         if open_settings is not False:
             open_settings_action = Action(
                 get_content_name_async("tray_management", "open_settings"),
-                triggered=lambda: require_and_run("open_settings", self.main_window, self.showSettingsRequested.emit)
+                triggered=lambda: require_and_run("open_settings", self.main_window, lambda: self.showSettingsRequested.emit('basicSettingsInterface'))
             )
             menu_items.append(open_settings_action)
 
@@ -128,7 +138,7 @@ class Tray(QSystemTrayIcon):
         if show_hide_float_window is not False:
             show_hide_float_window_action = Action(
                 get_content_name_async("tray_management", "show_hide_float_window"),
-                triggered=lambda: require_and_run("show_hide_floating_window", self.main_window, self.showFloatWindowRequested.emit)
+                triggered=lambda: require_and_run("show_hide_floating_window", self.main_window, self.main_window._toggle_float_window)
             )
             menu_items.append(show_hide_float_window_action)
 
@@ -199,3 +209,28 @@ class Tray(QSystemTrayIcon):
         """显示托盘图标"""
         if not self.isVisible():
             self.show()
+
+    def _handle_tray_action_requested(self, action: str):
+        """处理托盘操作请求
+        
+        Args:
+            action: 托盘操作类型 ('toggle_main_window', 'settings', 'float', 'restart', 'exit')
+        """
+        logger.debug(f"托盘收到操作请求: {action}")
+        if action == 'toggle_main_window':
+            # 切换主窗口显示状态
+            self.main_window.toggle_window()
+        elif action == 'settings':
+            # 打开设置页面
+            self.showSettingsRequested.emit('basicSettingsInterface')
+        elif action == 'float':
+            # 切换浮窗显示状态
+            self.showFloatWindowRequested.emit()
+        elif action == 'restart':
+            # 重启应用程序
+            require_and_run("restart", self.main_window, self.main_window.restart_app)
+        elif action == 'exit':
+            # 退出应用程序
+            require_and_run("exit", self.main_window, self.main_window.close_window_secrandom)
+        else:
+            logger.warning(f"未知的托盘操作: {action}")

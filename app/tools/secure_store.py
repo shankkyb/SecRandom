@@ -18,10 +18,30 @@ except Exception:
 def _set_hidden(path: str) -> None:
     try:
         if platform.system() == "Windows":
+            # Windows 平台：设置文件属性为隐藏和系统文件
             FILE_ATTRIBUTE_HIDDEN = 0x2
             FILE_ATTRIBUTE_SYSTEM = 0x4
             ctypes.windll.kernel32.SetFileAttributesW(path, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM)
-    except Exception:
+        else:  # Linux 平台：使用点前缀隐藏文件
+            import os
+            dirname = os.path.dirname(path)
+            basename = os.path.basename(path)
+            
+            # 如果文件名已经以点开头，则不需要处理
+            if basename.startswith("."):
+                return
+            
+            # 将文件重命名为以点开头的文件名
+            hidden_path = os.path.join(dirname, f".{basename}")
+            
+            # 如果隐藏文件已存在，先删除它
+            if os.path.exists(hidden_path):
+                os.remove(hidden_path)
+            
+            # 重命名原文件为隐藏文件
+            os.rename(path, hidden_path)
+    except Exception as e:
+        logger.warning(f"隐藏文件失败: {e}")
         pass
 
 def _get_machine_guid() -> str:
@@ -90,19 +110,10 @@ def read_secrets() -> dict:
             except Exception:
                 logger.warning("读取安全配置失败，返回空配置")
 
-    lp = get_config_path("secrets.json")
-    if os.path.exists(lp):
-        try:
-            with open(lp, "r", encoding="utf-8") as f:
-                out = json.load(f)
-                logger.debug("读取安全配置成功（旧路径）")
-                return out
-        except Exception:
-            logger.warning("读取旧路径安全配置失败，返回空配置")
     return {}
 
 def write_secrets(d: dict) -> None:
-    p = get_config_path("secrets.json")
+    p = get_settings_path("secrets.json")
     ensure_dir(os.path.dirname(p))
     try:
         raw = json.dumps(d, ensure_ascii=False, indent=4).encode("utf-8")
@@ -113,13 +124,6 @@ def write_secrets(d: dict) -> None:
             f.write(b"SRV1" + payload)
         _set_hidden(p)
         logger.debug(f"写入安全配置成功：{p}")
-        # 同时为设置路径的旧文件设置隐藏属性（若存在）
-        try:
-            sp = get_settings_path("secrets.json")
-            if os.path.exists(sp):
-                _set_hidden(sp)
-        except Exception:
-            pass
     except Exception:
         with open(p, "w", encoding="utf-8") as f:
             json.dump(d, f, ensure_ascii=False, indent=4)

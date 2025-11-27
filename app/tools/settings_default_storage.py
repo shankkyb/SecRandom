@@ -32,6 +32,7 @@ DEFAULT_SETTINGS = {
         "personalised": {"default_value": None},
         "autostart": {"default_value": False},
         "background_resident": {"default_value": True},
+        "url_protocol": {"default_value": False},
         "export_diagnostic_data": {"default_value": None},
         "export_settings": {"default_value": None},
         "import_settings": {"default_value": None},

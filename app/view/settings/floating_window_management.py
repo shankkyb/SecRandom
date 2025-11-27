@@ -40,6 +40,20 @@ class floating_window_management(QWidget):
         self.edge_settings = floating_window_edge_settings(self)
         self.vBoxLayout.addWidget(self.edge_settings)
 
+        # 存储浮窗实例的引用
+        self.levitation_window = None
+
+    def set_levitation_window(self, window):
+        """设置浮窗实例引用"""
+        self.levitation_window = window
+        # 连接外观设置变化信号到浮窗重建方法
+        self.appearance_settings.appearance_settings_changed.connect(self._on_appearance_settings_changed)
+
+    def _on_appearance_settings_changed(self):
+        """处理外观设置变更"""
+        if self.levitation_window:
+            self.levitation_window.rebuild_ui()
+
 
 # ==================================================
 # 浮动窗口管理 - 基础设置
@@ -180,6 +194,7 @@ class floating_window_basic_settings(GroupHeaderCardWidget):
 # 浮动窗口管理 - 外观设置
 # ==================================================
 class floating_window_appearance_settings(GroupHeaderCardWidget):
+    appearance_settings_changed = Signal()
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setTitle(
@@ -271,16 +286,19 @@ class floating_window_appearance_settings(GroupHeaderCardWidget):
         update_settings(
             "floating_window_management", "floating_window_button_control", index
         )
+        self.appearance_settings_changed.emit()
 
     def floating_window_placement_combo_box_changed(self, index):
         update_settings(
             "floating_window_management", "floating_window_placement", index
         )
+        self.appearance_settings_changed.emit()
 
     def floating_window_display_style_combo_box_changed(self, index):
         update_settings(
             "floating_window_management", "floating_window_display_style", index
         )
+        self.appearance_settings_changed.emit()
 
 
 # ==================================================

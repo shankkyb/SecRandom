@@ -18,6 +18,11 @@ basic_settings = {
             "description": "关闭所有窗口后是否仍在后台常驻",
             "switchbutton_name": {"enable": "", "disable": ""}
         },
+        "url_protocol": {
+            "name": "URL协议注册",
+            "description": "注册自定义URL协议(secrandom://)，支持通过链接启动应用",
+            "switchbutton_name": {"enable": "", "disable": ""}
+        },
         "export_diagnostic_data": {
             "name": "导出诊断数据",
             "description": "退出软件时导出诊断信息，用于排查问题",

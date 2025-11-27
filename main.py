@@ -29,6 +29,9 @@ float_window = None
 # 全局变量，用于存储本地服务器实例
 local_server = None
 
+# 全局URL处理器实例
+url_handler = None
+
 
 # 添加项目根目录到Python路径
 project_root = str(get_app_root())
@@ -119,21 +122,42 @@ def setup_local_server():
 
     def handle_new_connection():
         """处理新的连接请求"""
+        logger.debug("setup_local_server.handle_new_connection: 收到新的连接请求")
         socket = server.nextPendingConnection()
         if socket:
             if socket.waitForReadyRead(1000):
                 data = socket.readAll()
+                data_str = data.data().decode('utf-8') if isinstance(data.data(), bytes) else str(data.data())
+                logger.debug(f"setup_local_server.handle_new_connection: 收到数据: {data_str}")
+                
                 if data == b"activate":
                     # 激活主窗口
                     if main_window:
                         main_window.show()
                         main_window.raise_()
                         main_window.activateWindow()
-                        logger.info("已激活主窗口")
+                        logger.debug("setup_local_server.handle_new_connection: 已激活主窗口")
+                elif data_str.startswith("url:"):
+                    # 处理URL参数
+                    url = data_str[4:]  # 移除"url:"前缀
+                    logger.debug(f"setup_local_server.handle_new_connection: 收到URL参数: {url}")
+                    if url_handler:
+                        logger.debug(f"setup_local_server.handle_new_connection: 调用 url_handler.handle_url(url)")
+                        result = url_handler.handle_url(url)
+                        logger.debug(f"setup_local_server.handle_new_connection: url_handler.handle_url(url) 结果: {result}")
+                        # 只有在处理主界面相关的URL命令时才激活主窗口
+                        # 对于设置页面相关的URL命令，不激活主窗口
+                        if main_window and "settings" not in url:
+                            main_window.show()
+                            main_window.raise_()
+                            main_window.activateWindow()
+                            logger.debug("setup_local_server.handle_new_connection: 已激活主窗口")
+                else:
+                    logger.warning(f"setup_local_server.handle_new_connection: 未知的数据类型: {data_str}")
             socket.disconnectFromServer()
 
     server.newConnection.connect(handle_new_connection)
-    logger.info("本地服务器已启动，等待激活信号")
+    logger.debug("setup_local_server: 本地服务器已启动，等待激活信号")
     return server
 
 
@@ -221,15 +245,26 @@ def start_main_window():
         create_float_window()  # Ensure the global float window is created
         main_window = MainWindow(float_window=float_window)
         main_window.showSettingsRequested.connect(
-            lambda: show_settings_window()
+            lambda page_name='basicSettingsInterface': show_settings_window(page_name)
         )
         main_window.showSettingsRequestedAbout.connect(
-            lambda: show_settings_window_about
+            show_settings_window_about
         )
         main_window.showFloatWindowRequested.connect(
             show_float_window
         )
         main_window.show()
+        
+        # 连接 URLHandler 信号到 main_window 信号处理器
+        global url_handler
+        if url_handler:
+            url_handler.showMainPageRequested.connect(main_window._handle_main_page_requested)
+            url_handler.showTrayActionRequested.connect(
+                lambda action: main_window._handle_tray_action_requested(action)
+            )
+            
+            # 连接 URLHandler 信号到设置窗口显示方法
+            url_handler.showSettingsRequested.connect(show_settings_window)
         
         # 根据设置决定是否启动时显示浮窗
         startup_display_float = readme_settings_async(
@@ -241,7 +276,7 @@ def start_main_window():
             
         try:
             elapsed = time.perf_counter() - app_start_time
-            logger.debug(f"主窗口创建并显示完成，启动耗时: {elapsed:.3f}s")
+            logger.debug(f"主窗口创建完成，启动耗时: {elapsed:.3f}s")
         except Exception as e:
 
             logger.exception("计算启动耗时出错（已忽略）: {}", e)
@@ -260,14 +295,20 @@ def create_settings_window():
         logger.error(f"创建设置窗口失败: {e}", exc_info=True)
 
 
-def show_settings_window():
-    """显示设置窗口"""
+def show_settings_window(page_name='basicSettingsInterface'):
+    """显示设置窗口
+    
+    Args:
+        page_name: 设置页面名称，默认为 basicSettingsInterface
+    """
     try:
         global settings_window
         if settings_window is None:
             create_settings_window()
         if settings_window is not None:
             settings_window.show_settings_window()
+            # 处理设置页面跳转
+            settings_window._handle_settings_page_request(page_name)
     except Exception as e:
         logger.error(f"显示设置窗口失败: {e}", exc_info=True)
 
@@ -321,6 +362,9 @@ def initialize_app():
     # 管理设置文件，确保其存在且完整
     manage_settings_file()
 
+    # 初始化URL处理器
+    initialize_url_handler()
+
     # 加载主题
     QTimer.singleShot(
         APP_INIT_DELAY,
@@ -349,7 +393,7 @@ def initialize_app():
     # 清除重启记录
     QTimer.singleShot(APP_INIT_DELAY, lambda: (remove_record("", "", "", "restart")))
 
-    # 创建主窗口实例
+    # 创建主窗口实例（但不自动显示）
     QTimer.singleShot(APP_INIT_DELAY, lambda: (start_main_window()))
 
     # 应用字体设置
@@ -357,6 +401,24 @@ def initialize_app():
 
     # 记录初始化完成时间
     logger.debug("应用初始化调度已启动，主窗口将在延迟后创建")
+
+
+def initialize_url_handler():
+    """初始化URL处理器"""
+    global url_handler
+    try:
+        from app.tools.url_handler import URLHandler
+        
+        # 创建URL处理器实例
+        url_handler = URLHandler()
+        
+        # 处理命令行参数中的URL
+        if len(sys.argv) > 1:
+            url_handler.handle_command_line_args(sys.argv[1:])
+            
+        logger.debug("URL处理器初始化完成")
+    except Exception as e:
+        logger.error(f"初始化URL处理器失败: {e}")
 
 
 # ==================================================
@@ -380,7 +442,25 @@ if __name__ == "__main__":
     shared_memory, is_first_instance = check_single_instance()
 
     if not is_first_instance:
-        # 不是第一个实例，退出程序
+        # 不是第一个实例，检查是否有URL参数需要处理
+        if len(sys.argv) > 1 and any(arg.startswith("secrandom://") for arg in sys.argv):
+            # 有URL参数，发送到已运行的实例处理
+            try:
+                local_socket = QLocalSocket()
+                local_socket.connectToServer(SHARED_MEMORY_KEY)
+                if local_socket.waitForConnected(1000):
+                    # 发送URL参数
+                    for arg in sys.argv[1:]:
+                        if arg.startswith("secrandom://"):
+                            local_socket.write(f"url:{arg}".encode('utf-8'))
+                            local_socket.flush()
+                            local_socket.waitForBytesWritten(1000)
+                            logger.debug(f"已发送URL参数到已有实例: {arg}")
+                            break
+                    local_socket.disconnectFromServer()
+            except Exception as e:
+                logger.error(f"发送URL参数到已有实例失败: {e}")
+        
         logger.info("程序将退出，已有实例已激活")
         sys.exit(0)
 

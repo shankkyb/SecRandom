@@ -2,6 +2,7 @@
 # 导入库
 # ==================================================
 
+from loguru import logger
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QApplication
 from PySide6.QtGui import QFontDatabase
 from qfluentwidgets import (
@@ -27,6 +28,7 @@ from app.Language.obtain_language import (
     get_content_switchbutton_name_async,
 )
 from app.tools.config import export_diagnostic_data, export_settings, import_settings, export_all_data, import_all_data, configure_logging, set_autostart, show_notification, NotificationType, NotificationConfig
+from app.common.IPC_URL import URLIPCHandler
 
 
 # ==================================================
@@ -90,6 +92,27 @@ class basic_settings_function(GroupHeaderCardWidget):
         self.resident_switch.setChecked(True if _resident is None else _resident)
         self.resident_switch.checkedChanged.connect(self.__on_resident_changed)
 
+        # URL协议注册设置
+        self.url_protocol_switch = SwitchButton()
+        self.url_protocol_switch.setOffText(
+            get_content_switchbutton_name_async(
+                "basic_settings", "url_protocol", "disable"
+            )
+        )
+        self.url_protocol_switch.setOnText(
+            get_content_switchbutton_name_async(
+                "basic_settings", "url_protocol", "enable"
+            )
+        )
+        
+        # 初始化URL IPC处理器
+        self.url_ipc_handler = URLIPCHandler("SecRandom", "secrandom")
+        
+        # 检查协议是否已注册
+        is_protocol_registered = self.url_ipc_handler.is_protocol_registered()
+        self.url_protocol_switch.setChecked(is_protocol_registered)
+        self.url_protocol_switch.checkedChanged.connect(self.__on_url_protocol_changed)
+
         # 添加设置项到分组
         self.addGroup(
             get_theme_icon("ic_fluent_arrow_sync_20_filled"),
@@ -102,6 +125,12 @@ class basic_settings_function(GroupHeaderCardWidget):
             get_content_name_async("basic_settings", "background_resident"),
             get_content_description_async("basic_settings", "background_resident"),
             self.resident_switch,
+        )
+        self.addGroup(
+            get_theme_icon("ic_fluent_link_20_filled"),
+            get_content_name_async("basic_settings", "url_protocol"),
+            get_content_description_async("basic_settings", "url_protocol"),
+            self.url_protocol_switch,
         )
 
     def __on_autostart_changed(self, checked):
@@ -162,6 +191,86 @@ class basic_settings_function(GroupHeaderCardWidget):
                 ),
                 parent=self.window(),
             )
+
+    def __on_url_protocol_changed(self, checked):
+        """URL协议开关变化处理"""
+        # 临时断开信号连接，避免递归
+        self.url_protocol_switch.checkedChanged.disconnect(self.__on_url_protocol_changed)
+        
+        try:
+            if checked:
+                # 注册URL协议
+                success = self.url_ipc_handler.register_url_protocol()
+                if success:
+                    update_settings("basic_settings", "url_protocol", True)
+                    show_notification(
+                        NotificationType.SUCCESS,
+                        NotificationConfig(
+                            title=get_content_name_async("basic_settings", "url_protocol"),
+                            content="已开启URL协议注册",
+                        ),
+                        parent=self.window(),
+                    )
+                    # 更新开关状态为成功状态
+                    self.url_protocol_switch.setChecked(True)
+                else:
+                    # 注册失败，保持原状态
+                    self.url_protocol_switch.setChecked(False)
+                    show_notification(
+                        NotificationType.WARNING,
+                        NotificationConfig(
+                            title=get_content_name_async("basic_settings", "url_protocol"),
+                            content="URL协议注册失败，需要管理员权限",
+                        ),
+                        parent=self.window(),
+                    )
+            else:
+                # 注销URL协议
+                success = self.url_ipc_handler.unregister_url_protocol()
+                if success:
+                    update_settings("basic_settings", "url_protocol", False)
+                    show_notification(
+                        NotificationType.INFO,
+                        NotificationConfig(
+                            title=get_content_name_async("basic_settings", "url_protocol"),
+                            content="已关闭URL协议注册",
+                        ),
+                        parent=self.window(),
+                    )
+                    # 更新开关状态为成功状态
+                    self.url_protocol_switch.setChecked(False)
+                else:
+                    # 注销失败，保持原状态
+                    self.url_protocol_switch.setChecked(True)
+                    show_notification(
+                        NotificationType.WARNING,
+                        NotificationConfig(
+                            title=get_content_name_async("basic_settings", "url_protocol"),
+                            content="URL协议注销失败，可能需要管理员权限",
+                        ),
+                        parent=self.window(),
+                    )
+        except Exception as e:
+            logger.error(f"URL协议设置错误: {e}")
+            # 发生错误时恢复原状态
+            self.url_protocol_switch.setChecked(not checked)
+            error_msg = str(e)
+            if "Access is denied" in error_msg or "WinError 5" in error_msg:
+                content = "权限不足，URL协议注册/注销失败"
+            else:
+                content = f"URL协议设置错误: {error_msg}"
+            
+            show_notification(
+                NotificationType.ERROR,
+                NotificationConfig(
+                    title=get_content_name_async("basic_settings", "url_protocol"),
+                    content=content,
+                ),
+                parent=self.window(),
+            )
+        finally:
+            # 重新连接信号
+            self.url_protocol_switch.checkedChanged.connect(self.__on_url_protocol_changed)
 
 class basic_settings_personalised(GroupHeaderCardWidget):
     def __init__(self, parent=None):

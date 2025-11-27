@@ -85,16 +85,27 @@ class BindUsbWindow(QWidget):
     def __refresh(self):
         self.drive_combo.clear()
         try:
+            import platform
             # 优先使用WMI获取USB设备的逻辑盘符（可覆盖固定盘类型的外置硬盘）
             letters = list_usb_drive_letters_wmi()
             if not letters:
                 # 回退到驱动类型为可移动盘的枚举
                 letters = list_removable_drives()
-            logger.debug(f"刷新可绑定盘符，数量：{len(letters)}")
-            for lt in letters:
-                name = get_volume_label(lt)
-                text = f"{name} ({lt}:)" if name else f"({lt}:)"
-                self.drive_combo.addItem(text, lt)
+            logger.debug(f"刷新可绑定设备，数量：{len(letters)}")
+            
+            for device in letters:
+                if platform.system() == "Windows":
+                    # Windows 平台：device 是盘符（如 "E"）
+                    name = get_volume_label(device)
+                    text = f"{name} ({device}:)" if name else f"({device}:)"
+                    self.drive_combo.addItem(text, device)
+                else:
+                    # Linux 平台：device 是挂载点路径（如 "/media/user/USB Drive"）
+                    name = get_volume_label(device)
+                    # 在Linux上，name 可能就是挂载点的目录名，所以直接使用 device 作为显示文本
+                    text = device
+                    self.drive_combo.addItem(text, device)
+            
             if not letters:
                 self.drive_combo.setCurrentIndex(-1)
                 # 使占位文本可见
@@ -122,41 +133,39 @@ class BindUsbWindow(QWidget):
             self._notify_error(get_content_name_async("basic_safety_settings","usb_no_removable"))
             return
         text = self.drive_combo.currentText()
-        letter = self.drive_combo.currentData()
-        if not isinstance(letter, str) or len(letter) != 1:
-            try:
-                import re
-                m = re.search(r"\(([A-Za-z]):\)", text)
-                if m:
-                    letter = m.group(1).upper()
-            except Exception:
-                pass
-        if not isinstance(letter, str) or len(letter) != 1:
-            self._notify_error(get_content_name_async("basic_safety_settings","usb_no_removable"))
-            return
+        device = self.drive_combo.currentData()
+        
+        import platform
         try:
             # 允许来自USB设备的逻辑盘（包括部分显示为固定盘的外置硬盘）
-            serial = get_volume_serial(letter)
+            serial = get_volume_serial(device)
             if not serial or serial == "00000000":
                 raise RuntimeError(get_content_name_async("basic_safety_settings","usb_no_removable"))
+            
             require_key = bool(self.require_key_checkbox.isChecked())
             key_value = None
             if require_key:
                 try:
                     from app.common.safety.usb import write_key_file
                     try:
-                        remove_key_file(letter)
+                        remove_key_file(device)
                     except Exception:
                         pass
                     key_value = os.urandom(16).hex()
-                    ok = write_key_file(letter, key_value)
+                    ok = write_key_file(device, key_value)
                     if not ok:
                         raise RuntimeError(get_content_name_async("basic_safety_settings","usb_no_removable"))
                 except Exception as e:
                     raise RuntimeError(str(e))
-            display_name = get_volume_label(letter)
+            
+            display_name = get_volume_label(device)
             bind_with_options(serial, require_key_file=require_key, key_value=key_value, name=display_name)
-            logger.debug(f"绑定设备成功：{letter}:")
+            
+            if platform.system() == "Windows":
+                logger.debug(f"绑定设备成功：{device}:")
+            else:
+                logger.debug(f"绑定设备成功：{device}")
+            
             self._notify_success(f"{get_content_name_async('basic_safety_settings','usb_bind_success')}: {text}")
         except Exception as e:
             self._notify_error(str(e))
