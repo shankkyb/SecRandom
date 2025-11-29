@@ -1,10 +1,14 @@
 # 定义非设置项的初始变量
+import os
 
 # ==================== 软件基本信息 ====================
 APPLY_NAME = "SecRandom"  # 软件名称
 VERSION = "v0.0.0"  # 软件当前版本
 NEXT_VERSION = "v2.0.0-alpha.1"  # 软件下一个版本
 CODENAME = "Koharu"  # 软件代号
+SYSTEM = "windows" if os.name == "nt" else "linux"  # 软件系统
+ARCH = "x64"  # 软件架构
+STRUCT = "dir"  # 软件结构
 YEAR = 2025  # 软件发布年份
 MONTH = 4  # 软件发布月份
 AUTHOR = "lzy98276"  # 软件作者

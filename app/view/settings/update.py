@@ -17,6 +17,24 @@ from app.Language.obtain_language import *
 
 
 # ==================================================
+# 辅助类
+# ==================================================
+class Worker(QObject):
+    """用于在后台线程中执行任务的辅助类"""
+
+    finished = Signal()
+
+    def __init__(self, task):
+        super().__init__()
+        self.task = task
+
+    def run(self):
+        """执行任务"""
+        self.task()
+        self.finished.emit()
+
+
+# ==================================================
 # 更新页面
 # ==================================================
 class update(QWidget):
@@ -111,6 +129,12 @@ class update(QWidget):
         self.indeterminate_ring.setStrokeWidth(3)  # 减小厚度
         self.indeterminate_ring.setVisible(False)  # 默认隐藏
 
+        # 添加下载进度条
+        self.download_progress = ProgressBar()
+        self.download_progress.setRange(0, 100)
+        self.download_progress.setValue(0)
+        self.download_progress.setVisible(False)  # 默认隐藏
+
         # 将按钮和进度环添加到水平布局（下载按钮在左侧，检查按钮在中间，进度环在右侧）
         button_ring_layout.addWidget(self.download_install_button)
         button_ring_layout.addWidget(self.check_update_button)
@@ -121,6 +145,7 @@ class update(QWidget):
         status_layout.addWidget(self.version_label)
         status_layout.addWidget(self.last_check_label)
         status_layout.addLayout(button_ring_layout)
+        status_layout.addWidget(self.download_progress)
 
         self.header_layout.addWidget(status_container)
         self.header_layout.addStretch(1)  # 添加拉伸因子，将内容向左推
@@ -275,14 +300,156 @@ class update(QWidget):
 
     def download_and_install(self):
         """下载并安装更新"""
-        # 这里可以添加下载和安装更新的逻辑
-        # 暂时显示一个消息框，提示功能正在开发中
-        msg_box = MessageBox(
-            get_content_name_async("update", "download_and_install"),
-            get_content_name_async("update", "download_in_progress"),
-            self,
-        )
-        msg_box.exec()
+        # 获取最新版本信息
+        latest_version_info = get_latest_version()
+        if not latest_version_info:
+            msg_box = MessageBox(
+                get_content_name("update", "download_failed"),
+                get_content_name("update", "failed_to_get_version_info"),
+                self,
+            )
+            msg_box.exec()
+            return
+
+        latest_version = latest_version_info["version"]
+
+        # 更新状态显示
+        self.status_label.setText(get_content_name("update", "downloading_update"))
+        self.download_progress.setVisible(True)
+        self.download_install_button.setEnabled(False)
+        self.check_update_button.setEnabled(False)
+
+        # 定义进度回调函数
+        def progress_callback(downloaded: int, total: int):
+            if total > 0:
+                progress = int((downloaded / total) * 100)
+                # 使用 QMetaObject.invokeMethod 确保在主线程中更新UI
+                QMetaObject.invokeMethod(
+                    self.download_progress,
+                    "setValue",
+                    Qt.QueuedConnection,
+                    Q_ARG(int, progress),
+                )
+
+        # 定义下载完成后的处理函数
+        def on_download_complete(file_path: Optional[str]):
+            if file_path:
+                # 下载成功，开始安装
+                QMetaObject.invokeMethod(
+                    self.status_label,
+                    "setText",
+                    Qt.QueuedConnection,
+                    Q_ARG(str, get_content_name("update", "installing_update")),
+                )
+
+                # 安装更新
+                try:
+                    success = install_update(file_path)
+
+                    if success:
+                        # 安装成功
+                        QMetaObject.invokeMethod(
+                            self.status_label,
+                            "setText",
+                            Qt.QueuedConnection,
+                            Q_ARG(
+                                str,
+                                get_content_name(
+                                    "update", "update_installed_successfully"
+                                ),
+                            ),
+                        )
+                        # 显示安装成功消息
+                        msg_box = MessageBox(
+                            get_content_name("update", "update_installed"),
+                            get_content_name("update", "update_installed_successfully"),
+                            self,
+                        )
+                        msg_box.exec()
+                    else:
+                        # 安装失败
+                        QMetaObject.invokeMethod(
+                            self.status_label,
+                            "setText",
+                            Qt.QueuedConnection,
+                            Q_ARG(str, get_content_name("update", "install_failed")),
+                        )
+                        # 显示安装失败消息
+                        msg_box = MessageBox(
+                            get_content_name("update", "install_failed"),
+                            get_content_name("update", "failed_to_install_update"),
+                            self,
+                        )
+                        msg_box.exec()
+                except Exception as e:
+                    # 安装过程中发生错误
+                    QMetaObject.invokeMethod(
+                        self.status_label,
+                        "setText",
+                        Qt.QueuedConnection,
+                        Q_ARG(str, get_content_name("update", "install_failed")),
+                    )
+                    # 显示安装失败消息
+                    msg_box = MessageBox(
+                        get_content_name("update", "install_failed"),
+                        f"{get_content_name('update', 'failed_to_install_update')}: {str(e)}",
+                        self,
+                    )
+                    msg_box.exec()
+            else:
+                # 下载失败
+                QMetaObject.invokeMethod(
+                    self.status_label,
+                    "setText",
+                    Qt.QueuedConnection,
+                    Q_ARG(str, get_content_name("update", "download_failed")),
+                )
+                # 显示下载失败消息
+                msg_box = MessageBox(
+                    get_content_name("update", "download_failed"),
+                    get_content_name("update", "failed_to_download_update"),
+                    self,
+                )
+                msg_box.exec()
+
+            # 恢复UI状态
+            QMetaObject.invokeMethod(
+                self.download_progress,
+                "setVisible",
+                Qt.QueuedConnection,
+                Q_ARG(bool, False),
+            )
+            QMetaObject.invokeMethod(
+                self.download_install_button,
+                "setEnabled",
+                Qt.QueuedConnection,
+                Q_ARG(bool, True),
+            )
+            QMetaObject.invokeMethod(
+                self.check_update_button,
+                "setEnabled",
+                Qt.QueuedConnection,
+                Q_ARG(bool, True),
+            )
+
+        # 定义下载任务类
+        class DownloadTask(QRunnable):
+            def __init__(self, version, progress_callback, on_complete):
+                super().__init__()
+                self.version = version
+                self.progress_callback = progress_callback
+                self.on_complete = on_complete
+
+            def run(self):
+                """执行下载任务"""
+                file_path = download_update(
+                    self.version, progress_callback=self.progress_callback
+                )
+                self.on_complete(file_path)
+
+        # 使用 QThreadPool 执行下载任务
+        task = DownloadTask(latest_version, progress_callback, on_download_complete)
+        QThreadPool.globalInstance().start(task)
 
     @Slot(str)
     def _update_check_status(self, status_text):

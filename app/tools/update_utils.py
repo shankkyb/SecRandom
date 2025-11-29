@@ -4,11 +4,15 @@
 import yaml
 import aiohttp
 import asyncio
-from typing import Any, Tuple
+import zipfile
+import subprocess
+import sys
+import tempfile
+from typing import Any, Tuple, Callable, Optional
 from loguru import logger
 from app.tools.path_utils import *
 from app.tools.variable import *
-from app.tools.settings_access import readme_settings
+from app.tools.settings_access import *
 
 
 # ==================================================
@@ -45,6 +49,56 @@ def _run_async_func(async_func: Any, *args: Any, **kwargs: Any) -> Any:
     except Exception as e:
         logger.error(f"运行异步函数失败: {e}")
         return None
+
+
+def extract_zip(zip_path: str, target_dir: str | Path, overwrite: bool = True) -> bool:
+    """解压zip文件到指定目录
+
+    Args:
+        zip_path (str): zip文件路径
+        target_dir (str | Path): 目标目录
+        overwrite (bool, optional): 是否覆盖现有文件. Defaults to True.
+
+    Returns:
+        bool: 解压成功返回True，否则返回False
+    """
+    try:
+        logger.debug(f"开始解压文件: {zip_path} 到 {target_dir}")
+
+        # 确保目标目录存在
+        ensure_dir(target_dir)
+
+        # 打开zip文件
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            # 获取所有文件列表
+            file_list = zip_ref.namelist()
+            # 创建已解压文件列表
+            extracted_files = set()
+
+            for file in file_list:
+                # 构建目标文件路径
+                target_file = Path(target_dir) / file
+
+                # 确保父目录存在
+                ensure_dir(target_file.parent)
+
+                # 如果文件已存在且不允许覆盖，跳过
+                if target_file.exists() and not overwrite:
+                    logger.debug(f"文件已存在，跳过: {target_file}")
+                    continue
+
+                # 解压文件
+                zip_ref.extract(file, target_dir)
+                # 添加到已解压文件列表
+                extracted_files.add(file)
+
+        logger.debug(f"成功解压以下文件: {extracted_files}")
+
+        logger.debug(f"文件解压完成: {zip_path} 到 {target_dir}")
+        return True
+    except Exception as e:
+        logger.error(f"解压文件失败: {e}")
+        return False
 
 
 def parse_version(version_str: str) -> Tuple[list[int], list[str]]:
@@ -275,50 +329,307 @@ def compare_versions(current_version: str, latest_version: str) -> int:
         return -1
 
 
-async def get_update_file_name_async(
-    version: str, arch: str = "x64", struct: str = "dir"
+def get_update_download_url(
+    version: str, system: str = SYSTEM, arch: str = ARCH, struct: str = STRUCT
 ) -> str:
     """
-    获取更新文件名（异步版本）
+    获取更新下载 URL
 
     Args:
         version (str): 版本号，格式为 "vX.X.X.X"
-        arch (str, optional): 架构，默认为 "x64"
-        struct (str, optional): 结构，默认为 "dir"
+        system (str, optional): 系统，默认为当前系统
+        arch (str, optional): 架构，默认为当前架构
+        struct (str, optional): 结构，默认为当前结构
 
     Returns:
-        str: 更新文件名
+        str: 更新下载 URL
     """
     try:
-        metadata = await get_metadata_info_async()
-        if not metadata:
-            # 如果 metadata 读取失败，使用默认格式
-            name_format = DEFAULT_NAME_FORMAT
+        # 获取更新源 URL
+        source_url = get_update_source_url()
+
+        # 获取 GitHub 仓库 URL
+        repo_url = GITHUB_WEB
+
+        # 直接生成默认文件名，避免异步调用
+        file_name = f"SecRandom-{system}-{version}-{arch}-{struct}.zip"
+
+        # 构建完整的 GitHub 下载 URL
+        github_download_url = f"{repo_url}/releases/download/{version}/{file_name}"
+
+        # 如果是默认源（GitHub），直接返回
+        if source_url == "https://github.com":
+            download_url = github_download_url
         else:
-            name_format = metadata.get("name_format", DEFAULT_NAME_FORMAT)
+            # 其他镜像源，在 GitHub URL 前添加镜像源 URL
+            download_url = f"{source_url}/{github_download_url}"
 
-        # 替换占位符
-        file_name = name_format.replace("[version]", version)
-        file_name = file_name.replace("[arch]", arch)
-        file_name = file_name.replace("[struct]", struct)
-
-        logger.debug(f"生成更新文件名成功: {file_name}")
-        return file_name
+        logger.debug(f"生成更新下载 URL 成功: {download_url}")
+        return download_url
     except Exception as e:
-        logger.error(f"生成更新文件名失败: {e}")
-        return f"SecRandom-Windows-{version}-{arch}-{struct}.zip"
+        logger.error(f"生成更新下载 URL 失败: {e}")
+        # 返回默认的 GitHub 下载 URL
+        return f"https://github.com/SECTL/SecRandom/releases/download/{version}/SecRandom-{system}-{version}-{arch}-{struct}.zip"
 
 
-def get_update_file_name(version: str, arch: str = "x64", struct: str = "dir") -> str:
+async def download_update_async(
+    version: str,
+    system: str = SYSTEM,
+    arch: str = ARCH,
+    struct: str = STRUCT,
+    progress_callback: Optional[Callable] = None,
+) -> Optional[str]:
     """
-    获取更新文件名（同步版本）
+    异步下载更新文件
 
     Args:
         version (str): 版本号，格式为 "vX.X.X.X"
-        arch (str, optional): 架构，默认为 "x64"
-        struct (str, optional): 结构，默认为 "dir"
+        system (str, optional): 系统，默认为当前系统
+        arch (str, optional): 架构，默认为当前架构
+        struct (str, optional): 结构，默认为当前结构
+        progress_callback (Optional[Callable]): 进度回调函数，接收已下载字节数和总字节数
 
     Returns:
-        str: 更新文件名
+        Optional[str]: 下载完成的文件路径，如果下载失败则返回 None
     """
-    return _run_async_func(get_update_file_name_async, version, arch, struct)
+    try:
+        # 获取下载 URL
+        download_url = get_update_download_url(version, system, arch, struct)
+        logger.debug(f"开始下载更新文件: {download_url}")
+
+        # 获取更新文件名
+        file_name = f"SecRandom-{system}-{version}-{arch}-{struct}.zip"
+
+        # 确定下载保存路径
+        download_dir = get_resources_path("downloads")
+        ensure_dir(download_dir)
+        file_path = download_dir / file_name
+
+        # 发送异步请求
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                download_url, timeout=60, allow_redirects=True
+            ) as response:
+                response.raise_for_status()
+
+                # 获取文件总大小
+                total_size = int(response.headers.get("Content-Length", 0))
+                downloaded_size = 0
+
+                # 开始下载文件
+                with open(file_path, "wb") as f:
+                    async for chunk in response.content.iter_chunked(8192):
+                        if not chunk:
+                            break
+
+                        # 写入文件
+                        f.write(chunk)
+                        downloaded_size += len(chunk)
+
+                        # 调用进度回调函数
+                        if progress_callback:
+                            progress_callback(downloaded_size, total_size)
+
+        logger.debug(f"更新文件下载成功: {file_path}")
+        return file_path
+    except Exception as e:
+        logger.error(f"下载更新文件失败: {e}")
+        return None
+
+
+def download_update(
+    version: str,
+    system: str = SYSTEM,
+    arch: str = ARCH,
+    struct: str = STRUCT,
+    progress_callback: Optional[Callable] = None,
+) -> Optional[str]:
+    """
+    下载更新文件（同步版本）
+
+    Args:
+        version (str): 版本号，格式为 "vX.X.X.X"
+        system (str, optional): 系统，默认为当前系统
+        arch (str, optional): 架构，默认为当前架构
+        struct (str, optional): 结构，默认为当前结构
+        progress_callback (Optional[Callable]): 进度回调函数，接收已下载字节数和总字节数
+
+    Returns:
+        Optional[str]: 下载完成的文件路径，如果下载失败则返回 None
+    """
+    return _run_async_func(
+        download_update_async, version, system, arch, struct, progress_callback
+    )
+
+
+async def install_update_async(file_path: str) -> bool:
+    """
+    异步安装更新文件
+
+    Args:
+        file_path (str): 更新文件的路径
+
+    Returns:
+        bool: 安装成功返回 True，否则返回 False
+    """
+    try:
+        logger.debug(f"开始安装更新文件: {file_path}")
+
+        # 判断是否是开发环境
+        is_dev_env = False
+        try:
+            # 检查是否存在 .git 目录
+            git_dir = get_path(".git")
+            is_dev_env = git_dir.exists()
+        except Exception as e:
+            logger.debug(f"检查开发环境失败: {e}")
+
+        if is_dev_env:
+            # 开发环境：安装到 TEMP 文件夹
+            logger.info("开发环境，安装到 TEMP 文件夹")
+            temp_dir = get_path("TEMP")
+            ensure_dir(temp_dir)
+
+            # 解压更新文件到 TEMP 目录
+            success = extract_zip(file_path, temp_dir, overwrite=True)
+            if success:
+                logger.info(f"开发环境更新文件安装成功: {file_path}")
+                return True
+            else:
+                logger.error(f"开发环境更新文件安装失败: {file_path}")
+                return False
+        else:
+            # 生产环境：新开进程安装，主进程关闭
+            logger.info("生产环境，准备启动独立更新进程")
+
+            # 创建临时安装脚本
+            installer_script = """
+                import zipfile
+                import os
+                import sys
+                import shutil
+                import time
+                from pathlib import Path
+
+                # 配置日志
+                from loguru import logger
+
+                # 确保日志目录存在
+                log_dir = Path('logs')
+                log_dir.mkdir(exist_ok=True)
+
+                # 配置日志格式 - 文件输出
+                logger.add(
+                    log_dir / 'update_install_{time:YYYY-MM-DD}.log',
+                    rotation='1 MB',
+                    retention='30 days',
+                    compression='tar.gz',
+                    backtrace=True,
+                    diagnose=True,
+                    level='INFO',
+                    format='<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>'
+                )
+
+                # 配置日志格式 - 终端输出
+                logger.add(
+                    sys.stdout,
+                    format='<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>',
+                    level='INFO',
+                    colorize=True
+                )
+
+
+                def ensure_dir(path):
+                    # 确保目录存在
+                    Path(path).mkdir(parents=True, exist_ok=True)
+
+
+                def extract_zip(zip_path, target_dir, overwrite=True):
+                    # 解压zip文件
+                    try:
+                        logger.info(f"开始解压文件: {zip_path} 到 {target_dir}")
+                        ensure_dir(target_dir)
+
+                        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                            for file in zip_ref.namelist():
+                                target_file = Path(target_dir) / file
+                                ensure_dir(target_file.parent)
+
+                                if target_file.exists() and not overwrite:
+                                    logger.info(f"文件已存在，跳过: {target_file}")
+                                    continue
+
+                                zip_ref.extract(file, target_dir)
+                                logger.info(f"解压文件成功: {target_file}")
+
+                        logger.info(f"文件解压完成: {zip_path} 到 {target_dir}")
+                        return True
+                    except Exception as e:
+                        logger.error(f"解压文件失败: {e}")
+                        return False
+
+
+                if __name__ == '__main__':
+                    try:
+                        # 获取参数
+                        update_file = sys.argv[1]
+                        root_dir = sys.argv[2]
+
+                        logger.info(f"更新安装脚本启动")
+                        logger.info(f"更新文件: {update_file}")
+                        logger.info(f"根目录: {root_dir}")
+
+                        # 等待一段时间，确保主进程已关闭
+                        logger.info("等待主进程关闭...")
+                        time.sleep(3)
+
+                        # 解压更新文件到根目录
+                        success = extract_zip(update_file, root_dir, overwrite=True)
+                        if success:
+                            logger.info("更新安装成功")
+                        else:
+                            logger.error("更新安装失败")
+                            sys.exit(1)
+
+                    except Exception as e:
+                        logger.error(f"更新安装脚本执行失败: {e}")
+                        sys.exit(1)
+            """
+
+            # 写入临时脚本文件
+            temp_script_path = tempfile.mktemp(suffix=".py")
+            with open(temp_script_path, "w", encoding="utf-8") as f:
+                f.write(installer_script)
+
+            # 获取根目录
+            root_dir = get_app_root()
+
+            # 启动独立更新进程
+            logger.info("启动独立更新进程")
+            subprocess.Popen(
+                [sys.executable, temp_script_path, file_path, str(root_dir)],
+                close_fds=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            # 关闭主进程
+            logger.info("生产环境更新进程已启动，主进程将关闭")
+            sys.exit(0)
+            return True
+    except Exception as e:
+        logger.error(f"安装更新文件失败: {e}")
+        return False
+
+
+def install_update(file_path: str) -> bool:
+    """
+    安装更新文件（同步版本）
+
+    Args:
+        file_path (str): 更新文件的路径
+
+    Returns:
+        bool: 安装成功返回 True，否则返回 False
+    """
+    return _run_async_func(install_update_async, file_path)

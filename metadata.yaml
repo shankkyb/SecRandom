@@ -9,10 +9,12 @@ latest_no:
   alpha: 2
 
 subchannels:
+  system:
+    - windows
+    - linux
   arch:
-    - x86
     - x64
   struct:
     - dir
 
-name_format: SecRandom-Windows-[version]-[arch]-[struct].zip
+name_format: SecRandom-[system]-[version]-[arch]-[struct].zip
