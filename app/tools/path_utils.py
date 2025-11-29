@@ -19,6 +19,7 @@
 # ==================================================
 # 导入模块
 # ==================================================
+import os
 import sys
 from pathlib import Path
 from typing import Union
@@ -65,16 +66,46 @@ class PathManager:
         Returns:
             Path: 绝对路径
         """
-        if isinstance(relative_path, str):
-            relative_path = Path(relative_path)
+        # 转换为字符串
+        if isinstance(relative_path, Path):
+            relative_path_str = str(relative_path)
+        else:
+            relative_path_str = relative_path
 
-        # 如果已经是绝对路径，直接返回
-        if relative_path.is_absolute():
-            return relative_path
+        # 获取app_root的字符串表示
+        app_root_str = str(self._app_root)
 
-        # 拼接为绝对路径
-        absolute_path = self._app_root / relative_path
-        return absolute_path
+        # 使用字符串检查判断是否为绝对路径
+        # Windows绝对路径：以驱动器号开头，如 C:\ 或 c:/
+        # Linux绝对路径：以 / 开头
+        if os.name == "nt":
+            is_absolute = relative_path_str.startswith(("\\", "/")) or (
+                len(relative_path_str) >= 2 and relative_path_str[1] == ":"
+            )
+        else:
+            is_absolute = relative_path_str.startswith("/")
+
+        if is_absolute:
+            # 直接返回Path对象
+            return Path(relative_path_str)
+
+        # 使用字符串拼接构建绝对路径，避免使用Path的/运算符
+        # 确保路径分隔符正确
+        if os.name == "nt":
+            # Windows使用\作为路径分隔符
+            if relative_path_str.startswith("\\") or relative_path_str.startswith("/"):
+                # 去掉相对路径开头的分隔符
+                relative_path_str = relative_path_str[1:]
+            absolute_path_str = rf"{app_root_str}\{relative_path_str}"
+        else:
+            # Linux使用/作为路径分隔符
+            if relative_path_str.startswith("/"):
+                # 去掉相对路径开头的分隔符
+                relative_path_str = relative_path_str[1:]
+            absolute_path_str = f"{app_root_str}/{relative_path_str}"
+
+        # 返回Path对象
+        return Path(absolute_path_str)
 
     def ensure_directory_exists(self, path: Union[str, Path]) -> Path:
         """确保目录存在，如果不存在则创建

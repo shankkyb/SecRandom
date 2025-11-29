@@ -367,13 +367,6 @@ def show_float_window():
 # ==================================================
 def initialize_app():
     """初始化应用程序"""
-    program_dir = str(get_app_root())
-
-    # 更改当前工作目录
-    if os.getcwd() != program_dir:
-        os.chdir(program_dir)
-        logger.debug(f"工作目录已设置为: {program_dir}")
-
     # 管理设置文件，确保其存在且完整
     manage_settings_file()
 
@@ -445,7 +438,14 @@ def main_async():
 
 
 if __name__ == "__main__":
-    # 初始化日志记录器
+    program_dir = str(get_app_root())
+
+    # 更改当前工作目录
+    if os.getcwd() != program_dir:
+        os.chdir(program_dir)
+        logger.debug(f"工作目录已设置为: {program_dir}")
+
+    # 配置日志系统
     logger.remove()
     # 首先配置日志系统
     configure_logging()

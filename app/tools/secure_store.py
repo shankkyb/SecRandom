@@ -94,6 +94,14 @@ def _decrypt_payload(payload: bytes, key: bytes) -> bytes:
 
 def read_secrets() -> dict:
     p = get_settings_path("secrets.json")
+    # 不存在则创建空文件
+    if not os.path.exists(p):
+        ensure_dir(os.path.dirname(p))
+        with open(p, "wb") as f:
+            f.write(b"")
+        _set_hidden(p)
+        logger.debug(f"创建空安全配置文件：{p}")
+        return {}
     if os.path.exists(p):
         try:
             with open(p, "rb") as f:

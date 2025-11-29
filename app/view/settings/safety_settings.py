@@ -418,11 +418,19 @@ class basic_safety_verification_method(GroupHeaderCardWidget):
     def __on_setting_changed(self, first_level_key, second_level_key, value):
         if first_level_key != "basic_safety_settings":
             return
-        if second_level_key == "safety_switch":
+        # 只在状态不同时才更新，避免不必要的信号触发
+        if (
+            second_level_key == "safety_switch"
+            and self.safety_switch.isChecked() != bool(value)
+        ):
             self.safety_switch.setChecked(bool(value))
-        elif second_level_key == "totp_switch":
+        elif second_level_key == "totp_switch" and self.totp_switch.isChecked() != bool(
+            value
+        ):
             self.totp_switch.setChecked(bool(value))
-        elif second_level_key == "usb_switch":
+        elif second_level_key == "usb_switch" and self.usb_switch.isChecked() != bool(
+            value
+        ):
             self.usb_switch.setChecked(bool(value))
         enabled = password_is_configured()
         self.totp_switch.setEnabled(enabled)
@@ -721,21 +729,45 @@ class basic_safety_security_operations(GroupHeaderCardWidget):
         if first_level_key != "basic_safety_settings":
             return
         self._ensure_ops_disabled_if_no_password()
-        if second_level_key == "show_hide_floating_window_switch":
+        # 只在状态不同时才更新，避免不必要的信号触发
+        if (
+            second_level_key == "show_hide_floating_window_switch"
+            and self.show_hide_floating_window_switch.isChecked() != bool(value)
+        ):
             self.show_hide_floating_window_switch.setChecked(bool(value))
-        elif second_level_key == "restart_switch":
+        elif (
+            second_level_key == "restart_switch"
+            and self.restart_switch.isChecked() != bool(value)
+        ):
             self.restart_switch.setChecked(bool(value))
-        elif second_level_key == "exit_switch":
+        elif second_level_key == "exit_switch" and self.exit_switch.isChecked() != bool(
+            value
+        ):
             self.exit_switch.setChecked(bool(value))
-        elif second_level_key == "open_settings_switch":
+        elif (
+            second_level_key == "open_settings_switch"
+            and self.open_settings_switch.isChecked() != bool(value)
+        ):
             self.open_settings_switch.setChecked(bool(value))
-        elif second_level_key == "diagnostic_export_switch":
+        elif (
+            second_level_key == "diagnostic_export_switch"
+            and self.diagnostic_export_switch.isChecked() != bool(value)
+        ):
             self.diagnostic_export_switch.setChecked(bool(value))
-        elif second_level_key == "data_export_switch":
+        elif (
+            second_level_key == "data_export_switch"
+            and self.data_export_switch.isChecked() != bool(value)
+        ):
             self.data_export_switch.setChecked(bool(value))
-        elif second_level_key == "import_overwrite_switch":
+        elif (
+            second_level_key == "import_overwrite_switch"
+            and self.import_overwrite_switch.isChecked() != bool(value)
+        ):
             self.import_overwrite_switch.setChecked(bool(value))
-        elif second_level_key == "import_version_mismatch_switch":
+        elif (
+            second_level_key == "import_version_mismatch_switch"
+            and self.import_version_mismatch_switch.isChecked() != bool(value)
+        ):
             self.import_version_mismatch_switch.setChecked(bool(value))
 
     def _ensure_ops_disabled_if_no_password(self):
@@ -763,10 +795,12 @@ class basic_safety_security_operations(GroupHeaderCardWidget):
                 ("import_version_mismatch_switch", self.import_version_mismatch_switch),
             ]:
                 try:
-                    sw.blockSignals(True)
-                    sw.setChecked(False)
-                    sw.blockSignals(False)
-                    update_settings("basic_safety_settings", key, False)
+                    # 检查开关当前状态，如果已经是False，就不需要再次更新
+                    if sw.isChecked():
+                        sw.blockSignals(True)
+                        sw.setChecked(False)
+                        sw.blockSignals(False)
+                        update_settings("basic_safety_settings", key, False)
                 except Exception:
                     pass
 
