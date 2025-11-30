@@ -95,7 +95,7 @@ class update(QWidget):
 
         # 版本信息标签
         self.version_label = BodyLabel(
-            f"{get_content_name_async('update', 'current_version')}: {VERSION}"
+            f"{get_content_name_async('update', 'current_version')}: {SPECIAL_VERSION} | {CODENAME} ({SYSTEM}-{ARCH})"
         )
         self.version_label.setFont(QFont(load_custom_font(), 12))
 
@@ -274,7 +274,7 @@ class update(QWidget):
 
                     if compare_result == 1:
                         # 有新版本
-                        status_text = f"{get_content_name_async('update', 'new_version_available')}: {latest_version}"
+                        status_text = f"{get_content_name_async('update', 'new_version_available')}: {latest_version} | {CODENAME} ({SYSTEM}-{ARCH})"
                         # 显示下载并安装按钮
                         self.download_install_button.setVisible(True)
                     elif compare_result == 0:
@@ -342,6 +342,32 @@ class update(QWidget):
             return
 
         latest_version = latest_version_info["version"]
+        latest_version_no = latest_version_info["version_no"]
+
+        # 获取下载文件夹路径，与update_utils.py保持一致
+        download_dir = get_resources_path("downloads")
+        ensure_dir(download_dir)
+
+        # 构建预期的文件名，使用与update_utils.py一致的格式
+        expected_filename = DEFAULT_NAME_FORMAT
+        expected_filename = expected_filename.replace("[version]", latest_version)
+        expected_filename = expected_filename.replace("[system]", SYSTEM)
+        expected_filename = expected_filename.replace("[arch]", ARCH)
+        expected_filename = expected_filename.replace("[struct]", STRUCT)
+        expected_file_path = download_dir / expected_filename
+
+        # 检查文件是否存在且文件名一致（即版本号、系统、架构均匹配）
+        file_exists_and_same_version = False
+        if expected_file_path.exists():
+            # 仅通过文件名判断是否为同一版本
+            if expected_file_path.name == expected_filename:
+                file_exists_and_same_version = True
+                self.status_label.setText(
+                    get_content_name_async("update", "already_downloaded_same_version")
+                )
+                # 直接调用下载完成处理，跳过实际下载
+                self.on_download_complete(str(expected_file_path))
+                return
 
         # 更新状态显示
         self.status_label.setText(
@@ -425,50 +451,13 @@ class update(QWidget):
                     Q_ARG(str, get_content_name_async("update", "update_cancelled")),
                 )
             elif file_path:
-                # 下载成功，开始安装
+                # 下载成功，询问用户是否现在更新
                 QMetaObject.invokeMethod(
-                    self.status_label,
-                    "setText",
+                    self,
+                    "show_update_confirmation",
                     Qt.QueuedConnection,
-                    Q_ARG(str, get_content_name_async("update", "installing_update")),
+                    Q_ARG(str, file_path),
                 )
-
-                # 安装更新
-                try:
-                    success = install_update(file_path)
-
-                    if success:
-                        # 安装成功
-                        QMetaObject.invokeMethod(
-                            self.status_label,
-                            "setText",
-                            Qt.QueuedConnection,
-                            Q_ARG(
-                                str,
-                                get_content_name_async(
-                                    "update", "update_installed_successfully"
-                                ),
-                            ),
-                        )
-                    else:
-                        # 安装失败
-                        QMetaObject.invokeMethod(
-                            self.status_label,
-                            "setText",
-                            Qt.QueuedConnection,
-                            Q_ARG(
-                                str, get_content_name_async("update", "install_failed")
-                            ),
-                        )
-                except Exception as e:
-                    # 安装过程中发生错误
-                    error_text = f"{get_content_name_async('update', 'install_failed')}: {str(e)}"
-                    QMetaObject.invokeMethod(
-                        self.status_label,
-                        "setText",
-                        Qt.QueuedConnection,
-                        Q_ARG(str, error_text),
-                    )
             else:
                 # 下载失败
                 QMetaObject.invokeMethod(
@@ -536,6 +525,57 @@ class update(QWidget):
             latest_version, progress_callback, on_download_complete
         )
         QThreadPool.globalInstance().start(self._download_task)
+
+    def show_update_confirmation(self, file_path: str):
+        """显示更新确认对话框"""
+        # 创建消息框
+        msg_box = MessageBox(
+            title=get_content_name_async("update", "update_confirmation_title"),
+            content=get_content_name_async("update", "update_confirmation_content"),
+            parent=self,
+        )
+
+        # 设置按钮文本
+        msg_box.yesButton.setText(get_content_name_async("update", "yes_update_now"))
+        msg_box.cancelButton.setText(
+            get_content_name_async("update", "no_update_later")
+        )
+
+        # 显示消息框并等待用户响应
+        result = msg_box.exec()
+
+        if result == MessageBox.Yes:
+            # 用户选择现在更新
+            self.status_label.setText(
+                get_content_name_async("update", "installing_update")
+            )
+
+            # 安装更新
+            try:
+                success = install_update(file_path)
+                if success:
+                    # 安装成功
+                    self.status_label.setText(
+                        get_content_name_async(
+                            "update", "update_installed_successfully"
+                        )
+                    )
+                else:
+                    # 安装失败
+                    self.status_label.setText(
+                        get_content_name_async("update", "install_failed")
+                    )
+            except Exception as e:
+                # 安装过程中发生错误
+                error_text = (
+                    f"{get_content_name_async('update', 'install_failed')}: {str(e)}"
+                )
+                self.status_label.setText(error_text)
+        else:
+            # 用户选择稍后更新
+            self.status_label.setText(
+                get_content_name_async("update", "update_cancelled_by_user")
+            )
 
     def cancel_update(self):
         """取消更新"""
