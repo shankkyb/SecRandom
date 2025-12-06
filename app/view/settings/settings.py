@@ -828,17 +828,81 @@ class SettingsWindow(MSFluentWindow):
 
     def _adjustNavigationBarWidth(self):
         """调整导航栏宽度以适应多语言文本，按钮保持正方形，长文本换行"""
+        from PySide6.QtCore import Qt, QRect
+        from PySide6.QtGui import QFontMetrics
+        from app.tools.language_manager import get_current_language
+
         try:
             nav = self.navigationInterface
             if not nav or not hasattr(nav, "buttons"):
                 return
 
-            # 设置按钮的正方形尺寸
-            button_size = 80  # 正方形按钮的边长
-
             buttons = nav.buttons()
+            if not buttons:
+                return
+
+            # 获取当前语言
+            current_lang = get_current_language().lower()
+
+            # 判断是否是 CJK 语言（中日韩文字通常更紧凑）
+            is_cjk = current_lang.startswith(("zh", "ja", "ko"))
+
+            # 基础尺寸参数 - 根据语言类型调整
+            if is_cjk:
+                min_button_size = 70  # CJK 语言最小按钮尺寸
+                max_button_size = 90  # CJK 语言最大按钮尺寸
+            else:
+                min_button_size = 80  # 拉丁语言最小按钮尺寸
+                max_button_size = 110  # 拉丁语言最大按钮尺寸
+
+            icon_size = 20
+            spacing = 4  # 图标和文本间距
+            text_padding = 8  # 文本区域左右边距
+            max_text_lines = 3  # 最大文本行数
+
+            # 计算所需的按钮尺寸
+            calculated_size = min_button_size
+
+            for button in buttons:
+                text = button.text()
+                if not text:
+                    continue
+
+                fm = QFontMetrics(button.font())
+                line_height = fm.height()
+
+                # 计算不同按钮尺寸下的文本换行情况
+                for test_size in range(min_button_size, max_button_size + 1, 5):
+                    text_width = test_size - text_padding
+                    text_rect = QRect(0, 0, text_width, 1000)
+                    bounding = fm.boundingRect(
+                        text_rect, Qt.AlignHCenter | Qt.TextWordWrap, text
+                    )
+                    text_height = bounding.height()
+                    num_lines = max(1, round(text_height / line_height))
+
+                    # 计算内容总高度
+                    total_content_height = icon_size + spacing + text_height
+
+                    # 如果内容可以在按钮内显示，且行数不超过限制
+                    if (
+                        total_content_height <= test_size - 8
+                        and num_lines <= max_text_lines
+                    ):
+                        if test_size > calculated_size:
+                            calculated_size = test_size
+                        break
+                else:
+                    # 如果所有尺寸都不够，使用最大尺寸
+                    calculated_size = max_button_size
+
+            # 应用计算出的按钮尺寸
+            button_size = min(calculated_size, max_button_size)
+
             for button in buttons:
                 button.setFixedSize(button_size, button_size)
+                # 设置工具提示，显示完整文本
+                button.setToolTip(button.text())
                 # 重写绘制方法使图标和文本整体居中
                 self._patchButtonDraw(button, button_size)
 
