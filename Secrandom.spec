@@ -1,6 +1,6 @@
 """PyInstaller spec leveraging shared packaging utilities."""
 
-from PyInstaller.utils.hooks import collect_data_files
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules, collect_dynamic_libs
 
 from packaging_utils import (
     ADDITIONAL_HIDDEN_IMPORTS,
@@ -20,19 +20,35 @@ except Exception as exc:
     print(f"Warning: unable to collect qfluentwidgets data: {exc}")
     qfluentwidgets_datas = []
 
-all_datas = base_datas + qfluentwidgets_datas
+# 收集numpy的数据文件和动态库
+try:
+    numpy_datas = collect_data_files("numpy")
+    numpy_libs = collect_dynamic_libs("numpy")
+except Exception as exc:
+    print(f"Warning: unable to collect numpy data: {exc}")
+    numpy_datas = []
+    numpy_libs = []
+
+all_datas = base_datas + qfluentwidgets_datas + numpy_datas
 
 language_hiddenimports = collect_language_modules()
 view_hiddenimports = collect_view_modules()
 
+# 收集numpy的所有子模块
+try:
+    numpy_hiddenimports = collect_submodules("numpy")
+except Exception as exc:
+    print(f"Warning: unable to collect numpy submodules: {exc}")
+    numpy_hiddenimports = []
+
 all_hiddenimports = normalize_hidden_imports(
-    language_hiddenimports + view_hiddenimports + ADDITIONAL_HIDDEN_IMPORTS
+    language_hiddenimports + view_hiddenimports + ADDITIONAL_HIDDEN_IMPORTS + numpy_hiddenimports
 )
 
 a = Analysis(
     ["main.py"],
     pathex=[],
-    binaries=[],
+    binaries=numpy_libs,
     datas=all_datas,
     hiddenimports=all_hiddenimports,
     hookspath=[],
