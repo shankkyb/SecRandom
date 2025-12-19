@@ -133,6 +133,98 @@ class roll_call_history(GroupHeaderCardWidget):
     def clear_roll_call_history(self):
         """清除点名历史记录"""
         logger.debug("清除点名历史记录")
+        from app.common.history.history import get_history_file_path
+
+        # 获取当前选中的班级名称
+        class_name = self.class_name_combo.currentText()
+        if not class_name:
+            logger.warning("未选择班级，无法清除历史记录")
+            return
+
+        # 显示确认对话框
+        dialog = MessageBox(
+            get_content_name_async("history_management", "clear_roll_call_history"),
+            get_any_position_value_async(
+                "history_management", "clear_roll_call_history", "confirm_message"
+            ).format(name=class_name),
+            self,
+        )
+
+        dialog.yesButton.setText(
+            get_any_position_value_async(
+                "history_management",
+                "clear_roll_call_history",
+                "button_text",
+                "confirm",
+            )
+        )
+        dialog.cancelButton.setText(
+            get_any_position_value_async(
+                "history_management", "clear_roll_call_history", "button_text", "cancel"
+            )
+        )
+
+        if dialog.exec() == MessageBox.DialogCode.Accepted:
+            try:
+                # 获取历史记录文件路径
+                history_file_path = get_history_file_path("roll_call", class_name)
+
+                # 直接删除历史记录文件
+                import os
+
+                if history_file_path.exists():
+                    os.remove(history_file_path)
+                    logger.info(f"已删除班级 '{class_name}' 的点名历史记录文件")
+                else:
+                    logger.info(f"班级 '{class_name}' 的历史记录文件不存在")
+
+                # 显示成功提示
+                from qfluentwidgets import MessageBox
+
+                success_dialog = MessageBox(
+                    get_content_name_async(
+                        "history_management", "clear_roll_call_history"
+                    ),
+                    get_any_position_value_async(
+                        "history_management",
+                        "clear_roll_call_history",
+                        "success_message",
+                    ).format(name=class_name),
+                    self,
+                )
+                success_dialog.yesButton.setText(
+                    get_any_position_value_async(
+                        "history_management",
+                        "clear_roll_call_history",
+                        "button_text",
+                        "confirm",
+                    )
+                )
+                success_dialog.cancelButton.hide()
+                success_dialog.exec()
+            except Exception as e:
+                logger.error(f"清除点名历史记录失败: {e}")
+                from qfluentwidgets import MessageBox
+
+                error_dialog = MessageBox(
+                    get_content_name_async(
+                        "history_management", "clear_roll_call_history"
+                    ),
+                    get_any_position_value_async(
+                        "history_management", "clear_roll_call_history", "error_message"
+                    ).format(error=e),
+                    self,
+                )
+                error_dialog.yesButton.setText(
+                    get_any_position_value_async(
+                        "history_management",
+                        "clear_roll_call_history",
+                        "button_text",
+                        "confirm",
+                    )
+                )
+                error_dialog.cancelButton.hide()
+                error_dialog.exec()
 
     def setup_file_watcher(self):
         """设置文件系统监视器，监控班级名单文件夹的变化"""
@@ -280,6 +372,93 @@ class lottery_history(GroupHeaderCardWidget):
     def clear_lottery_history(self):
         """清除抽奖历史记录"""
         logger.debug("清除抽奖历史记录")
+        from app.common.history.history import get_history_file_path
+
+        # 获取当前选中的奖池名称
+        pool_name = self.pool_name_combo.currentText()
+        if not pool_name:
+            logger.warning("未选择奖池，无法清除历史记录")
+            return
+
+        # 显示确认对话框
+        dialog = MessageBox(
+            get_content_name_async("history_management", "clear_lottery_history"),
+            get_any_position_value_async(
+                "history_management", "clear_lottery_history", "confirm_message"
+            ).format(name=pool_name),
+            self,
+        )
+
+        dialog.yesButton.setText(
+            get_any_position_value_async(
+                "history_management", "clear_lottery_history", "button_text", "confirm"
+            )
+        )
+        dialog.cancelButton.setText(
+            get_any_position_value_async(
+                "history_management", "clear_lottery_history", "button_text", "cancel"
+            )
+        )
+
+        if dialog.exec() == MessageBox.DialogCode.Accepted:
+            try:
+                # 获取历史记录文件路径
+                history_file_path = get_history_file_path("lottery", pool_name)
+
+                # 直接删除历史记录文件
+                import os
+
+                if history_file_path.exists():
+                    os.remove(history_file_path)
+                    logger.info(f"已删除奖池 '{pool_name}' 的抽奖历史记录文件")
+                else:
+                    logger.info(f"奖池 '{pool_name}' 的历史记录文件不存在")
+
+                # 显示成功提示
+                from qfluentwidgets import MessageBox
+
+                success_dialog = MessageBox(
+                    get_content_name_async(
+                        "history_management", "clear_lottery_history"
+                    ),
+                    get_any_position_value_async(
+                        "history_management", "clear_lottery_history", "success_message"
+                    ).format(name=pool_name),
+                    self,
+                )
+                success_dialog.yesButton.setText(
+                    get_any_position_value_async(
+                        "history_management",
+                        "clear_lottery_history",
+                        "button_text",
+                        "confirm",
+                    )
+                )
+                success_dialog.cancelButton.hide()
+                success_dialog.exec()
+            except Exception as e:
+                logger.error(f"清除抽奖历史记录失败: {e}")
+                from qfluentwidgets import MessageBox
+
+                error_dialog = MessageBox(
+                    get_content_name_async(
+                        "history_management", "clear_lottery_history"
+                    ),
+                    get_any_position_value_async(
+                        "history_management", "clear_lottery_history", "error_message"
+                    ).format(error=e),
+                    self,
+                )
+                error_dialog.yesButton.setText(
+                    get_any_position_value_async(
+                        "history_management",
+                        "clear_lottery_history",
+                        "button_text",
+                        "confirm",
+                    )
+                )
+                error_dialog.cancelButton.hide()
+                error_dialog.exec()
 
     def setup_file_watcher(self):
         """设置文件系统监视器，监控奖池名单文件夹的变化"""

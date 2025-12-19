@@ -36,6 +36,10 @@ history_management = {
             "name": "清除点名历史记录",
             "description": "清除选定班级的点名历史记录",
             "pushbutton_name": "清除",
+            "confirm_message": "确定要清除班级 '{name}' 的点名历史记录吗？此操作不可恢复。",
+            "success_message": "班级 '{name}' 的点名历史记录已成功清除。",
+            "error_message": "清除点名历史记录失败: {error}",
+            "button_text": {"confirm": "确定", "cancel": "取消"},
         },
         "show_lottery_history": {
             "name": "启用抽奖历史记录",
@@ -50,6 +54,10 @@ history_management = {
             "name": "清除抽奖历史记录",
             "description": "清除选定奖池的抽奖历史记录",
             "pushbutton_name": "清除",
+            "confirm_message": "确定要清除奖池 '{name}' 的抽奖历史记录吗？此操作不可恢复。",
+            "success_message": "奖池 '{name}' 的抽奖历史记录已成功清除。",
+            "error_message": "清除抽奖历史记录失败: {error}",
+            "button_text": {"confirm": "确定", "cancel": "取消"},
         },
     },
     "EN_US": {
