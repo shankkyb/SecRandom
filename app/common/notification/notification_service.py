@@ -344,21 +344,6 @@ class FloatingNotificationWindow(CardWidget):
 
             fg = "#ffffff" if is_dark_theme(qconfig) else "#000000"
 
-            # 更新所有 BodyLabel 子控件颜色
-            for lbl in self.findChildren(BodyLabel):
-                try:
-                    existing = lbl.styleSheet() or ""
-                    parts = [
-                        p.strip()
-                        for p in existing.split(";")
-                        if p.strip() and not p.strip().startswith("color:")
-                    ]
-                    parts.append(f"color: {fg} !important")
-                    lbl.setStyleSheet("; ".join(parts) + ";")
-                except Exception as e:
-                    logger.exception("应用颜色到标签子元素时出错（继续执行）: {}", e)
-                    continue
-
             # 更新倒计时标签颜色
             try:
                 existing = self.countdown_label.styleSheet() or ""
