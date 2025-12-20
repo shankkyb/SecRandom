@@ -53,6 +53,7 @@ class extraction_settings_page(PivotPageTemplate):
                 "instant_draw_settings", "title"
             ),
             "lottery_settings": get_content_name_async("lottery_settings", "title"),
+            "time_settings": get_content_name_async("time_settings", "title"),
         }
         super().__init__(page_config, parent)
         self.set_base_path("app.view.settings.extraction_settings")

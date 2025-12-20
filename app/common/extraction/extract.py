@@ -13,6 +13,7 @@ from loguru import logger
 from PySide6.QtCore import QDateTime
 
 from app.tools.path_utils import *
+from app.common.extraction.cses_parser import CSESParser
 
 
 # ==================================================
@@ -164,3 +165,164 @@ def _parse_time_string_to_seconds(time_str: str) -> int:
     seconds = time_parts[2] if len(time_parts) > 2 else 0
 
     return hours * 3600 + minutes * 60 + seconds
+
+
+# ==================================================
+# CSES导入功能
+# ==================================================
+def import_cses_schedule(file_path: str) -> tuple[bool, str]:
+    """从CSES文件导入课程表
+
+    Args:
+        file_path: CSES文件路径
+
+    Returns:
+        tuple[bool, str]: (是否成功, 结果消息)
+    """
+    try:
+        # 创建CSES解析器
+        parser = CSESParser()
+
+        # 加载CSES文件
+        if not parser.load_from_file(file_path):
+            return False, "CSES文件格式错误或文件无法读取"
+
+        # 获取非上课时间段配置
+        non_class_times = parser.get_non_class_times()
+        if not non_class_times:
+            return False, "未能从课程表中提取有效的时间段信息"
+
+        # 保存到设置文件
+        success = _save_non_class_times_to_settings(non_class_times)
+        if not success:
+            return False, "保存设置失败"
+
+        # 获取摘要信息
+        summary = parser.get_summary()
+        return True, f"成功导入课程表: {summary}"
+
+    except Exception as e:
+        logger.error(f"导入CSES文件失败: {e}")
+        return False, f"导入失败: {str(e)}"
+
+
+def import_cses_schedule_from_content(content: str) -> tuple[bool, str]:
+    """从CSES内容字符串导入课程表
+
+    Args:
+        content: CSES格式的YAML内容
+
+    Returns:
+        tuple[bool, str]: (是否成功, 结果消息)
+    """
+    try:
+        # 创建CSES解析器
+        parser = CSESParser()
+
+        # 加载CSES内容
+        if not parser.load_from_content(content):
+            return False, "CSES内容格式错误"
+
+        # 获取非上课时间段配置
+        non_class_times = parser.get_non_class_times()
+        if not non_class_times:
+            return False, "未能从课程表中提取有效的时间段信息"
+
+        # 保存到设置文件
+        success = _save_non_class_times_to_settings(non_class_times)
+        if not success:
+            return False, "保存设置失败"
+
+        # 获取摘要信息
+        summary = parser.get_summary()
+        return True, f"成功导入课程表: {summary}"
+
+    except Exception as e:
+        logger.error(f"导入CSES内容失败: {e}")
+        return False, f"导入失败: {str(e)}"
+
+
+def _save_non_class_times_to_settings(non_class_times: Dict[str, str]) -> bool:
+    """保存非上课时间段到设置文件
+
+    Args:
+        non_class_times: 非上课时间段字典
+
+    Returns:
+        bool: 保存成功返回True，否则返回False
+    """
+    try:
+        settings_path = get_settings_path()
+
+        # 读取现有设置
+        if file_exists(settings_path):
+            with open_file(settings_path, "r", encoding="utf-8") as f:
+                settings = json.load(f)
+        else:
+            settings = {}
+
+        # 更新非上课时间段配置
+        settings["non_class_times"] = non_class_times
+
+        # 写入设置文件
+        with open_file(settings_path, "w", encoding="utf-8") as f:
+            json.dump(settings, f, ensure_ascii=False, indent=2)
+
+        logger.info(f"成功保存{len(non_class_times)}个非上课时间段到设置文件")
+        return True
+
+    except Exception as e:
+        logger.error(f"保存非上课时间段失败: {e}")
+        return False
+
+
+def get_cses_import_template() -> str:
+    """获取CSES导入模板内容
+
+    Returns:
+        str: CSES格式的模板内容
+    """
+    template = """# CSES (Course Schedule Exchange Schema) 课程表模板
+# 更多详情请参考: https://github.com/SmartTeachCN/CSES
+
+schedule:
+  timeslots:
+    - name: "第一节课"
+      start_time: "08:00"
+      end_time: "08:45"
+      teacher: "张老师"
+      location: "教室A"
+      day_of_week: 1
+      
+    - name: "第二节课"
+      start_time: "08:55"
+      end_time: "09:40"
+      teacher: "李老师"
+      location: "教室B"
+      day_of_week: 1
+      
+    - name: "第三节课"
+      start_time: "10:00"
+      end_time: "10:45"
+      teacher: "王老师"
+      location: "教室C"
+      day_of_week: 1
+      
+    - name: "第四节课"
+      start_time: "10:55"
+      end_time: "11:40"
+      teacher: "赵老师"
+      location: "教室D"
+      day_of_week: 1
+"""
+    return template
+
+
+# ==================================================
+# 导出函数列表
+# ==================================================
+__all__ = [
+    "import_cses_schedule",
+    "import_cses_schedule_from_content",
+    "get_cses_import_template",
+]
