@@ -93,6 +93,9 @@ class music_management(GroupHeaderCardWidget):
         # 连接信号
         self.music_file_combo.currentIndexChanged.connect(self.on_music_file_changed)
 
+        # 设置文件系统监视器，监听音乐文件夹变化
+        self.setup_file_watcher()
+
     def import_music(self):
         """导入音乐文件"""
         # 打开文件选择对话框
@@ -106,7 +109,7 @@ class music_management(GroupHeaderCardWidget):
         if file_dialog.exec():
             selected_files = file_dialog.selectedFiles()
             # 获取音频文件目录
-            audio_dir = get_audio_path()
+            audio_dir = get_audio_path("music")
             # 确保目录存在
             ensure_dir(audio_dir)
 
@@ -127,15 +130,15 @@ class music_management(GroupHeaderCardWidget):
             # 刷新音乐文件列表
             self.refresh_music_files()
             # 更新表格中的音乐文件下拉框
-            if hasattr(self.parent, "music_settings_table_widget"):
-                self.parent.music_settings_table_widget.refresh_music_files()
+            if hasattr(self.parent(), "music_settings_table_widget"):
+                self.parent().music_settings_table_widget.refresh_music_files()
 
     def delete_music(self):
         """删除选中的音乐文件"""
         current_text = self.music_file_combo.currentText()
         if current_text:
             # 获取音频文件路径
-            audio_file_path = get_audio_path(current_text)
+            audio_file_path = get_audio_path(f"music/{current_text}")
 
             # 删除文件
             if audio_file_path.exists():
@@ -147,8 +150,8 @@ class music_management(GroupHeaderCardWidget):
             # 刷新音乐文件列表
             self.refresh_music_files()
             # 更新表格中的音乐文件下拉框
-            if hasattr(self.parent, "music_settings_table_widget"):
-                self.parent.music_settings_table_widget.refresh_music_files()
+            if hasattr(self.parent(), "music_settings_table_widget"):
+                self.parent().music_settings_table_widget.refresh_music_files()
 
     def refresh_music_files(self):
         """刷新音乐文件列表"""
@@ -156,7 +159,7 @@ class music_management(GroupHeaderCardWidget):
         self.music_file_combo.clear()
 
         # 获取音频文件目录
-        audio_dir = get_audio_path()
+        audio_dir = get_audio_path("music")
         # 确保目录存在
         ensure_dir(audio_dir)
 
@@ -179,6 +182,29 @@ class music_management(GroupHeaderCardWidget):
     def on_music_file_changed(self, index):
         """当音乐文件选择变化时"""
         self.delete_music_button.setEnabled(index >= 0)
+
+    def setup_file_watcher(self):
+        """设置文件系统监视器，监听音乐文件夹变化"""
+        self.file_watcher = QFileSystemWatcher()
+        # 获取音频文件目录
+        audio_dir = get_audio_path("music")
+        # 确保目录存在
+        ensure_dir(audio_dir)
+        # 添加目录到监视器
+        self.file_watcher.addPath(str(audio_dir))
+        # 连接目录变化信号
+        self.file_watcher.directoryChanged.connect(self.on_directory_changed)
+
+    def on_directory_changed(self, path):
+        """当音乐文件夹内容变化时的处理"""
+        # 延迟刷新，避免文件操作未完成时就刷新
+        QTimer.singleShot(500, self.refresh_music_files)
+        # 更新表格中的音乐文件下拉框
+        if hasattr(self.parent(), "music_settings_table_widget"):
+            QTimer.singleShot(
+                500,
+                lambda: self.parent().music_settings_table_widget.refresh_music_files(),
+            )
 
 
 class music_settings_table(GroupHeaderCardWidget):
@@ -214,6 +240,7 @@ class music_settings_table(GroupHeaderCardWidget):
             get_content_name_async("music_settings", "result_music"),
             get_content_name_async("music_settings", "result_fade_in_duration"),
             get_content_name_async("music_settings", "result_fade_out_duration"),
+            get_content_name_async("music_settings", "volume"),
         ]
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
@@ -232,22 +259,9 @@ class music_settings_table(GroupHeaderCardWidget):
 
     def get_music_files(self):
         """获取音乐文件列表"""
-        # 获取音频文件目录
-        audio_dir = get_audio_path()
-        # 确保目录存在
-        ensure_dir(audio_dir)
+        from app.common.music.music_player import get_music_files
 
-        # 获取音频文件列表
-        music_files = [""]  # 空选项，表示不使用音乐
-        if audio_dir.exists():
-            # 支持的音频格式
-            supported_formats = [".mp3", ".flac", ".wav", ".ogg"]
-            # 遍历目录获取所有支持的音频文件
-            for file in audio_dir.iterdir():
-                if file.is_file() and file.suffix.lower() in supported_formats:
-                    music_files.append(file.name)
-
-        return music_files
+        return get_music_files()
 
     def init_table_data(self):
         """初始化表格数据"""
@@ -288,10 +302,23 @@ class music_settings_table(GroupHeaderCardWidget):
             process_music_combo = ComboBox()
             process_music_combo.addItems(music_files)
             # 从设置中加载数据
-            # process_music = readme_settings_async(config["config_key"], "animation_music")
-            # if process_music:
-            #     # 这里需要根据实际的音乐文件映射来设置索引
-            #     pass
+            process_music = readme_settings_async(
+                config["config_key"], "animation_music"
+            )
+            if process_music:
+                # 如果设置了音乐文件，则设置为当前选择
+                if process_music in music_files:
+                    process_music_combo.setCurrentText(process_music)
+                else:
+                    # 如果音乐文件不存在，则选择"无音乐"
+                    process_music_combo.setCurrentText(
+                        get_content_name_async("music_settings", "no_music")
+                    )
+            else:
+                # 如果没有设置音乐，则选择"无音乐"
+                process_music_combo.setCurrentText(
+                    get_content_name_async("music_settings", "no_music")
+                )
             # 连接信号
             process_music_combo.currentIndexChanged.connect(
                 lambda index, key=config["config_key"]: self.update_process_music(
@@ -300,15 +327,14 @@ class music_settings_table(GroupHeaderCardWidget):
             )
             self.table.setCellWidget(row, 1, process_music_combo)
 
-            # 渐入时长 - SpinBox
-            fade_in_spin = SpinBox()
+            # 渐入时长 - CompactSpinBox
+            fade_in_spin = CompactSpinBox()
             fade_in_spin.setRange(0, 5000)
             # 从设置中加载数据
             fade_in_duration = readme_settings_async(
                 config["config_key"], "animation_music_fade_in"
             )
             fade_in_spin.setValue(fade_in_duration)
-            fade_in_spin.setSuffix("ms")
             fade_in_spin.setAlignment(Qt.AlignmentFlag.AlignCenter)
             # 连接信号
             fade_in_spin.valueChanged.connect(
@@ -318,15 +344,14 @@ class music_settings_table(GroupHeaderCardWidget):
             )
             self.table.setCellWidget(row, 2, fade_in_spin)
 
-            # 渐出时长 - SpinBox
-            fade_out_spin = SpinBox()
+            # 渐出时长 - CompactSpinBox
+            fade_out_spin = CompactSpinBox()
             fade_out_spin.setRange(0, 5000)
             # 从设置中加载数据
             fade_out_duration = readme_settings_async(
                 config["config_key"], "animation_music_fade_out"
             )
             fade_out_spin.setValue(fade_out_duration)
-            fade_out_spin.setSuffix("ms")
             fade_out_spin.setAlignment(Qt.AlignmentFlag.AlignCenter)
             # 连接信号
             fade_out_spin.valueChanged.connect(
@@ -340,10 +365,21 @@ class music_settings_table(GroupHeaderCardWidget):
             result_music_combo = ComboBox()
             result_music_combo.addItems(music_files)
             # 从设置中加载数据
-            # result_music = readme_settings_async(config["config_key"], "result_music")
-            # if result_music:
-            #     # 这里需要根据实际的音乐文件映射来设置索引
-            #     pass
+            result_music = readme_settings_async(config["config_key"], "result_music")
+            if result_music:
+                # 如果设置了音乐文件，则设置为当前选择
+                if result_music in music_files:
+                    result_music_combo.setCurrentText(result_music)
+                else:
+                    # 如果音乐文件不存在，则选择"无音乐"
+                    result_music_combo.setCurrentText(
+                        get_content_name_async("music_settings", "no_music")
+                    )
+            else:
+                # 如果没有设置音乐，则选择"无音乐"
+                result_music_combo.setCurrentText(
+                    get_content_name_async("music_settings", "no_music")
+                )
             # 连接信号
             result_music_combo.currentIndexChanged.connect(
                 lambda index, key=config["config_key"]: self.update_result_music(
@@ -352,15 +388,14 @@ class music_settings_table(GroupHeaderCardWidget):
             )
             self.table.setCellWidget(row, 4, result_music_combo)
 
-            # 结果渐入时长 - SpinBox
-            result_fade_in_spin = SpinBox()
+            # 结果渐入时长 - CompactSpinBox
+            result_fade_in_spin = CompactSpinBox()
             result_fade_in_spin.setRange(0, 5000)
             # 从设置中加载数据
             result_fade_in_duration = readme_settings_async(
                 config["config_key"], "result_music_fade_in"
             )
             result_fade_in_spin.setValue(result_fade_in_duration)
-            result_fade_in_spin.setSuffix("ms")
             result_fade_in_spin.setAlignment(Qt.AlignmentFlag.AlignCenter)
             # 连接信号
             result_fade_in_spin.valueChanged.connect(
@@ -371,15 +406,14 @@ class music_settings_table(GroupHeaderCardWidget):
             )
             self.table.setCellWidget(row, 5, result_fade_in_spin)
 
-            # 结果渐出时长 - SpinBox
-            result_fade_out_spin = SpinBox()
+            # 结果渐出时长 - CompactSpinBox
+            result_fade_out_spin = CompactSpinBox()
             result_fade_out_spin.setRange(0, 5000)
             # 从设置中加载数据
             result_fade_out_duration = readme_settings_async(
                 config["config_key"], "result_music_fade_out"
             )
             result_fade_out_spin.setValue(result_fade_out_duration)
-            result_fade_out_spin.setSuffix("ms")
             result_fade_out_spin.setAlignment(Qt.AlignmentFlag.AlignCenter)
             # 连接信号
             result_fade_out_spin.valueChanged.connect(
@@ -389,6 +423,21 @@ class music_settings_table(GroupHeaderCardWidget):
                 )
             )
             self.table.setCellWidget(row, 6, result_fade_out_spin)
+
+            # 音量 - CompactSpinBox
+            volume_spin = CompactSpinBox()
+            volume_spin.setRange(0, 100)
+            # 从设置中加载数据
+            volume = readme_settings_async(
+                config["config_key"], "animation_music_volume", 100
+            )
+            volume_spin.setValue(volume)
+            volume_spin.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            # 连接信号
+            volume_spin.valueChanged.connect(
+                lambda value, key=config["config_key"]: self.update_volume(key, value)
+            )
+            self.table.setCellWidget(row, 7, volume_spin)
 
     def refresh_music_files(self):
         """刷新表格中的音乐文件列表"""
@@ -427,10 +476,21 @@ class music_settings_table(GroupHeaderCardWidget):
 
     def update_process_music(self, config_key, index):
         """更新过程音乐设置"""
-        # 这里需要根据实际的音乐文件映射来更新设置
-        # 暂时只更新是否启用
-        music_enabled = index > 0
-        update_settings(config_key, "animation_music", music_enabled)
+        # 获取当前选择的音乐文件名
+        process_music_combo = None
+        for row in range(self.table.rowCount()):
+            # 找到对应的配置行
+            row_config_key = self.application_configs[row]["config_key"]
+            if row_config_key == config_key:
+                process_music_combo = self.table.cellWidget(row, 1)
+                break
+
+        if process_music_combo and isinstance(process_music_combo, ComboBox):
+            music_file = process_music_combo.currentText()
+            # 如果选择了"无音乐"，则保存空字符串
+            if music_file == get_content_name_async("music_settings", "no_music"):
+                music_file = ""
+            update_settings(config_key, "animation_music", music_file)
 
     def update_fade_in_duration(self, config_key, value):
         """更新渐入时长设置"""
@@ -440,12 +500,27 @@ class music_settings_table(GroupHeaderCardWidget):
         """更新渐出时长设置"""
         update_settings(config_key, "animation_music_fade_out", value)
 
+    def update_volume(self, config_key, value):
+        """更新音量设置"""
+        update_settings(config_key, "animation_music_volume", value)
+
     def update_result_music(self, config_key, index):
         """更新结果音乐设置"""
-        # 这里需要根据实际的音乐文件映射来更新设置
-        # 暂时只更新是否启用
-        music_enabled = index > 0
-        update_settings(config_key, "result_music", music_enabled)
+        # 获取当前选择的音乐文件名
+        result_music_combo = None
+        for row in range(self.table.rowCount()):
+            # 找到对应的配置行
+            row_config_key = self.application_configs[row]["config_key"]
+            if row_config_key == config_key:
+                result_music_combo = self.table.cellWidget(row, 4)
+                break
+
+        if result_music_combo and isinstance(result_music_combo, ComboBox):
+            music_file = result_music_combo.currentText()
+            # 如果选择了"无音乐"，则保存空字符串
+            if music_file == get_content_name_async("music_settings", "no_music"):
+                music_file = ""
+            update_settings(config_key, "result_music", music_file)
 
     def update_result_fade_in_duration(self, config_key, value):
         """更新结果渐入时长设置"""

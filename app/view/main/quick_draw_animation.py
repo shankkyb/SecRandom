@@ -8,6 +8,7 @@ from loguru import logger
 from app.common.data.list import *
 from app.common.display.result_display import *
 from app.tools.settings_access import *
+from app.common.music.music_player import music_player
 
 
 # ==================================================
@@ -42,6 +43,19 @@ class QuickDrawAnimation(QObject):
 
         # 设置闪抽模式标志，避免stop_animation方法覆盖闪抽结果
         self.roll_call_widget.is_quick_draw = True
+
+        # 获取动画音乐设置
+        animation_music = readme_settings_async(
+            "quick_draw_settings", "animation_music"
+        )
+        if animation_music:
+            # 播放动画音乐
+            music_player.play_music(
+                music_file=animation_music,
+                settings_group="quick_draw_settings",
+                loop=True,
+                fade_in=True,
+            )
 
         # 根据动画模式选择不同的实现方式
         animation_mode = quick_draw_settings["animation"]
@@ -82,6 +96,19 @@ class QuickDrawAnimation(QObject):
         ):
             self.animation_timer.stop()
             self.is_animating = False
+
+            # 停止动画音乐
+            music_player.stop_music(fade_out=True)
+
+            # 播放结果音乐
+            result_music = readme_settings_async("quick_draw_settings", "result_music")
+            if result_music:
+                music_player.play_music(
+                    music_file=result_music,
+                    settings_group="quick_draw_settings",
+                    loop=False,
+                    fade_in=True,
+                )
 
             # 移除闪抽模式标志
             self.roll_call_widget.is_quick_draw = False

@@ -4,6 +4,7 @@
 import random
 import colorsys
 import weakref
+from loguru import logger
 
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QMenu, QApplication
 from PySide6.QtGui import QMouseEvent, QPalette
@@ -667,8 +668,6 @@ class ResultDisplayUtils:
 
         # 内存优化：只在有组件被删除时记录日志
         if count > 0:
-            from loguru import logger
-
             logger.debug(f"本次销毁了{count}个组件")
 
         # 清理缓存引用
@@ -715,7 +714,5 @@ class ResultDisplayUtils:
         # 可选：强制垃圾回收
         # import gc
         # gc.collect()
-
-        from loguru import logger
 
         logger.debug("ResultDisplayUtils内存清理完成")

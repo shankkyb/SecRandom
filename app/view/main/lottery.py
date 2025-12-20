@@ -22,6 +22,7 @@ from app.tools.config import *
 from app.common.lottery.lottery_utils import LotteryUtils
 from app.tools.variable import *
 from app.common.voice.voice import TTSHandler
+from app.common.music.music_player import music_player
 
 from app.page_building.another_window import *
 
@@ -564,7 +565,20 @@ class Lottery(QWidget):
         animation_interval = readme_settings_async(
             "lottery_settings", "animation_interval"
         )
+
+        # 获取动画音乐设置
+        animation_music = readme_settings_async("lottery_settings", "animation_music")
+
         if animation == 0:
+            # 播放动画音乐
+            if animation_music:
+                music_player.play_music(
+                    music_file=animation_music,
+                    settings_group="lottery_settings",
+                    loop=True,
+                    fade_in=True,
+                )
+
             self.start_button.setText(
                 get_content_pushbutton_name_async("lottery", "stop_button")
             )
@@ -574,6 +588,15 @@ class Lottery(QWidget):
             self.animation_timer.start(animation_interval)
             self.start_button.clicked.connect(lambda: self.stop_animation())
         elif animation == 1:
+            # 播放动画音乐
+            if animation_music:
+                music_player.play_music(
+                    music_file=animation_music,
+                    settings_group="lottery_settings",
+                    loop=True,
+                    fade_in=True,
+                )
+
             self.is_animating = True
             self.animation_timer = QTimer()
             self.animation_timer.timeout.connect(self.animate_result)
@@ -616,6 +639,19 @@ class Lottery(QWidget):
                 e,
             )
         self.start_button.clicked.connect(lambda: self.start_draw())
+
+        # 停止动画音乐
+        music_player.stop_music(fade_out=True)
+
+        # 播放结果音乐
+        result_music = readme_settings_async("lottery_settings", "result_music")
+        if result_music:
+            music_player.play_music(
+                music_file=result_music,
+                settings_group="lottery_settings",
+                loop=False,
+                fade_in=True,
+            )
 
         half_repeat = readme_settings_async("lottery_settings", "half_repeat")
         if half_repeat > 0:

@@ -22,6 +22,7 @@ from app.tools.config import *
 from app.common.roll_call.roll_call_utils import RollCallUtils
 from app.tools.variable import *
 from app.common.voice.voice import TTSHandler
+from app.common.music.music_player import music_player
 
 from app.page_building.another_window import *
 
@@ -545,6 +546,18 @@ class roll_call(QWidget):
                 "Error disconnecting start_button clicked (ignored): {}", e
             )
         self.draw_random()
+
+        # 获取动画音乐设置
+        animation_music = readme_settings_async("roll_call_settings", "animation_music")
+        if animation_music:
+            # 播放动画音乐
+            music_player.play_music(
+                music_file=animation_music,
+                settings_group="roll_call_settings",
+                loop=True,
+                fade_in=True,
+            )
+
         animation = readme_settings_async("roll_call_settings", "animation")
         autoplay_count = readme_settings_async("roll_call_settings", "autoplay_count")
         animation_interval = readme_settings_async(
@@ -675,6 +688,19 @@ class roll_call(QWidget):
 
             # 播放语音
             self.play_voice_result()
+
+            # 停止动画音乐
+            music_player.stop_music(fade_out=True)
+
+            # 播放结果音乐
+            result_music = readme_settings_async("roll_call_settings", "result_music")
+            if result_music:
+                music_player.play_music(
+                    music_file=result_music,
+                    settings_group="roll_call_settings",
+                    loop=False,
+                    fade_in=True,
+                )
 
     def play_voice_result(self):
         """播放语音结果"""
