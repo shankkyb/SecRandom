@@ -392,6 +392,11 @@ def check_for_updates_on_startup():
                 auto_update_mode = readme_settings_async("update", "auto_update_mode")
                 logger.debug(f"自动更新模式: {auto_update_mode}")
 
+                # 如果是模式0（不自动检查更新），直接返回
+                if auto_update_mode == 0:
+                    logger.debug("自动更新模式为0，不执行更新检查")
+                    return
+
                 # 获取最新版本信息
                 logger.debug("开始检查更新")
                 latest_version_info = get_latest_version()
@@ -435,11 +440,6 @@ def check_for_updates_on_startup():
                         logger.debug("自动安装更新成功")
                     else:
                         logger.error("自动安装更新失败")
-                    return
-
-                # 如果是模式0（不自动检查更新），直接返回
-                if auto_update_mode == 0:
-                    logger.debug("自动更新模式为0，不执行更新检查")
                     return
 
                 if compare_result == 1:
