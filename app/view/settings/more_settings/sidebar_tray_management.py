@@ -163,26 +163,6 @@ class sidebar_management_window(GroupHeaderCardWidget):
             )
         )
 
-        # 自定义抽侧边栏位置下拉框
-        self.custom_roll_call_sidebar_position_comboBox = ComboBox(self)
-        self.custom_roll_call_sidebar_position_comboBox.addItems(
-            get_content_combo_name_async(
-                "sidebar_management_window", "custom_roll_call_sidebar_position"
-            )
-        )
-        self.custom_roll_call_sidebar_position_comboBox.setCurrentIndex(
-            readme_settings_async(
-                "sidebar_management_window", "custom_roll_call_sidebar_position"
-            )
-        )
-        self.custom_roll_call_sidebar_position_comboBox.currentIndexChanged.connect(
-            lambda: update_settings(
-                "sidebar_management_window",
-                "custom_roll_call_sidebar_position",
-                self.custom_roll_call_sidebar_position_comboBox.currentIndex(),
-            )
-        )
-
         # 抽奖侧边栏位置下拉框
         self.lottery_sidebar_position_comboBox = ComboBox(self)
         self.lottery_sidebar_position_comboBox.addItems(
@@ -247,16 +227,6 @@ class sidebar_management_window(GroupHeaderCardWidget):
                 "sidebar_management_window", "roll_call_sidebar_position"
             ),
             self.roll_call_sidebar_position_comboBox,
-        )
-        self.addGroup(
-            get_theme_icon("ic_fluent_receipt_20_filled"),
-            get_content_name_async(
-                "sidebar_management_window", "custom_roll_call_sidebar_position"
-            ),
-            get_content_description_async(
-                "sidebar_management_window", "custom_roll_call_sidebar_position"
-            ),
-            self.custom_roll_call_sidebar_position_comboBox,
         )
         self.addGroup(
             get_theme_icon("ic_fluent_gift_20_filled"),

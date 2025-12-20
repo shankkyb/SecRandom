@@ -29,19 +29,11 @@ floating_window_management = {
                 "点名",
                 "闪抽",
                 "即抽",
-                "自定义抽",
                 "抽奖",
                 "点名+闪抽",
-                "点名+自定义抽",
                 "点名+抽奖",
-                "闪抽+自定义抽",
                 "闪抽+抽奖",
-                "自定义抽+抽奖",
-                "点名+闪抽+自定义抽",
                 "点名+闪抽+抽奖",
-                "点名+自定义抽+抽奖",
-                "闪抽+自定义抽+抽奖",
-                "点名+闪抽+自定义抽+抽奖",
             ],
         },
         "floating_window_placement": {
@@ -200,11 +192,6 @@ sidebar_management_window = {
             "description": "配置点名功能在侧边栏位置",
             "combo_items": ["顶部", "底部", "不显示"],
         },
-        "custom_roll_call_sidebar_position": {
-            "name": "自定义抽侧边栏位置",
-            "description": "配置自定义抽功能在侧边栏位置",
-            "combo_items": ["顶部", "底部", "不显示"],
-        },
         "lottery_sidebar_position": {
             "name": "抽奖侧边栏位置",
             "description": "配置抽奖功能在侧边栏位置",
@@ -229,11 +216,6 @@ sidebar_management_window = {
         "roll_call_sidebar_position": {
             "name": "Position of Picking",
             "description": "Set the position of Pick in sidebar",
-            "combo_items": {"0": "Top", "1": "Bottom", "2": "Hide"},
-        },
-        "custom_roll_call_sidebar_position": {
-            "name": "Custom pick sidebar position",
-            "description": "Set the position of Custom Pick in sidebar",
             "combo_items": {"0": "Top", "1": "Bottom", "2": "Hide"},
         },
         "lottery_sidebar_position": {

@@ -52,9 +52,6 @@ class extraction_settings_page(PivotPageTemplate):
             "instant_draw_settings": get_content_name_async(
                 "instant_draw_settings", "title"
             ),
-            "custom_draw_settings": get_content_name_async(
-                "custom_draw_settings", "title"
-            ),
             "lottery_settings": get_content_name_async("lottery_settings", "title"),
         }
         super().__init__(page_config, parent)
@@ -83,9 +80,6 @@ class notification_settings_page(PivotPageTemplate):
             ),
             "instant_draw_notification_settings": get_content_name_async(
                 "instant_draw_notification_settings", "title"
-            ),
-            "custom_draw_notification_settings": get_content_name_async(
-                "custom_draw_notification_settings", "title"
             ),
             "lottery_notification_settings": get_content_name_async(
                 "lottery_notification_settings", "title"

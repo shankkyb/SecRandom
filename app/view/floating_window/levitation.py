@@ -476,11 +476,6 @@ class LevitationWindow(QWidget):
                 "text": names[2],
                 "signal": self.instantDrawRequested,
             },
-            "custom_draw": {
-                "icon": get_theme_icon("ic_fluent_edit_20_filled"),
-                "text": names[3],
-                "signal": self.customDrawRequested,
-            },
         }
 
         # 默认配置（抽奖按钮）
@@ -1532,19 +1527,11 @@ class LevitationWindow(QWidget):
             ["roll_call"],
             ["quick_draw"],
             ["instant_draw"],
-            ["custom_draw"],
             ["lottery"],
             ["roll_call", "quick_draw"],
-            ["roll_call", "custom_draw"],
             ["roll_call", "lottery"],
-            ["quick_draw", "custom_draw"],
             ["quick_draw", "lottery"],
-            ["custom_draw", "lottery"],
-            ["roll_call", "quick_draw", "custom_draw"],
             ["roll_call", "quick_draw", "lottery"],
-            ["roll_call", "custom_draw", "lottery"],
-            ["quick_draw", "custom_draw", "lottery"],
-            ["roll_call", "quick_draw", "custom_draw", "lottery"],
         ]
         if idx < 0 or idx >= len(combos):
             return combos[0]
