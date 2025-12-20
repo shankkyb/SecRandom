@@ -639,18 +639,39 @@ class roll_call(QWidget):
                 call_notification_service = readme_settings_async(
                     "roll_call_notification_settings", "call_notification_service"
                 )
+                # 检查是否启用了最大浮窗通知人数功能
+                use_main_window_when_exceed_threshold = readme_settings_async(
+                    "roll_call_notification_settings",
+                    "use_main_window_when_exceed_threshold",
+                )
+                # 检查人数是否超过最大浮窗通知人数
+                max_notify_count = readme_settings_async(
+                    "roll_call_notification_settings", "main_window_display_threshold"
+                )
                 if call_notification_service:
                     # 准备通知设置
                     settings = RollCallUtils.prepare_notification_settings()
-
-                    # 使用ResultDisplayUtils显示通知
-                    ResultDisplayUtils.show_notification_if_enabled(
-                        self.final_class_name,
-                        self.final_selected_students,
-                        self.current_count,
-                        settings,
-                        settings_group="roll_call_notification_settings",
-                    )
+                    # 只有当没有启用阈值功能，或者启用了但抽取人数没有超过阈值时，才显示通知
+                    if use_main_window_when_exceed_threshold:
+                        # 如果启用了阈值功能，检查抽取人数是否超过阈值
+                        if self.current_count <= max_notify_count:
+                            # 使用ResultDisplayUtils显示通知
+                            ResultDisplayUtils.show_notification_if_enabled(
+                                self.final_class_name,
+                                self.final_selected_students,
+                                self.current_count,
+                                settings,
+                                settings_group="roll_call_notification_settings",
+                            )
+                    else:
+                        # 如果没有启用阈值功能，直接显示通知
+                        ResultDisplayUtils.show_notification_if_enabled(
+                            self.final_class_name,
+                            self.final_selected_students,
+                            self.current_count,
+                            settings,
+                            settings_group="roll_call_notification_settings",
+                        )
 
             # 播放语音
             self.play_voice_result()
@@ -738,18 +759,38 @@ class roll_call(QWidget):
         call_notification_service = readme_settings_async(
             "roll_call_notification_settings", "call_notification_service"
         )
+        # 检查是否启用了最大浮窗通知人数功能
+        use_main_window_when_exceed_threshold = readme_settings_async(
+            "roll_call_notification_settings", "use_main_window_when_exceed_threshold"
+        )
+        # 检查人数是否超过最大浮窗通知人数
+        max_notify_count = readme_settings_async(
+            "roll_call_notification_settings", "main_window_display_threshold"
+        )
         if call_notification_service:
             # 准备通知设置
             settings = RollCallUtils.prepare_notification_settings()
-
-            # 使用ResultDisplayUtils显示通知
-            ResultDisplayUtils.show_notification_if_enabled(
-                self.final_class_name,
-                self.final_selected_students,
-                self.current_count,
-                settings,
-                settings_group="roll_call_notification_settings",
-            )
+            # 只有当没有启用阈值功能，或者启用了但抽取人数没有超过阈值时，才显示通知
+            if use_main_window_when_exceed_threshold:
+                # 如果启用了阈值功能，检查抽取人数是否超过阈值
+                if self.current_count <= max_notify_count:
+                    # 使用ResultDisplayUtils显示通知
+                    ResultDisplayUtils.show_notification_if_enabled(
+                        self.final_class_name,
+                        self.final_selected_students,
+                        self.current_count,
+                        settings,
+                        settings_group="roll_call_notification_settings",
+                    )
+            else:
+                # 如果没有启用阈值功能，直接显示通知
+                ResultDisplayUtils.show_notification_if_enabled(
+                    self.final_class_name,
+                    self.final_selected_students,
+                    self.current_count,
+                    settings,
+                    settings_group="roll_call_notification_settings",
+                )
 
     def display_result(self, selected_students, class_name, display_settings=None):
         """显示抽取结果

@@ -94,6 +94,53 @@ class basic_settings(GroupHeaderCardWidget):
             )
         )
 
+        # 超过阈值时使用主窗口
+        self.use_main_window_switch = SwitchButton()
+        self.use_main_window_switch.setOffText(
+            get_content_switchbutton_name_async(
+                "roll_call_notification_settings",
+                "use_main_window_when_exceed_threshold",
+                "disable",
+            )
+        )
+        self.use_main_window_switch.setOnText(
+            get_content_switchbutton_name_async(
+                "roll_call_notification_settings",
+                "use_main_window_when_exceed_threshold",
+                "enable",
+            )
+        )
+        self.use_main_window_switch.setChecked(
+            readme_settings_async(
+                "roll_call_notification_settings",
+                "use_main_window_when_exceed_threshold",
+            )
+        )
+        self.use_main_window_switch.checkedChanged.connect(
+            lambda: update_settings(
+                "roll_call_notification_settings",
+                "use_main_window_when_exceed_threshold",
+                self.use_main_window_switch.isChecked(),
+            )
+        )
+
+        # 主窗口显示阈值
+        self.main_window_threshold_spinbox = SpinBox()
+        self.main_window_threshold_spinbox.setFixedWidth(WIDTH_SPINBOX)
+        self.main_window_threshold_spinbox.setMinimum(1)
+        self.main_window_threshold_spinbox.setValue(
+            readme_settings_async(
+                "roll_call_notification_settings", "main_window_display_threshold"
+            )
+        )
+        self.main_window_threshold_spinbox.valueChanged.connect(
+            lambda: update_settings(
+                "roll_call_notification_settings",
+                "main_window_display_threshold",
+                self.main_window_threshold_spinbox.value(),
+            )
+        )
+
         # 添加设置项到分组
         self.addGroup(
             get_theme_icon("ic_fluent_comment_20_filled"),
@@ -112,6 +159,28 @@ class basic_settings(GroupHeaderCardWidget):
                 "roll_call_notification_settings", "animation"
             ),
             self.animation_switch,
+        )
+        self.addGroup(
+            get_theme_icon("ic_fluent_window_20_filled"),
+            get_content_name_async(
+                "roll_call_notification_settings",
+                "use_main_window_when_exceed_threshold",
+            ),
+            get_content_description_async(
+                "roll_call_notification_settings",
+                "use_main_window_when_exceed_threshold",
+            ),
+            self.use_main_window_switch,
+        )
+        self.addGroup(
+            get_theme_icon("ic_fluent_number_symbol_20_filled"),
+            get_content_name_async(
+                "roll_call_notification_settings", "main_window_display_threshold"
+            ),
+            get_content_description_async(
+                "roll_call_notification_settings", "main_window_display_threshold"
+            ),
+            self.main_window_threshold_spinbox,
         )
 
 
@@ -203,7 +272,7 @@ class floating_window_settings(GroupHeaderCardWidget):
         # 浮窗自动关闭时间
         self.floating_window_auto_close_time_spinbox = SpinBox()
         self.floating_window_auto_close_time_spinbox.setFixedWidth(WIDTH_SPINBOX)
-        self.floating_window_auto_close_time_spinbox.setRange(0, 300)
+        self.floating_window_auto_close_time_spinbox.setMinimum(1)
         self.floating_window_auto_close_time_spinbox.setSuffix("秒")
         self.floating_window_auto_close_time_spinbox.setValue(
             readme_settings_async(

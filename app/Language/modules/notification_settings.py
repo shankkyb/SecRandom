@@ -469,12 +469,12 @@ lottery_notification_settings = {
         },
         "use_main_window_when_exceed_threshold": {
             "name": "超过阈值时使用主窗口",
-            "description": "当抽取人数超过设定阈值时，只在主窗口显示结果，不显示浮窗通知",
+            "description": "当抽取奖数超过设定阈值时，只在主窗口显示结果，不显示浮窗通知",
             "switchbutton_name": {"enable": "", "disable": ""},
         },
         "main_window_display_threshold": {
             "name": "主窗口显示阈值",
-            "description": "设置触发主窗口显示结果的人数阈值，最小值为1",
+            "description": "设置触发主窗口显示结果的奖数阈值，最小值为1",
         },
     },
     "EN_US": {

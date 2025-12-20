@@ -166,7 +166,7 @@ class floating_window_settings(GroupHeaderCardWidget):
         # 浮窗自动关闭时间
         self.floating_window_auto_close_time_spinbox = SpinBox()
         self.floating_window_auto_close_time_spinbox.setFixedWidth(WIDTH_SPINBOX)
-        self.floating_window_auto_close_time_spinbox.setRange(0, 300)
+        self.floating_window_auto_close_time_spinbox.setMinimum(1)
         self.floating_window_auto_close_time_spinbox.setSuffix("秒")
         self.floating_window_auto_close_time_spinbox.setValue(
             readme_settings_async(
