@@ -1,6 +1,6 @@
 <div align="center">
 
-<image src="data/secrandom-icon-paper.png" width="128" height="128" />
+<image src="data/assets/icon/secrandom-icon-paper.png" width="128" height="128" />
 
 # SecRandom - 公平随机抽取系统
 
@@ -34,7 +34,7 @@
 --------
 > [!NOTE]
 >
-> **SecRandom v2** 将会在 2025/12/14 (GMT +8:00 中国标准时间) 附近发布!
+> **SecRandom v2** 将会在 2026/1/1 (GMT +8:00 中国标准时间) 发布!
 >
 > 敬请关注我们的 BiliBili / QQ频道，获取最新动态！
 
