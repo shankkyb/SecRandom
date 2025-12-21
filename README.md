@@ -102,10 +102,14 @@
 <details>
 <summary>📸 软件截图展示 ✨</summary>
 
-![点名界面](./resources/ScreenShots/主界面_抽人_浅色.png)
-![抽奖界面](./resources/ScreenShots/主界面_抽奖_浅色.png)
-![历史记录](./resources/ScreenShots/主界面_抽人历史记录_浅色.png)
-![设置界面](./resources/ScreenShots/设置_抽人设置_浅色.png)
+<div align="center">
+
+<img src="resources/ScreenShots/zh-cn/pick.png" alt="点名界面" height="400px"/> <br/> <sub> 点名界面 </sub> <br/>
+<img src="resources/ScreenShots/zh-cn/lottery.png" alt="抽奖界面" height="400px"/> <br/> <sub> 抽奖界面 </sub> <br/>
+<img src="resources/ScreenShots/zh-cn/history.png" alt="历史记录" height="400px"/> <br/> <sub> 历史记录 </sub> <br/>
+<img src="resources/ScreenShots/zh-cn/pick_settings.png" alt="抽取设置" height="400px"/> <br/> <sub> 抽取设置 </sub> <br/>
+
+</div>
 
 </details>
 

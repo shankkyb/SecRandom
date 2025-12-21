@@ -34,7 +34,7 @@
 >
 > GNU GPLv3 具有 Copyleft 特性，這意味著您可以修改 SecRandom 的原始碼，但**必須也以 GNU GPLv3 許可證開源修改後的版本**
 ---------
-> [!note]
+> [!NOTE]
 >
 > **SecRandom v2** 將會在 2026/01/01 (GMT +8:00 中國標準時間) 左右 發布！
 >
@@ -104,11 +104,17 @@
 <details>
 <summary>📸 軟體截圖展示 ✨</summary>
 
-![點名介面](./ScreenShots/主界面_抽人_浅色.png)
-![抽獎介面](./ScreenShots/主界面_抽奖_浅色.png)
-![歷史記錄](./ScreenShots/主界面_抽人历史记录_浅色.png)
-![設定介面](./ScreenShots/设置_抽人设置_浅色.png)
+> [!WARNING]
+> 目前SecRandom暫不支援繁體中文，您所看到的界面以簡體中文顯示。
 
+<div align="center">
+
+<img src="ScreenShots/zh-cn/pick.png" alt="點名界面" height="400px"/> <br/> <sub> 點名界面 </sub> <br/>
+<img src="ScreenShots/zh-cn/lottery.png" alt="抽獎界面" height="400px"/> <br/> <sub> 抽獎界面 </sub> <br/>
+<img src="ScreenShots/zh-cn/history.png" alt="歷史記錄" height="400px"/> <br/> <sub> 歷史記錄 </sub> <br/>
+<img src="ScreenShots/zh-cn/pick_settings.png" alt="抽取設置" height="400px"/> <br/> <sub> 抽取設置 </sub> <br/> 
+
+</div>
 </details>
 
 ## 🙏 貢獻者與特別感謝

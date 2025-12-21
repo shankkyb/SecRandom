@@ -107,11 +107,14 @@ Traditional random selection often has the problem of "repeatedly selecting cert
 <details>
 <summary>📸 Software Screenshots Display ✨</summary>
 
-![Selection Interface](./ScreenShots/主界面_抽人_浅色.png)
-![Lottery Interface](./ScreenShots/主界面_抽奖_浅色.png)
-![History Records](./ScreenShots/主界面_抽人历史记录_浅色.png)
-![Settings Interface](./ScreenShots/设置_抽人设置_浅色.png)
+<div align="center">
 
+<img src="ScreenShots/en_us/pick.png" alt="Pick Interface" height="400px"/> <br/> <sub> Pick Interface </sub> <br/>
+<img src="ScreenShots/en_us/lottery.png" alt="Lottery Interface" height="400px"/> <br/> <sub> Lottery Interface </sub> <br/>
+<img src="ScreenShots/en_us/history.png" alt="History Records" height="400px"/> <br/> <sub> History Records </sub> <br/>
+<img src="ScreenShots/en_us/pick_settings.png" alt="Pick Settings" height="400px"/> <br/> <sub> Pick Settings </sub> <br/>
+
+</div>
 </details>
 
 ## 🙏 Contributors and Special Thanks
