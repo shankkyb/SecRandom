@@ -226,7 +226,7 @@ class SimplePasswordVerifier(SecurityVerifier):
     """简单密码验证器
 
     使用预设密码进行验证
-    
+
     安全特性：
     - 支持明文密码和预计算哈希值
     - 使用SHA-512进行密码哈希
@@ -236,7 +236,7 @@ class SimplePasswordVerifier(SecurityVerifier):
 
     def __init__(self, password: str = None, use_kdf: bool = False):
         """初始化密码验证器
-        
+
         Args:
             password: 密码（明文或SHA-512哈希）
             use_kdf: 是否使用PBKDF2进行密钥强化（针对弱密码）
@@ -252,7 +252,7 @@ class SimplePasswordVerifier(SecurityVerifier):
         else:
             # 明文密码，进行哈希
             password_hash = hashlib.sha512(original_password.encode()).hexdigest()
-            
+
             # 如果启用KDF，进一步强化密码哈希
             if use_kdf:
                 # 使用PBKDF2直接对原始密码进行强化，防止暴力破解
@@ -332,10 +332,8 @@ class SimplePasswordVerifier(SecurityVerifier):
             self.hashed_password = original_password
         else:
             # 明文密码，进行哈希
-            password_hash = hashlib.sha512(
-                original_password.encode()
-            ).hexdigest()
-            
+            password_hash = hashlib.sha512(original_password.encode()).hexdigest()
+
             # 如果启用KDF，进一步强化
             if self.use_kdf:
                 derived = KeyDerivation.derive_key(password_hash)
