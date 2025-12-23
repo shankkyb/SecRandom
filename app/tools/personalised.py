@@ -120,6 +120,12 @@ def _load_default_font():
 # ==================================================
 # 图标相关类和函数
 # ==================================================
+
+# 全局图标缓存，避免重复创建图标对象和读取JSON
+_icon_cache = {}
+_icon_map_cache = None
+
+
 class FluentSystemIcons(FluentFontIconBase):
     """Fluent System Icons 字体图标类"""
 
@@ -140,8 +146,26 @@ class FluentSystemIcons(FluentFontIconBase):
         return str(get_data_path("assets", "FluentSystemIcons-Filled.json"))
 
 
+def _get_icon_map():
+    """获取图标映射表，使用缓存避免重复读取JSON
+
+    Returns:
+        dict: 图标名称到码点的映射表
+    """
+    global _icon_map_cache
+    if _icon_map_cache is None:
+        try:
+            map_path = get_data_path("assets", "FluentSystemIcons-Filled.json")
+            with open(map_path, "r", encoding="utf-8") as f:
+                _icon_map_cache = json.load(f)
+        except Exception as e:
+            logger.error(f"加载图标映射表失败: {e}")
+            _icon_map_cache = {}
+    return _icon_map_cache
+
+
 def get_theme_icon(icon_name):
-    """获取主题相关的图标
+    """获取主题相关的图标，带缓存机制
 
     Args:
         icon_name: 图标名称或码点
@@ -149,38 +173,44 @@ def get_theme_icon(icon_name):
     Returns:
         QIcon: 图标对象
     """
+    global _icon_cache
+
+    # 检查缓存
+    if icon_name in _icon_cache:
+        return _icon_cache[icon_name]
+
     try:
+        icon = None
         # 尝试使用名称获取图标
         if isinstance(icon_name, str) and not icon_name.startswith("\\u"):
-            # 尝试从JSON文件中直接获取码点
-            try:
-                map_path = get_data_path("assets", "FluentSystemIcons-Filled.json")
-                with open(map_path, "r", encoding="utf-8") as f:
-                    icon_map = json.load(f)
+            # 从缓存的映射表中获取码点
+            icon_map = _get_icon_map()
 
-                if icon_name in icon_map:
-                    # 获取图标码点并转换为字符串
-                    code_point = icon_map[icon_name]
-                    char = chr(code_point)
-                    icon = FluentSystemIcons(char)
-                    return icon
-                else:
-                    raise ValueError(f"图标名称 '{icon_name}' 未在图标映射表中找到")
-            except Exception as json_error:
-                logger.error(f"从JSON加载图标'{icon_name}'也失败: {str(json_error)}")
-                raise
+            if icon_name in icon_map:
+                # 获取图标码点并转换为字符串
+                code_point = icon_map[icon_name]
+                char = chr(code_point)
+                icon = FluentSystemIcons(char)
+            else:
+                raise ValueError(f"图标名称 '{icon_name}' 未在图标映射表中找到")
         else:
             # 处理码点输入
             char = _convert_icon_name_to_char(icon_name)
             icon = FluentSystemIcons(char)
-            return icon
+
+        # 缓存图标
+        if icon:
+            _icon_cache[icon_name] = icon
+        return icon
     except Exception as e:
         logger.error(f"加载图标{icon_name}出错: {str(e)}")
         # 返回默认图标
         try:
             # 尝试使用码点创建默认图标
             default_char = chr(DEFAULT_ICON_CODEPOINT)  # 使用info图标的码点
-            return FluentSystemIcons(default_char)
+            default_icon = FluentSystemIcons(default_char)
+            _icon_cache[icon_name] = default_icon
+            return default_icon
         except Exception as default_error:
             logger.error(f"加载默认图标也失败: {str(default_error)}")
             # 返回空的QIcon作为最后备选

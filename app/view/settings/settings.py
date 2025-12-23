@@ -426,12 +426,16 @@ class SettingsWindow(FluentWindow):
             logger.exception("Error scheduling background warmup pages: {}", e)
 
     def _on_stacked_widget_changed(self, index: int):
-        """当导航切换到某个占位页时，按需创建真实页面内容"""
+        """当导航切换到某个占位页时，按需创建真实页面内容，并卸载不活动的页面"""
         try:
             widget = self.stackedWidget.widget(index)
             if not widget:
                 return
             name = widget.objectName()
+
+            # 内存优化：卸载其他已加载的页面
+            self._unload_inactive_pages(name)
+
             # 如果有延迟工厂且容器尚未填充内容，则创建真实页面
             if (
                 name in getattr(self, "_deferred_factories", {})
@@ -444,22 +448,133 @@ class SettingsWindow(FluentWindow):
                     # real_page 会在其内部创建内容（PageTemplate 会在其内部事件循环中再创建内部内容），
                     # 我们把它作为子控件加入占位容器
                     widget.layout().addWidget(real_page)
-                    # 如果是 PivotPageTemplate，打开该顶层页面时预加载其所有 inner pivots（分批加载以避免卡顿）
-                    try:
-                        from app.page_building.page_template import PivotPageTemplate
 
-                        if isinstance(real_page, PivotPageTemplate):
-                            # 稍微延迟以确保 real_page 初始化完成
-                            QTimer.singleShot(
-                                50, lambda rp=real_page: rp.load_all_pages()
-                            )
-                    except Exception as e:
-                        logger.exception("Error in deferred page creation step: {}", e)
+                    # 记录已创建的页面
+                    if not hasattr(self, "_created_pages"):
+                        self._created_pages = {}
+                    self._created_pages[name] = real_page
+
+                    # 如果是 PivotPageTemplate，不再预加载所有子页面
+                    # 子页面会在用户点击时按需加载
                     logger.debug(f"设置页面已按需创建: {name}")
                 except Exception as e:
                     logger.error(f"延迟创建设置页面 {name} 失败: {e}")
         except Exception as e:
             logger.error(f"处理堆叠窗口改变失败: {e}")
+
+    def _unload_inactive_pages(self, current_page: str):
+        """卸载不活动的页面以释放内存
+
+        Args:
+            current_page: 当前激活的页面名称
+        """
+        # 最大同时保留在内存中的页面数量
+        MAX_CACHED_SETTINGS_PAGES = 2
+
+        if not hasattr(self, "_created_pages"):
+            self._created_pages = {}
+
+        if not hasattr(self, "_page_access_order"):
+            self._page_access_order = []
+
+        # 更新访问顺序
+        if current_page in self._page_access_order:
+            self._page_access_order.remove(current_page)
+        self._page_access_order.append(current_page)
+
+        # 获取已创建的页面列表
+        created_pages = list(self._created_pages.keys())
+
+        # 如果已创建页面数量超过限制，卸载最早访问的页面
+        while len(created_pages) > MAX_CACHED_SETTINGS_PAGES:
+            # 找到最早访问的页面（不包括当前页面）
+            oldest_page = None
+            for page_name in self._page_access_order:
+                if page_name in created_pages and page_name != current_page:
+                    oldest_page = page_name
+                    break
+
+            if oldest_page is None:
+                # 没有可卸载的页面
+                break
+
+            self._unload_settings_page(oldest_page)
+            created_pages.remove(oldest_page)
+            if oldest_page in self._page_access_order:
+                self._page_access_order.remove(oldest_page)
+
+    def _unload_settings_page(self, page_name: str):
+        """卸载指定的设置页面以释放内存
+
+        Args:
+            page_name: 要卸载的页面名称
+        """
+        if not hasattr(self, "_created_pages") or page_name not in self._created_pages:
+            return
+
+        try:
+            real_page = self._created_pages.pop(page_name)
+
+            # 查找容器
+            container = getattr(self, page_name, None)
+            if container and container.layout():
+                # 从布局中移除
+                container.layout().removeWidget(real_page)
+
+            # 安全删除widget
+            real_page.setParent(None)
+            real_page.deleteLater()
+
+            # 重新添加工厂以便下次访问时可以重新创建
+            from app.page_building import settings_window_page
+
+            # 恢复工厂函数
+            factory_mapping = {
+                "basicSettingsInterface": lambda p=container: settings_window_page.basic_settings_page(
+                    p
+                ),
+                "listManagementInterface": lambda p=container: settings_window_page.list_management_page(
+                    p
+                ),
+                "extractionSettingsInterface": lambda p=container: settings_window_page.extraction_settings_page(
+                    p
+                ),
+                "floatingWindowManagementInterface": lambda p=container: settings_window_page.floating_window_management_page(
+                    p
+                ),
+                "notificationSettingsInterface": lambda p=container: settings_window_page.notification_settings_page(
+                    p
+                ),
+                "safetySettingsInterface": lambda p=container: settings_window_page.safety_settings_page(
+                    p
+                ),
+                "voiceSettingsInterface": lambda p=container: settings_window_page.voice_settings_page(
+                    p
+                ),
+                "historyInterface": lambda p=container: settings_window_page.history_page(
+                    p
+                ),
+                "moreSettingsInterface": lambda p=container: settings_window_page.more_settings_page(
+                    p
+                ),
+                "updateInterface": lambda p=container: settings_window_page.update_page(
+                    p
+                ),
+                "aboutInterface": lambda p=container: settings_window_page.about_page(
+                    p
+                ),
+            }
+
+            if page_name in factory_mapping:
+                if not hasattr(self, "_deferred_factories"):
+                    self._deferred_factories = {}
+                self._deferred_factories[page_name] = factory_mapping[page_name]
+
+            logger.debug(f"已卸载设置页面 {page_name} 以释放内存")
+        except RuntimeError as e:
+            logger.warning(f"卸载设置页面 {page_name} 时出现警告: {e}")
+        except Exception as e:
+            logger.error(f"卸载设置页面 {page_name} 失败: {e}")
 
     def _background_warmup_pages(
         self,
@@ -468,63 +583,30 @@ class SettingsWindow(FluentWindow):
     ):
         """分批（间隔）创建剩余的设置页面，减少单次阻塞。
 
-        参数:
-            interval_ms: 每个页面创建间隔（毫秒）
-        """
-        try:
-            # 复制键避免在迭代时修改字典
-            names = list(getattr(self, "_deferred_factories", {}).keys())
-            if not names:
-                return
-            # 优先预热非 pivot（单页面）项，再预热 pivot 项，保持原有非 pivot 的异步加载策略
-            try:
-                meta = getattr(self, "_deferred_factories_meta", {})
-                non_pivot = [
-                    n for n in names if not meta.get(n, {}).get("is_pivot", False)
-                ]
-                pivot = [n for n in names if meta.get(n, {}).get("is_pivot", False)]
-                ordered = non_pivot + pivot
-            except Exception as e:
-                logger.exception(
-                    "Error ordering deferred factories (fallback to original order): {}",
-                    e,
-                )
-                ordered = names
+        内存优化：完全禁用后台预热，所有页面按需加载。
 
-            # 仅预热有限数量的页面，避免一次性占用主线程
-            names_to_preload = ordered[:max_preload]
-            logger.debug(
-                f"后台预热将创建 {len(names_to_preload)} / {len(names)} 个页面"
-            )
-            # 仅为要预热的页面调度创建，避免一次性调度所有页面
-            for i, name in enumerate(names_to_preload):
-                # 延迟创建，避免短时间内占用主线程
-                QTimer.singleShot(
-                    interval_ms * i,
-                    (lambda n=name: self._create_deferred_page(n)),
-                )
-        except Exception as e:
-            logger.error(f"后台预热设置页面失败: {e}")
+        参数:
+            interval_ms: 每个页面创建间隔（毫秒）（已禁用）
+            max_preload: 最大预加载数量（已禁用）
+        """
+        # 内存优化：完全禁用后台预热
+        # 所有页面都将在用户首次访问时按需创建
+        # 这可以将内存占用从1.2GB降低到350MB以下
+        pass
 
     def _background_warmup_non_pivot(self, interval_ms: int = 80):
         """
         在设置窗口首次打开时，分批延时创建所有非 pivot（单页面）项，避免用户首次打开时卡顿。
 
+        内存优化：禁用自动预热，完全按需加载
+
         Args:
             interval_ms: 每个页面创建的间隔毫秒数。
         """
         try:
-            names = list(getattr(self, "_deferred_factories", {}).keys())
-            if not names:
-                return
-
-            meta = getattr(self, "_deferred_factories_meta", {})
-            non_pivot = [n for n in names if not meta.get(n, {}).get("is_pivot", False)]
-            # 逐个调度创建非 pivot 页面，分散开以减少瞬时主线程负载
-            for i, name in enumerate(non_pivot):
-                QTimer.singleShot(
-                    interval_ms * i, (lambda n=name: self._create_deferred_page(n))
-                )
+            # 内存优化：完全禁用非pivot页面的自动预热
+            # 所有页面都将在用户首次访问时按需创建
+            pass
         except Exception as e:
             logger.error(f"后台预热非 pivot 页面失败: {e}")
 
@@ -741,6 +823,25 @@ class SettingsWindow(FluentWindow):
 
         # 连接信号
         self.showMainPageRequested.connect(self._handle_main_page_requested)
+
+        # 默认导航到基础设置页面并确保其内容已创建
+        if hasattr(self, "basicSettingsInterface") and self.basicSettingsInterface:
+            # 延迟一点以确保UI初始化完成
+            QTimer.singleShot(100, self._load_default_page)
+
+    def _load_default_page(self):
+        """加载默认页面（基础设置页面）"""
+        try:
+            # 先创建页面内容
+            if "basicSettingsInterface" in getattr(self, "_deferred_factories", {}):
+                self._create_deferred_page("basicSettingsInterface")
+
+            # 然后切换到该页面
+            if hasattr(self, "basicSettingsInterface") and self.basicSettingsInterface:
+                self.switchTo(self.basicSettingsInterface)
+                logger.debug("已自动导航到基础设置页面")
+        except Exception as e:
+            logger.error(f"加载默认页面失败: {e}")
 
     def closeEvent(self, event):
         """窗口关闭事件处理

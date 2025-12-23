@@ -43,43 +43,54 @@ class PageTemplate(QFrame):
         if self.ui_created:
             return
 
-        self.scroll_area_personal = SingleDirectionScrollArea(self)
-        self.scroll_area_personal.setWidgetResizable(True)
-        self.scroll_area_personal.setStyleSheet("""
-            QScrollArea {
-                border: none;
-                background-color: transparent;
-            }
-            QScrollArea QWidget {
-                border: none;
-                background-color: transparent;
-            }
-        """)
-        QScroller.grabGesture(
-            self.scroll_area_personal.viewport(),
-            QScroller.ScrollerGestureType.LeftMouseButtonGesture,
-        )
-
-        self.inner_frame_personal = QWidget(self.scroll_area_personal)
-        self.inner_layout_personal = QVBoxLayout(self.inner_frame_personal)
-        self.inner_layout_personal.setAlignment(
-            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop
-        )
-
-        self.scroll_area_personal.setWidget(self.inner_frame_personal)
-
-        self.main_layout = QVBoxLayout(self)
-        self.main_layout.addWidget(self.scroll_area_personal)
-
+        # 内存优化：延迟创建滚动区域，只在需要时创建
+        self._scroll_area_lazy = None
+        self._inner_frame_lazy = None
+        self._inner_layout_lazy = None
+        self._main_layout_lazy = None
         self.ui_created = True
 
         if self.content_widget_class:
             self.create_content()
 
+    def _ensure_scroll_area(self):
+        """确保滚动区域已创建 - 延迟创建以减少内存使用"""
+        if self._scroll_area_lazy is None:
+            self._scroll_area_lazy = SingleDirectionScrollArea(self)
+            self._scroll_area_lazy.setWidgetResizable(True)
+            self._scroll_area_lazy.setStyleSheet("""
+                QScrollArea {
+                    border: none;
+                    background-color: transparent;
+                }
+                QScrollArea QWidget {
+                    border: none;
+                    background-color: transparent;
+                }
+            """)
+            QScroller.grabGesture(
+                self._scroll_area_lazy.viewport(),
+                QScroller.ScrollerGestureType.LeftMouseButtonGesture,
+            )
+
+            self._inner_frame_lazy = QWidget(self._scroll_area_lazy)
+            self._inner_layout_lazy = QVBoxLayout(self._inner_frame_lazy)
+            self._inner_layout_lazy.setAlignment(
+                Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop
+            )
+
+            self._scroll_area_lazy.setWidget(self._inner_frame_lazy)
+
+            self._main_layout_lazy = QVBoxLayout(self)
+            self._main_layout_lazy.addWidget(self._scroll_area_lazy)
+
     def create_content(self):
-        """后台创建内容组件，避免堵塞进程"""
+        """后台创建内容组件，避免堵塞进程 - 使用延迟创建的布局"""
         if not self.ui_created or self.content_created or not self.content_widget_class:
             return
+
+        # 确保滚动区域已创建
+        self._ensure_scroll_area()
 
         # 支持传入三种类型的 content_widget_class:
         # 1) 直接的类 / 可调用对象 -> content_widget_class(self)
@@ -102,9 +113,9 @@ class PageTemplate(QFrame):
                 content_cls = self.content_widget_class
                 content_name = getattr(content_cls, "__name__", str(content_cls))
 
-            # 实例化并添加到布局
+            # 实例化并添加到延迟创建的布局
             self.contentWidget = content_cls(self)
-            self.inner_layout_personal.addWidget(self.contentWidget)
+            self._inner_layout_lazy.addWidget(self.contentWidget)
             self.content_created = True
 
             elapsed = time.perf_counter() - start
@@ -167,7 +178,13 @@ class PageTemplate(QFrame):
 
 
 class PivotPageTemplate(QFrame):
-    """Pivot 导航页面模板类，支持动态加载不同的页面组件"""
+    """Pivot 导航页面模板类，支持动态加载不同的页面组件
+
+    内存优化：
+    - 只保留当前页面在内存中
+    - 切换页面时卸载之前的页面
+    - 支持按需重新加载
+    """
 
     def __init__(self, page_config: dict, parent: QFrame = None):
         """
@@ -185,6 +202,8 @@ class PivotPageTemplate(QFrame):
         self.page_infos = {}  # 存储页面附加信息: display, layout, loaded
         self.current_page = None  # 当前页面
         self.base_path = "app.view.settings.list_management"  # 默认基础路径
+        self._page_load_order = []  # 页面加载顺序，用于LRU卸载
+        self.MAX_CACHED_PAGES = MAX_CACHED_PAGES  # 最大同时保留在内存中的页面数量
 
         self.__connectSignalToSlot()
 
@@ -402,8 +421,11 @@ class PivotPageTemplate(QFrame):
                 self.stacked_widget.setCurrentWidget(scroll_area)
 
     def switch_to_page(self, page_name: str):
-        """切换到指定页面"""
+        """切换到指定页面，并卸载不活动的页面以释放内存"""
         if page_name in self.pages:
+            # 先卸载超出缓存限制的页面
+            self._unload_excess_pages(page_name)
+
             # 按需加载：如果尚未加载该页面的实际内容，则先加载
             info = self.page_infos.get(page_name)
             if info and not info.get("loaded"):
@@ -412,44 +434,98 @@ class PivotPageTemplate(QFrame):
                     page_name, info["display"], info["scroll"], info["layout"]
                 )
 
+            # 更新加载顺序（LRU）
+            if page_name in self._page_load_order:
+                self._page_load_order.remove(page_name)
+            self._page_load_order.append(page_name)
+
             self.stacked_widget.setCurrentWidget(self.pages[page_name])
             self.pivot.setCurrentItem(page_name)
             self.current_page = page_name
 
-    def load_all_pages(self, interval_ms: int = 50, max_per_tick: int = 5):
-        """
-        分批异步加载该 PivotPageTemplate 下所有未加载的页面项，避免一次性阻塞UI。
+    def _unload_excess_pages(self, exclude_page: str = None):
+        """卸载超出缓存限制的页面以释放内存
 
         Args:
-            interval_ms: 每个批次内相邻项的间隔毫秒数。
-            max_per_tick: 每个定时器回调中加载的最大项数（进一步减少主线程压力）。
+            exclude_page: 不卸载的页面名称（通常是即将切换到的页面）
         """
+        # 获取已加载的页面列表
+        loaded_pages = [
+            name
+            for name, info in self.page_infos.items()
+            if info.get("loaded") and name != exclude_page
+        ]
+
+        # 如果已加载页面数量超过限制，卸载最早加载的页面
+        while len(loaded_pages) >= self.MAX_CACHED_PAGES:
+            # 找到最早加载的页面（使用加载顺序列表）
+            oldest_page = None
+            for page_name in self._page_load_order:
+                if page_name in loaded_pages and page_name != exclude_page:
+                    oldest_page = page_name
+                    break
+
+            if oldest_page is None and loaded_pages:
+                # 如果没有在顺序列表中找到，使用第一个
+                oldest_page = loaded_pages[0]
+
+            if oldest_page:
+                self._unload_page(oldest_page)
+                loaded_pages.remove(oldest_page)
+                if oldest_page in self._page_load_order:
+                    self._page_load_order.remove(oldest_page)
+            else:
+                break
+
+    def _unload_page(self, page_name: str):
+        """卸载指定页面以释放内存
+
+        Args:
+            page_name: 要卸载的页面名称
+        """
+        info = self.page_infos.get(page_name)
+        if not info or not info.get("loaded"):
+            return
+
         try:
-            names = [n for n, info in self.page_infos.items() if not info.get("loaded")]
-            if not names:
-                return
+            # 获取并销毁页面组件
+            widget = info.get("widget")
+            inner_layout = info.get("layout")
 
-            # 调度分批加载
-            for i in range(0, len(names), max_per_tick):
-                batch = names[i : i + max_per_tick]
-                QTimer.singleShot(
-                    interval_ms * (i // max_per_tick),
-                    (
-                        lambda b=batch: [
-                            self._load_page_content(
-                                n,
-                                self.page_infos[n]["display"],
-                                self.page_infos[n]["scroll"],
-                                self.page_infos[n]["layout"],
-                            )
-                            for n in b
-                        ]
-                    ),
-                )
+            if widget and inner_layout:
+                # 从布局中移除
+                inner_layout.removeWidget(widget)
+                # 安全删除widget
+                widget.setParent(None)
+                widget.deleteLater()
+
+                # 清除引用
+                info["widget"] = None
+                info["loaded"] = False
+
+                logger.debug(f"已卸载页面组件 {page_name} 以释放内存")
+        except RuntimeError as e:
+            # widget可能已经被销毁
+            logger.warning(f"卸载页面 {page_name} 时出现警告: {e}")
+            info["widget"] = None
+            info["loaded"] = False
         except Exception as e:
-            from loguru import logger
+            logger.error(f"卸载页面 {page_name} 失败: {e}")
 
-            logger.exception("调度批量页面加载时出错（已忽略）: {}", e)
+    def load_all_pages(self, interval_ms: int = 50, max_per_tick: int = 5):
+        """
+        分批异步加载该 PivotPageTemplate 下所有未加载的页面项。
+
+        内存优化：此方法已禁用批量预加载。
+        页面现在完全按需加载，切换时才创建，离开时自动卸载。
+
+        Args:
+            interval_ms: 每个批次内相邻项的间隔毫秒数（已禁用）。
+            max_per_tick: 每个定时器回调中加载的最大项数（已禁用）。
+        """
+        # 内存优化：禁用批量预加载，所有页面按需加载
+        # 这可以显著减少内存占用
+        pass
 
     def on_current_index_changed(self, index: int):
         """堆叠窗口索引改变时的处理"""

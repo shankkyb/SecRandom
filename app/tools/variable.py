@@ -63,6 +63,7 @@ FALLBACK_THEME_COLOR = "#3AF2FF"  # 备用主题色
 DEFAULT_ICON_CODEPOINT = 62634  # 默认图标码点(info图标)
 WIDTH_SPINBOX = 180  # 自旋框宽度
 MINIMUM_WINDOW_SIZE = (600, 400)  # 窗口最小尺寸
+MAX_CACHED_PAGES = 1  # 最大同时保留在内存中的页面数量
 
 # -------------------- 字体配置 --------------------
 DEFAULT_FONT_NAME_PRIMARY = "HarmonyOS Sans SC"  # 主要字体名称
