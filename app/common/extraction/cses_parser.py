@@ -56,31 +56,70 @@ class CSESParser:
             logger.error("课程表数据为空")
             return False
 
-        # 基本结构验证
+        # 处理不同格式的课程表数据
+        # 格式1: schedule.timeslots (原始格式)
+        # 格式2: schedules列表，每个元素包含classes列表 (test.yml格式)
+
+        # 检查是否有原始格式的schedule
         schedule = self.schedule_data.get("schedule")
-        if not schedule:
-            logger.error("缺少'schedule'字段")
-            return False
-
-        if not isinstance(schedule, dict):
-            logger.error("'schedule'字段必须是字典类型")
-            return False
-
-        # 验证时间段配置
-        timeslots = schedule.get("timeslots")
-        if timeslots is None:
-            logger.error("缺少'timeslots'字段")
-            return False
-
-        if not isinstance(timeslots, list):
-            logger.error("'timeslots'字段必须是列表类型")
-            return False
-
-        # 验证每个时间段
-        for i, timeslot in enumerate(timeslots):
-            if not self._validate_timeslot(timeslot, i):
+        if schedule and isinstance(schedule, dict):
+            timeslots = schedule.get("timeslots")
+            if timeslots is None:
+                logger.warning("缺少'timeslots'字段，将使用空课程表数据")
+                return True
+            if not isinstance(timeslots, list):
+                logger.error("'timeslots'字段必须是列表类型")
                 return False
+            # 验证每个时间段
+            for i, timeslot in enumerate(timeslots):
+                if not self._validate_timeslot(timeslot, i):
+                    return False
+            return True
 
+        # 检查是否有schedules列表
+        schedules = self.schedule_data.get("schedules")
+        if schedules and isinstance(schedules, list):
+            # 构建科目-老师映射表
+            subject_teacher_map = {}
+            subjects = self.schedule_data.get("subjects")
+            if subjects and isinstance(subjects, list):
+                for subject in subjects:
+                    if isinstance(subject, dict):
+                        name = subject.get("name")
+                        teacher = subject.get("teacher")
+                        if name and teacher:
+                            subject_teacher_map[name] = teacher
+
+            # 转换为统一的timeslots格式
+            timeslots = []
+            for day_schedule in schedules:
+                if isinstance(day_schedule, dict) and day_schedule.get("classes"):
+                    for cls in day_schedule["classes"]:
+                        if isinstance(cls, dict):
+                            # 获取老师信息，如果课程中没有，则从映射表中查找
+                            teacher = cls.get("teacher", "")
+                            if not teacher:
+                                teacher = subject_teacher_map.get(
+                                    cls.get("subject", ""), ""
+                                )
+
+                            # 转换为timeslot格式
+                            timeslot = {
+                                "name": cls.get("subject", ""),
+                                "start_time": cls.get("start_time"),
+                                "end_time": cls.get("end_time"),
+                                "teacher": teacher,
+                                "location": cls.get("room", ""),
+                                "day_of_week": day_schedule.get("enable_day"),
+                            }
+                            timeslots.append(timeslot)
+
+            # 更新为统一格式
+            self.schedule_data["schedule"] = {"timeslots": timeslots}
+            return True
+
+        logger.warning("缺少有效的课程表结构，将使用空课程表数据")
+        self.schedule_data["schedule"] = {"timeslots": []}
         return True
 
     def _validate_timeslot(self, timeslot: dict, index: int) -> bool:
@@ -166,8 +205,9 @@ class CSESParser:
             and slot.get("start_time")
             and slot.get("end_time")
         ]
+        # 确保start_time为字符串类型后再排序
         sorted_timeslots = sorted(
-            valid_timeslots, key=lambda x: x.get("start_time", "")
+            valid_timeslots, key=lambda x: str(x.get("start_time", ""))
         )
 
         # 构建上课时间段列表
@@ -201,15 +241,23 @@ class CSESParser:
         logger.info(f"成功解析CSES课程表，生成{len(non_class_times)}个非上课时间段")
         return non_class_times
 
-    def _format_time_for_secrandom(self, time_str: str) -> str:
-        """将时间字符串格式化为SecRandom需要的格式 (HH:MM:SS)
+    def _format_time_for_secrandom(self, time_val: str | int) -> str:
+        """将时间字符串或秒数格式化为SecRandom需要的格式 (HH:MM:SS)
 
         Args:
-            time_str: 原始时间字符串 (HH:MM 或 HH:MM:SS)
+            time_val: 原始时间字符串 (HH:MM 或 HH:MM:SS) 或秒数 (int)
 
         Returns:
             str: 格式化后的时间字符串 (HH:MM:SS)
         """
+        if isinstance(time_val, int):
+            # 处理YAML解析将时间识别为整数(秒数)的情况
+            hours = time_val // 3600
+            minutes = (time_val % 3600) // 60
+            seconds = time_val % 60
+            return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+        time_str = str(time_val)
         if time_str.count(":") == 1:  # HH:MM 格式
             return f"{time_str}:00"
         return time_str
@@ -231,8 +279,12 @@ class CSESParser:
             if isinstance(timeslot, dict):
                 info = {
                     "name": timeslot.get("name", ""),
-                    "start_time": timeslot.get("start_time", ""),
-                    "end_time": timeslot.get("end_time", ""),
+                    "start_time": self._format_time_for_secrandom(
+                        timeslot.get("start_time", "")
+                    ),
+                    "end_time": self._format_time_for_secrandom(
+                        timeslot.get("end_time", "")
+                    ),
                     "teacher": timeslot.get("teacher", ""),
                     "location": timeslot.get("location", ""),
                     "day_of_week": timeslot.get("day_of_week", ""),
@@ -258,12 +310,12 @@ class CSESParser:
 
         # 获取最早和最晚时间
         start_times = [
-            slot.get("start_time", "")
+            str(slot.get("start_time", ""))
             for slot in timeslots
             if isinstance(slot, dict) and slot.get("start_time")
         ]
         end_times = [
-            slot.get("end_time", "")
+            str(slot.get("end_time", ""))
             for slot in timeslots
             if isinstance(slot, dict) and slot.get("end_time")
         ]

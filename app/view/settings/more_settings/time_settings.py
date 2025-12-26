@@ -271,11 +271,20 @@ class cses_import_settings(GroupHeaderCardWidget):
 
         except Exception as e:
             logger.error(f"导入CSES文件失败: {e}")
+            import_error_msg = get_content_name_async("time_settings", "import_error")
+            if "{}" in import_error_msg:
+                error_content = import_error_msg.format(str(e))
+            else:
+                error_content = import_error_msg
+            import_failed_title = get_content_name_async(
+                "time_settings", "import_failed"
+            )
+            # 确保标题不包含意外的格式化占位符
+            if "{}" in import_failed_title:
+                import_failed_title = import_failed_title.format("")
             InfoBar.error(
-                title=get_content_name_async("time_settings", "import_failed"),
-                content=get_content_name_async("time_settings", "import_error").format(
-                    str(e)
-                ),
+                title=import_failed_title,
+                content=error_content,
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
