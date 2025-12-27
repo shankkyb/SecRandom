@@ -30,6 +30,8 @@ from loguru import logger
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 
+from edge_tts.exceptions import NoAudioReceived, WebSocketError
+
 # --------- 项目内部 ---------
 from app.tools.path_utils import ensure_dir, get_audio_path
 from app.tools.settings_access import readme_settings_async
@@ -318,7 +320,7 @@ class VoiceCacheManager:
             logger.error(f"无效的语音名称: {voice}")
             raise ValueError("语音名称不能为空")
 
-        logger.info(f"获取语音: text='{text}', voice='{voice}'")
+        logger.debug(f"获取语音: text='{text}', voice='{voice}'")
 
         # 检查并执行缓存清理
         self._check_and_cleanup()
@@ -374,19 +376,45 @@ class VoiceCacheManager:
 
         while retry_count < max_retries:
             try:
-                communicate = edge_tts.Communicate(text=text, voice=voice)
+                communicate = edge_tts.Communicate(text, voice)
 
                 audio_buffer = BytesIO()
+                audio_chunks = 0
                 async for chunk in communicate.stream():
                     if chunk["type"] == "audio":
                         audio_buffer.write(chunk["data"])
+                        audio_chunks += 1
+
+                logger.debug(f"接收到{audio_chunks}个音频数据块")
+
+                if audio_chunks == 0:
+                    raise RuntimeError("未接收到任何音频数据")
+
                 audio_buffer.seek(0)  # 重置指针位置
-                return sf.read(audio_buffer)
+                data, fs = sf.read(audio_buffer)
+                logger.debug(f"成功生成语音: 数据长度={len(data)}, 采样率={fs}")
+                return data, fs
+            except NoAudioReceived as e:
+                retry_count += 1
+                logger.error(
+                    f"生成语音失败，未接收到音频数据，重试{retry_count}/{max_retries}: {type(e).__name__} {e}"
+                )
+                if retry_count < max_retries:
+                    await asyncio.sleep(1)
+            except WebSocketError as e:
+                retry_count += 1
+                logger.error(
+                    f"生成语音失败，WebSocket通信错误，重试{retry_count}/{max_retries}: {type(e).__name__} {e}"
+                )
+                if retry_count < max_retries:
+                    await asyncio.sleep(1)
             except Exception as e:
                 retry_count += 1
-                logger.error(f"生成语音失败，重试{retry_count}/{max_retries}: {e}")
+                logger.error(
+                    f"生成语音失败，重试{retry_count}/{max_retries}: {type(e).__name__} {e}"
+                )
                 if retry_count < max_retries:
-                    await asyncio.sleep(1)  # 重试间隔1秒
+                    await asyncio.sleep(1)
 
         # 最终失败时的降级处理
         logger.error("生成语音失败，已达到最大重试次数")

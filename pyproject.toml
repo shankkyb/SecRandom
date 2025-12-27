@@ -7,13 +7,11 @@ requires-python = "==3.13.5"
 
 dependencies = [
     # === UI / 界面 ===
-    "PySide6-Fluent-Widgets>1.9.1",
+    "PySide6-Fluent-Widgets==1.10.5",
     "pyside6>6.6.3.1",
     "pysidesix-frameless-window>=0.7.4",
     "darkdetect==0.8.0",
     # === 核心/日志/工具 ===
-    # 注意：`asyncio` 为标准库，通常不应列在依赖中；已注释以提示移除
-    # "asyncio~=4.0.0",
     "loguru==0.7.3",
     "colorama==0.4.6",
     "packaging==25.0",
@@ -30,7 +28,7 @@ dependencies = [
     "colorthief==0.2.1",
     # === 网络 / TTS 服务 ===
     "requests==2.32.5",
-    "edge-tts==7.2.3",
+    "edge-tts==7.2.7",
     # === 音频 / TTS 本地 ===
     "pyttsx3==2.99",
     "sounddevice==0.5.3",

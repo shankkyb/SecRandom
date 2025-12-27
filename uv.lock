@@ -215,7 +215,7 @@ wheels = [
 
 [[package]]
 name = "edge-tts"
-version = "7.2.3"
+version = "7.2.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -223,9 +223,9 @@ dependencies = [
     { name = "tabulate" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e8/d0/db9a841ac29f119ca8e3d2a22325849997c571a4f31f728042c5fdbdff33/edge_tts-7.2.3.tar.gz", hash = "sha256:b85e271181cd52656934069237bfc3853335a17f7e51a4f7116e2936d32e62d2", size = 27308, upload-time = "2025-08-28T21:13:53.376Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/16/d2/1ce38f6e4fe7275207f4033b0971db489a0b594340ae6bac2320127e71ee/edge_tts-7.2.7.tar.gz", hash = "sha256:0127fba57a742bc48ff0a2a3b24b8324f7859260185274c335b4e54735aff325", size = 27508, upload-time = "2025-12-12T20:54:28.403Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c3/c6/9387c3f9decdd9780dfe21b7d9c0831aafd5d6813baf4f17b50afc7b7d77/edge_tts-7.2.3-py3-none-any.whl", hash = "sha256:62c87df25dedb6cd565cbdf87c639e01c466095b1e8f48ab8fa9efbb2123f53c", size = 30349, upload-time = "2025-08-28T21:13:52.145Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/89/92ac6b154ab87d236c15e5e0c73cb99be58efb1ea3eb9318c266bf9a36bf/edge_tts-7.2.7-py3-none-any.whl", hash = "sha256:ac11d9e834347e5ee62cbe72e8a56ffd65d3c4e795be14b1e593b72cf6480dd9", size = 30556, upload-time = "2025-12-12T20:54:26.956Z" },
 ]
 
 [[package]]
@@ -3502,16 +3502,16 @@ wheels = [
 
 [[package]]
 name = "pyside6-fluent-widgets"
-version = "1.9.2"
+version = "1.10.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "darkdetect" },
     { name = "pyside6" },
     { name = "pysidesix-frameless-window" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9a/0c/b431d696d9275e2bc079b4f1e96d7fb9ef399b72a5cbdd013b35a946d1c6/pyside6_fluent_widgets-1.9.2.tar.gz", hash = "sha256:a90f262246ff69d3651863efc4845c3095c9d4589fc63c69f21ff4ca401c8afd", size = 1443280, upload-time = "2025-11-02T10:16:56.429Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/43/9f/a82dfb44dad71619a39f2e9923ac8c1511d9b9fc0a2c37f3050e35cefa8c/pyside6_fluent_widgets-1.10.5.tar.gz", hash = "sha256:b46a560daf74a1d96f9ac208a08546d3a0e68ea02d8e5fca9a70cc620326b6fa", size = 1453771, upload-time = "2025-12-21T08:06:49.098Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d9/89/c680d7a084575f5b599030eef706768545fa7236dbf8efba17e5141bda9c/pyside6_fluent_widgets-1.9.2-py3-none-any.whl", hash = "sha256:28eeca58b3012beeb87aa8a1ca080e7a5bef0d0f111e28c6ad46160d77a6b551", size = 1536986, upload-time = "2025-11-02T10:16:54.504Z" },
+    { url = "https://files.pythonhosted.org/packages/16/cd/7b58089e5674e03c78c37632ddf807ae8b533a8763e01f649acb139312e9/pyside6_fluent_widgets-1.10.5-py3-none-any.whl", hash = "sha256:9187fec4a5280d60dba050bf0a1905b7981f1251f9e4976c1fd98b85d0bd9acf", size = 1547094, upload-time = "2025-12-21T08:06:45.807Z" },
 ]
 
 [[package]]
@@ -3741,7 +3741,7 @@ requires-dist = [
     { name = "colorthief", specifier = "==0.2.1" },
     { name = "comtypes", specifier = "==1.4.13" },
     { name = "darkdetect", specifier = "==0.8.0" },
-    { name = "edge-tts", specifier = "==7.2.3" },
+    { name = "edge-tts", specifier = "==7.2.7" },
     { name = "flake8", marker = "extra == 'dev'" },
     { name = "imageio", specifier = ">=2.37.2" },
     { name = "jinja2", specifier = "~=3.1.6" },
@@ -3764,7 +3764,7 @@ requires-dist = [
     { name = "pypng", specifier = "~=0.20220715.0" },
     { name = "pyqrcode", specifier = "~=1.2.1" },
     { name = "pyside6", specifier = ">6.6.3.1" },
-    { name = "pyside6-fluent-widgets", specifier = ">1.9.1" },
+    { name = "pyside6-fluent-widgets", specifier = "==1.10.5" },
     { name = "pysidesix-frameless-window", specifier = ">=0.7.4" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=6.0" },
     { name = "pyttsx3", specifier = "==2.99" },
