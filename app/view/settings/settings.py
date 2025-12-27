@@ -753,6 +753,9 @@ class SettingsWindow(FluentWindow):
             "draw_settings": readme_settings_async(
                 "sidebar_management_settings", "draw_settings"
             ),
+            "floating_window_management": readme_settings_async(
+                "sidebar_management_settings", "floating_window_management"
+            ),
             "notification_service": readme_settings_async(
                 "sidebar_management_settings", "notification_service"
             ),

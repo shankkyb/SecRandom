@@ -363,6 +363,7 @@ DEFAULT_SETTINGS = {
         "base_settings": {"default_value": 0},
         "name_management": {"default_value": 0},
         "draw_settings": {"default_value": 0},
+        "floating_window_management": {"default_value": 0},
         "notification_service": {"default_value": 1},
         "security_settings": {"default_value": 1},
         "personal_settings": {"default_value": 1},

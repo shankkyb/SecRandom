@@ -310,6 +310,26 @@ class sidebar_management_settings(GroupHeaderCardWidget):
             )
         )
 
+        # 浮窗管理下拉框
+        self.floating_window_management_comboBox = ComboBox(self)
+        self.floating_window_management_comboBox.addItems(
+            get_content_combo_name_async(
+                "sidebar_management_settings", "floating_window_management"
+            )
+        )
+        self.floating_window_management_comboBox.setCurrentIndex(
+            readme_settings_async(
+                "sidebar_management_settings", "floating_window_management"
+            )
+        )
+        self.floating_window_management_comboBox.currentIndexChanged.connect(
+            lambda: update_settings(
+                "sidebar_management_settings",
+                "floating_window_management",
+                self.floating_window_management_comboBox.currentIndex(),
+            )
+        )
+
         # 通知服务下拉框
         self.notification_service_comboBox = ComboBox(self)
         self.notification_service_comboBox.addItems(
@@ -440,6 +460,16 @@ class sidebar_management_settings(GroupHeaderCardWidget):
                 "sidebar_management_settings", "draw_settings"
             ),
             self.draw_settings_comboBox,
+        )
+        self.addGroup(
+            get_theme_icon("ic_fluent_app_generic_20_filled"),
+            get_content_name_async(
+                "sidebar_management_settings", "floating_window_management"
+            ),
+            get_content_description_async(
+                "sidebar_management_settings", "floating_window_management"
+            ),
+            self.floating_window_management_comboBox,
         )
         self.addGroup(
             get_theme_icon("ic_fluent_service_bell_20_filled"),
