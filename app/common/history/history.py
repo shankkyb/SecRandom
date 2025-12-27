@@ -847,7 +847,6 @@ def format_table_item(
 
 def create_table_item(
     value: Union[str, int, float],
-    font_size: int = 12,
     is_centered: bool = True,
     is_percentage: bool = False,
 ) -> "QTableWidgetItem":
@@ -855,7 +854,6 @@ def create_table_item(
 
     Args:
         value: 要显示的值
-        font_size: 字体大小
         is_centered: 是否居中
         is_percentage: 是否为百分比值
 
@@ -864,26 +862,6 @@ def create_table_item(
     """
     display_value = format_table_item(value, is_percentage)
     item = QTableWidgetItem(display_value)
-    from app.tools.personalised import load_custom_font
-
-    try:
-        # 确保font_size是有效的整数
-        if not isinstance(font_size, (int, float)):
-            font_size = int(font_size) if str(font_size).isdigit() else 12
-
-        font_size = int(font_size)
-        if font_size <= 0 or font_size > 200:  # 设置合理的上限
-            font_size = 12  # 使用默认字体大小
-
-        custom_font = load_custom_font()
-        if custom_font:
-            item.setFont(QFont(custom_font, font_size))
-    except (ValueError, TypeError) as e:
-        logger.warning(f"设置表格项字体大小失败，使用默认值: {e}")
-        # 使用默认字体大小
-        custom_font = load_custom_font()
-        if custom_font:
-            item.setFont(QFont(custom_font, 12))
 
     if is_centered:
         item.setTextAlignment(
