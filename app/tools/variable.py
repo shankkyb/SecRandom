@@ -99,12 +99,24 @@ CHANNEL_MAP = {
     2: "alpha",  # 发布预览通道
 }
 
-# 更新源映射
-SOURCE_MAP = {
-    0: "https://github.com",  # GitHub
-    1: "https://ghfast.top",  # ghfast
-    2: "https://gh-proxy.com",  # gh-proxy
-}
+# 更新源列表（按优先级排序）
+UPDATE_SOURCES = [
+    {
+        "name": "GitHub",
+        "url": "https://github.com",
+        "priority": 0,
+    },
+    {
+        "name": "ghfast",
+        "url": "https://ghfast.top",
+        "priority": 1,
+    },
+    {
+        "name": "gh-proxy",
+        "url": "https://gh-proxy.com",
+        "priority": 2,
+    },
+]
 
 DEFAULT_NAME_FORMAT = (
     "SecRandom-Windows-[version]-[arch]-[struct].zip"  # 默认更新文件名格式

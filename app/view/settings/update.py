@@ -14,6 +14,7 @@ from app.tools.settings_default import *
 from app.tools.settings_access import *
 from app.tools.update_utils import *
 from app.Language.obtain_language import *
+from loguru import logger
 
 
 # ==================================================
@@ -73,6 +74,12 @@ class update(QWidget):
 
         # 初始化更新检查
         # self.check_for_updates()
+
+        # 从全局状态管理器恢复状态
+        self._restore_from_global_status()
+
+        # 连接全局状态管理器的信号
+        self._connect_global_status_signals()
 
     def setup_header_info(self):
         """设置头部信息区域"""
@@ -237,19 +244,6 @@ class update(QWidget):
             )
         )
 
-        # 更新源选择
-        self.update_source_combo = ComboBox()
-        self.update_source_combo.addItems(
-            get_content_combo_name_async("update", "update_source")
-        )
-        update_source = readme_settings("update", "update_source")
-        self.update_source_combo.setCurrentIndex(update_source)
-        self.update_source_combo.currentIndexChanged.connect(
-            lambda: update_settings(
-                "update", "update_source", self.update_source_combo.currentIndex()
-            )
-        )
-
         # 添加设置项到卡片
         self.update_settings_card.addGroup(
             get_theme_icon("ic_fluent_arrow_repeat_all_20_filled"),
@@ -263,13 +257,6 @@ class update(QWidget):
             get_content_name_async("update", "update_channel"),
             get_content_description_async("update", "update_channel"),
             self.update_channel_combo,
-        )
-
-        self.update_settings_card.addGroup(
-            get_theme_icon("ic_fluent_cloud_arrow_down_20_filled"),
-            get_content_name_async("update", "update_source"),
-            get_content_description_async("update", "update_source"),
-            self.update_source_combo,
         )
 
     def force_check_for_updates(self):
@@ -363,6 +350,12 @@ class update(QWidget):
 
     def download_and_install(self):
         """下载并安装更新"""
+        # 初始化下载状态变量
+        self._download_cancelled = False
+        self._start_time = QDateTime.currentDateTime().toMSecsSinceEpoch()
+        self._last_speed_update = 0
+        self._speed_update_interval = 300  # 每300ms更新一次速度
+
         # 获取最新版本信息
         latest_version_info = get_latest_version()
         if not latest_version_info:
@@ -395,8 +388,82 @@ class update(QWidget):
                 self.status_label.setText(
                     get_content_name_async("update", "already_downloaded_same_version")
                 )
+
+                # 定义下载完成后的处理函数（需要在调用前定义）
+                def on_download_complete(file_path: Optional[str]):
+                    if self._download_cancelled:
+                        # 下载已取消
+                        QMetaObject.invokeMethod(
+                            self.status_label,
+                            "setText",
+                            Qt.QueuedConnection,
+                            Q_ARG(
+                                str,
+                                get_content_name_async("update", "update_cancelled"),
+                            ),
+                        )
+                    elif file_path:
+                        # 下载成功，询问用户是否现在更新
+                        QMetaObject.invokeMethod(
+                            self,
+                            "show_update_confirmation",
+                            Qt.QueuedConnection,
+                            Q_ARG(str, file_path),
+                        )
+                    else:
+                        # 下载失败
+                        QMetaObject.invokeMethod(
+                            self.status_label,
+                            "setText",
+                            Qt.QueuedConnection,
+                            Q_ARG(
+                                str,
+                                get_content_name_async(
+                                    "update", "failed_to_download_update"
+                                ),
+                            ),
+                        )
+
+                    # 恢复UI状态
+                    QMetaObject.invokeMethod(
+                        self.download_progress,
+                        "setVisible",
+                        Qt.QueuedConnection,
+                        Q_ARG(bool, False),
+                    )
+                    QMetaObject.invokeMethod(
+                        self.download_info_label,
+                        "setVisible",
+                        Qt.QueuedConnection,
+                        Q_ARG(bool, False),
+                    )
+                    QMetaObject.invokeMethod(
+                        self.cancel_update_button,
+                        "setVisible",
+                        Qt.QueuedConnection,
+                        Q_ARG(bool, False),
+                    )
+                    QMetaObject.invokeMethod(
+                        self.download_install_button,
+                        "setEnabled",
+                        Qt.QueuedConnection,
+                        Q_ARG(bool, True),
+                    )
+                    QMetaObject.invokeMethod(
+                        self.check_update_button,
+                        "setEnabled",
+                        Qt.QueuedConnection,
+                        Q_ARG(bool, True),
+                    )
+                    QMetaObject.invokeMethod(
+                        self.download_info_label,
+                        "setText",
+                        Qt.QueuedConnection,
+                        Q_ARG(str, ""),
+                    )
+
                 # 直接调用下载完成处理，跳过实际下载
-                self.on_download_complete(str(expected_file_path))
+                on_download_complete(str(expected_file_path))
                 return
 
         # 更新状态显示
@@ -406,14 +473,9 @@ class update(QWidget):
         self.download_progress.setVisible(True)
         self.download_info_label.setVisible(True)
         self.cancel_update_button.setVisible(True)
+        self.cancel_update_button.setEnabled(True)
         self.download_install_button.setEnabled(False)
         self.check_update_button.setEnabled(False)
-
-        # 下载状态变量
-        self._download_cancelled = False
-        self._start_time = QDateTime.currentDateTime().toMSecsSinceEpoch()
-        self._last_speed_update = 0
-        self._speed_update_interval = 300  # 每300ms更新一次速度
 
         # 定义进度回调函数
         def progress_callback(downloaded: int, total: int):
@@ -552,7 +614,8 @@ class update(QWidget):
                     file_path = download_update(
                         self.version,
                         progress_callback=self.progress_callback,
-                        timeout=300,  # 增加超时时间到300秒
+                        timeout=300,
+                        cancel_check=lambda: self.parent._download_cancelled,
                     )
                     self.on_complete(file_path)
                 except Exception as e:
@@ -566,6 +629,7 @@ class update(QWidget):
         )
         QThreadPool.globalInstance().start(self._download_task)
 
+    @Slot(str)
     def show_update_confirmation(self, file_path: str):
         """显示更新确认对话框"""
         # 创建消息框
@@ -584,7 +648,7 @@ class update(QWidget):
         # 显示消息框并等待用户响应
         result = msg_box.exec()
 
-        if result == MessageBox.Yes:
+        if result:
             # 用户选择现在更新
             self.status_label.setText(
                 get_content_name_async("update", "installing_update")
@@ -616,6 +680,9 @@ class update(QWidget):
             self.status_label.setText(
                 get_content_name_async("update", "update_cancelled_by_user")
             )
+            # 恢复按钮状态
+            self.download_install_button.setEnabled(True)
+            self.check_update_button.setEnabled(True)
 
     def cancel_update(self):
         """取消更新"""
@@ -639,5 +706,254 @@ class update(QWidget):
         self.status_label.setText(status_text)
         self.indeterminate_ring.setVisible(False)  # 隐藏不确定进度环
         self.check_update_button.setEnabled(True)
-        # 更新上次检查时间
+
+    def set_checking_status(self):
+        """设置正在检查更新的状态（公共方法，供外部调用）"""
+        QMetaObject.invokeMethod(
+            self.status_label,
+            "setText",
+            Qt.QueuedConnection,
+            Q_ARG(str, get_content_name_async("update", "checking_update")),
+        )
+        QMetaObject.invokeMethod(
+            self.indeterminate_ring,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, True),
+        )
+
+    def set_new_version_available(self, latest_version: str):
+        """设置发现新版本的状态（公共方法，供外部调用）"""
+        status_text = f"{get_content_name_async('update', 'new_version_available')}: {latest_version} | {CODENAME} ({SYSTEM}-{ARCH})"
+        QMetaObject.invokeMethod(
+            self.status_label,
+            "setText",
+            Qt.QueuedConnection,
+            Q_ARG(str, status_text),
+        )
+        QMetaObject.invokeMethod(
+            self.indeterminate_ring,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, False),
+        )
+        QMetaObject.invokeMethod(
+            self.download_install_button,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, True),
+        )
+
+    def set_latest_version(self):
+        """设置已是最新版本的状态（公共方法，供外部调用）"""
+        QMetaObject.invokeMethod(
+            self.status_label,
+            "setText",
+            Qt.QueuedConnection,
+            Q_ARG(str, get_content_name_async("update", "already_latest_version")),
+        )
+        QMetaObject.invokeMethod(
+            self.indeterminate_ring,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, False),
+        )
+        QMetaObject.invokeMethod(
+            self.download_install_button,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, False),
+        )
+
+    def set_check_failed(self):
+        """设置检查失败的状态（公共方法，供外部调用）"""
+        QMetaObject.invokeMethod(
+            self.status_label,
+            "setText",
+            Qt.QueuedConnection,
+            Q_ARG(str, get_content_name_async("update", "check_update_failed")),
+        )
+        QMetaObject.invokeMethod(
+            self.indeterminate_ring,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, False),
+        )
+        QMetaObject.invokeMethod(
+            self.download_install_button,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, False),
+        )
+
+    def set_downloading_status(self):
+        """设置正在下载的状态（公共方法，供外部调用）"""
+        QMetaObject.invokeMethod(
+            self.status_label,
+            "setText",
+            Qt.QueuedConnection,
+            Q_ARG(str, get_content_name_async("update", "downloading_update")),
+        )
+        QMetaObject.invokeMethod(
+            self.download_progress,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, True),
+        )
+        QMetaObject.invokeMethod(
+            self.download_info_label,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, True),
+        )
+
+    def update_download_progress(self, progress: int, speed: str, total_size: str):
+        """更新下载进度（公共方法，供外部调用）"""
+        QMetaObject.invokeMethod(
+            self.download_progress,
+            "setValue",
+            Qt.QueuedConnection,
+            Q_ARG(int, progress),
+        )
+        info_text = f"{speed} | {total_size}"
+        QMetaObject.invokeMethod(
+            self.download_info_label,
+            "setText",
+            Qt.QueuedConnection,
+            Q_ARG(str, info_text),
+        )
+
+    def set_download_complete(self, file_path: str):
+        """设置下载完成的状态（公共方法，供外部调用）"""
+        QMetaObject.invokeMethod(
+            self.download_progress,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, False),
+        )
+        QMetaObject.invokeMethod(
+            self.download_info_label,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, False),
+        )
+        QMetaObject.invokeMethod(
+            self.status_label,
+            "setText",
+            Qt.QueuedConnection,
+            Q_ARG(
+                str, get_content_name_async("update", "already_downloaded_same_version")
+            ),
+        )
+
+    def set_download_failed(self):
+        """设置下载失败的状态（公共方法，供外部调用）"""
+        QMetaObject.invokeMethod(
+            self.download_progress,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, False),
+        )
+        QMetaObject.invokeMethod(
+            self.download_info_label,
+            "setVisible",
+            Qt.QueuedConnection,
+            Q_ARG(bool, False),
+        )
+        QMetaObject.invokeMethod(
+            self.status_label,
+            "setText",
+            Qt.QueuedConnection,
+            Q_ARG(str, get_content_name_async("update", "failed_to_download_update")),
+        )
+
+    def update_last_check_time(self):
+        """更新上次检查时间（公共方法，供外部调用）"""
         self._update_last_check_time()
+
+    def _restore_from_global_status(self):
+        """从全局状态管理器恢复状态"""
+        try:
+            from main import update_status_manager
+
+            status = update_status_manager.status
+
+            if status == "checking":
+                self.status_label.setText(
+                    get_content_name_async("update", "checking_update")
+                )
+                self.indeterminate_ring.setVisible(True)
+            elif status == "new_version" and update_status_manager.latest_version:
+                status_text = f"{get_content_name_async('update', 'new_version_available')}: {update_status_manager.latest_version} | {CODENAME} ({SYSTEM}-{ARCH})"
+                self.status_label.setText(status_text)
+                self.indeterminate_ring.setVisible(False)
+                self.download_install_button.setVisible(True)
+            elif status == "downloading":
+                self.status_label.setText(
+                    get_content_name_async("update", "downloading_update")
+                )
+                self.indeterminate_ring.setVisible(False)
+                self.download_progress.setVisible(True)
+                self.download_info_label.setVisible(True)
+                self.cancel_update_button.setVisible(True)
+                if update_status_manager.download_progress > 0:
+                    self.download_progress.setValue(
+                        update_status_manager.download_progress
+                    )
+                    info_text = f"{update_status_manager.download_speed} | {update_status_manager.download_total}"
+                    self.download_info_label.setText(info_text)
+            elif status == "completed" and update_status_manager.download_file_path:
+                self.status_label.setText(
+                    get_content_name_async("update", "download_complete")
+                )
+                self.indeterminate_ring.setVisible(False)
+                self.download_progress.setVisible(False)
+                self.download_info_label.setVisible(False)
+                self.cancel_update_button.setVisible(False)
+                self.download_install_button.setVisible(True)
+                self.download_install_button.setEnabled(True)
+                self.check_update_button.setEnabled(True)
+            elif status == "failed":
+                self.status_label.setText(
+                    get_content_name_async("update", "check_update_failed")
+                )
+                self.indeterminate_ring.setVisible(False)
+        except Exception as e:
+            logger.warning(f"从全局状态恢复失败: {e}")
+
+    def _connect_global_status_signals(self):
+        """连接全局状态管理器的信号"""
+        try:
+            from main import update_status_manager
+
+            update_status_manager.status_changed.connect(self._on_status_changed)
+            update_status_manager.download_progress_updated.connect(
+                self._on_download_progress_updated
+            )
+        except Exception as e:
+            logger.warning(f"连接全局状态信号失败: {e}")
+
+    def _on_status_changed(self, status):
+        """处理状态变化"""
+        try:
+            from main import update_status_manager
+
+            if status == "checking":
+                self.set_checking_status()
+            elif status == "new_version" and update_status_manager.latest_version:
+                self.set_new_version_available(update_status_manager.latest_version)
+            elif status == "downloading":
+                self.set_downloading_status()
+            elif status == "completed" and update_status_manager.download_file_path:
+                self.set_download_complete(update_status_manager.download_file_path)
+            elif status == "failed":
+                self.set_check_failed()
+        except Exception as e:
+            logger.warning(f"处理状态变化失败: {e}")
+
+    def _on_download_progress_updated(self, progress, speed, total):
+        """处理下载进度更新"""
+        try:
+            self.update_download_progress(progress, speed, total)
+        except Exception as e:
+            logger.warning(f"处理下载进度更新失败: {e}")

@@ -4,6 +4,7 @@
 import os
 import sys
 import time
+import asyncio
 
 from PySide6.QtGui import *
 from PySide6.QtCore import *
@@ -33,6 +34,80 @@ url_handler = None
 
 # 全局更新检查线程实例
 update_check_thread = None
+
+
+# 全局更新状态管理器
+class UpdateStatusManager(QObject):
+    """全局更新状态管理器，用于在更新页面创建前后同步状态"""
+
+    status_changed = Signal(str)  # 状态变化信号
+    download_progress_updated = Signal(int, str, str)  # 下载进度更新信号
+
+    def __init__(self):
+        super().__init__()
+        self.status = (
+            "idle"  # idle, checking, new_version, downloading, completed, failed
+        )
+        self.latest_version = None
+        self.download_progress = 0
+        self.download_speed = ""
+        self.download_total = ""
+        self.download_file_path = None
+        self.error_message = None
+
+    def set_checking(self):
+        """设置正在检查更新的状态"""
+        self.status = "checking"
+        self.latest_version = None
+        self.download_progress = 0
+        self.download_speed = ""
+        self.download_total = ""
+        self.download_file_path = None
+        self.error_message = None
+        self.status_changed.emit("checking")
+
+    def set_new_version(self, version):
+        """设置发现新版本的状态"""
+        self.status = "new_version"
+        self.latest_version = version
+        self.status_changed.emit("new_version")
+
+    def set_downloading(self):
+        """设置正在下载的状态"""
+        self.status = "downloading"
+        self.status_changed.emit("downloading")
+
+    def update_download_progress(self, progress, speed, total):
+        """更新下载进度"""
+        self.download_progress = progress
+        self.download_speed = speed
+        self.download_total = total
+        self.download_progress_updated.emit(progress, speed, total)
+
+    def set_download_complete(self, file_path):
+        """设置下载完成的状态"""
+        self.status = "completed"
+        self.download_file_path = file_path
+        self.status_changed.emit("completed")
+
+    def set_download_failed(self):
+        """设置下载失败的状态"""
+        self.status = "failed"
+        self.status_changed.emit("failed")
+
+    def set_check_failed(self):
+        """设置检查失败的状态"""
+        self.status = "failed"
+        self.status_changed.emit("failed")
+
+    def set_latest_version(self):
+        """设置已是最新版本的状态"""
+        self.status = "idle"
+        self.status_changed.emit("idle")
+
+
+# 全局更新状态管理器实例
+update_status_manager = UpdateStatusManager()
 
 # 导入更新相关模块
 from app.tools.update_utils import *
@@ -439,7 +514,23 @@ def check_for_updates_on_startup():
     # 创建一个QThread来执行更新检查，避免阻塞主线程
     class UpdateCheckThread(QThread):
         def run(self):
+            loop = None
             try:
+                global settings_window
+                # 创建新的事件循环
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+
+                # 辅助函数：安全地调用更新页面的方法
+                def safe_call_update_interface(method_name, *args):
+                    """安全地调用更新页面的方法"""
+                    if settings_window and hasattr(settings_window, "updateInterface"):
+                        update_iface = settings_window.updateInterface
+                        if hasattr(update_iface, method_name):
+                            method = getattr(update_iface, method_name)
+                            # 直接调用方法，方法内部已经使用 QMetaObject.invokeMethod 确保在主线程执行
+                            method(*args)
+
                 # 读取自动更新模式设置
                 auto_update_mode = readme_settings_async("update", "auto_update_mode")
                 logger.debug(f"自动更新模式: {auto_update_mode}")
@@ -449,12 +540,23 @@ def check_for_updates_on_startup():
                     logger.debug("自动更新模式为0，不执行更新检查")
                     return
 
-                # 获取最新版本信息
+                # 通知更新页面开始检查
+                safe_call_update_interface("set_checking_status")
+                # 更新全局状态
+                update_status_manager.set_checking()
+
+                # 获取最新版本信息（使用异步方式）
                 logger.debug("开始检查更新")
-                latest_version_info = get_latest_version()
+                latest_version_info = loop.run_until_complete(
+                    get_latest_version_async()
+                )
 
                 if not latest_version_info:
                     logger.debug("获取最新版本信息失败")
+                    # 通知更新页面检查失败
+                    safe_call_update_interface("set_check_failed")
+                    # 更新全局状态
+                    update_status_manager.set_check_failed()
                     return
 
                 latest_version = latest_version_info["version"]
@@ -498,6 +600,13 @@ def check_for_updates_on_startup():
                     # 有新版本
                     logger.debug(f"发现新版本: {latest_version}")
 
+                    # 通知更新页面发现新版本
+                    safe_call_update_interface(
+                        "set_new_version_available", latest_version
+                    )
+                    # 更新全局状态
+                    update_status_manager.set_new_version(latest_version)
+
                     # 发送系统通知
                     title = get_content_name_async(
                         "update", "update_notification_title"
@@ -520,22 +629,84 @@ def check_for_updates_on_startup():
                             logger.debug(
                                 f"更新文件已存在，跳过下载: {expected_file_path}"
                             )
+                            # 通知更新页面下载完成
+                            safe_call_update_interface(
+                                "set_download_complete", str(expected_file_path)
+                            )
                             return
 
-                        # 自动下载更新
-                        file_path = download_update(latest_version)
+                        # 通知更新页面开始下载
+                        safe_call_update_interface("set_downloading_status")
+                        # 更新全局状态
+                        update_status_manager.set_downloading()
+
+                        # 定义进度回调函数
+                        def progress_callback(downloaded: int, total: int):
+                            if total > 0:
+                                progress = int((downloaded / total) * 100)
+                                # 计算下载速度
+                                current_time = (
+                                    QDateTime.currentDateTime().toMSecsSinceEpoch()
+                                )
+                                elapsed = (current_time - start_time) / 1000  # 秒
+                                speed = downloaded / elapsed if elapsed > 0 else 0
+                                speed_str = f"{speed / 1024 / 1024:.2f} MB/s"
+                                total_str = f"{total / 1024 / 1024:.2f} MB"
+                                # 通知更新页面更新进度
+                                safe_call_update_interface(
+                                    "update_download_progress",
+                                    progress,
+                                    speed_str,
+                                    total_str,
+                                )
+                                # 更新全局状态
+                                update_status_manager.update_download_progress(
+                                    progress, speed_str, total_str
+                                )
+
+                        start_time = QDateTime.currentDateTime().toMSecsSinceEpoch()
+
+                        # 自动下载更新（使用异步方式）
+                        file_path = loop.run_until_complete(
+                            download_update_async(
+                                latest_version, progress_callback=progress_callback
+                            )
+                        )
                         if file_path:
                             logger.debug(f"自动下载更新成功: {file_path}")
+                            # 通知更新页面下载完成
+                            safe_call_update_interface(
+                                "set_download_complete", file_path
+                            )
+                            # 更新全局状态
+                            update_status_manager.set_download_complete(file_path)
                         else:
                             logger.error("自动下载更新失败")
+                            # 通知更新页面下载失败
+                            safe_call_update_interface("set_download_failed")
+                            # 更新全局状态
+                            update_status_manager.set_download_failed()
                 elif compare_result == 0:
                     # 当前是最新版本
                     logger.debug("当前已是最新版本")
+                    # 通知更新页面已是最新版本
+                    safe_call_update_interface("set_latest_version")
                 else:
                     # 版本比较失败
                     logger.debug("版本比较失败")
+                    # 通知更新页面检查失败
+                    safe_call_update_interface("set_check_failed")
+
+                # 更新上次检查时间
+                safe_call_update_interface("update_last_check_time")
             except Exception as e:
                 logger.error(f"启动时检查更新失败: {e}")
+                # 通知更新页面检查失败
+                safe_call_update_interface("set_check_failed")
+            finally:
+                # 关闭事件循环
+                if loop and not loop.is_closed():
+                    loop.close()
 
     # 启动更新检查线程
     global update_check_thread

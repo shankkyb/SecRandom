@@ -53,6 +53,144 @@ def _run_async_func(async_func: Any, *args: Any, **kwargs: Any) -> Any:
         return None
 
 
+def check_zip_integrity(zip_path: str) -> bool:
+    """检查ZIP文件的完整性
+
+    Args:
+        zip_path (str): zip文件路径
+
+    Returns:
+        bool: 文件完整返回True，否则返回False
+    """
+    try:
+        logger.debug(f"检查ZIP文件完整性: {zip_path}")
+
+        # 检查文件是否存在
+        if not Path(zip_path).exists():
+            logger.error(f"ZIP文件不存在: {zip_path}")
+            return False
+
+        # 检查文件大小
+        file_size = Path(zip_path).stat().st_size
+        if file_size == 0:
+            logger.error(f"ZIP文件大小为0: {zip_path}")
+            return False
+
+        # 尝试打开并测试ZIP文件
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            # 测试ZIP文件的完整性
+            bad_file = zip_ref.testzip()
+            if bad_file is not None:
+                logger.error(f"ZIP文件损坏，损坏的文件: {bad_file}")
+                return False
+
+            # 检查ZIP文件是否为空
+            file_list = zip_ref.namelist()
+            if not file_list:
+                logger.error(f"ZIP文件为空: {zip_path}")
+                return False
+
+        logger.debug(f"ZIP文件完整性检查通过: {zip_path}")
+        return True
+    except zipfile.BadZipFile as e:
+        logger.error(f"ZIP文件格式错误: {e}")
+        return False
+    except Exception as e:
+        logger.error(f"检查ZIP文件完整性失败: {e}")
+        return False
+
+
+def check_deb_integrity(deb_path: str) -> bool:
+    """检查DEB包的完整性
+
+    Args:
+        deb_path (str): deb文件路径
+
+    Returns:
+        bool: 文件完整返回True，否则返回False
+    """
+    try:
+        logger.debug(f"检查DEB包完整性: {deb_path}")
+
+        # 检查文件是否存在
+        if not Path(deb_path).exists():
+            logger.error(f"DEB文件不存在: {deb_path}")
+            return False
+
+        # 检查文件大小
+        file_size = Path(deb_path).stat().st_size
+        if file_size == 0:
+            logger.error(f"DEB文件大小为0: {deb_path}")
+            return False
+
+        # DEB包实际上是ar归档格式
+        # 检查ar文件头
+        with open(deb_path, "rb") as f:
+            # 检查ar文件签名
+            magic = f.read(8)
+            if not magic.startswith(b"!<arch>"):
+                logger.error(f"DEB文件格式错误，不是有效的ar归档: {deb_path}")
+                return False
+
+            # 读取ar文件内容
+            f.seek(0)
+            content = f.read()
+
+            # 检查是否包含必要的文件（debian-binary, control.tar.gz, data.tar.gz）
+            if b"debian-binary" not in content:
+                logger.error(f"DEB文件缺少debian-binary: {deb_path}")
+                return False
+
+            if b"control.tar" not in content:
+                logger.error(f"DEB文件缺少control.tar: {deb_path}")
+                return False
+
+            if b"data.tar" not in content:
+                logger.error(f"DEB文件缺少data.tar: {deb_path}")
+                return False
+
+        logger.debug(f"DEB包完整性检查通过: {deb_path}")
+        return True
+    except Exception as e:
+        logger.error(f"检查DEB包完整性失败: {e}")
+        return False
+
+
+def check_update_file_integrity(file_path: str, file_type: str = None) -> bool:
+    """检查更新文件的完整性（自动检测文件类型）
+
+    Args:
+        file_path (str): 更新文件路径
+        file_type (str, optional): 文件类型，如果不指定则自动检测
+
+    Returns:
+        bool: 文件完整返回True，否则返回False
+    """
+    try:
+        # 自动检测文件类型
+        if file_type is None:
+            file_ext = Path(file_path).suffix.lower()
+            if file_ext == ".zip":
+                file_type = "zip"
+            elif file_ext == ".deb":
+                file_type = "deb"
+            else:
+                logger.error(f"不支持的更新文件类型: {file_ext}")
+                return False
+
+        # 根据文件类型调用相应的检查函数
+        if file_type == "zip":
+            return check_zip_integrity(file_path)
+        elif file_type == "deb":
+            return check_deb_integrity(file_path)
+        else:
+            logger.error(f"不支持的文件类型: {file_type}")
+            return False
+    except Exception as e:
+        logger.error(f"检查更新文件完整性失败: {e}")
+        return False
+
+
 def extract_zip(zip_path: str, target_dir: str | Path, overwrite: bool = True) -> bool:
     """解压zip文件到指定目录
 
@@ -127,19 +265,118 @@ def parse_version(version_str: str) -> Tuple[list[int], list[str]]:
 # ==================================================
 # 更新工具函数
 # ==================================================
+
+
+async def test_source_latency(source_url: str, timeout: int = 5) -> float:
+    """
+    测试镜像源的延迟
+
+    Args:
+        source_url (str): 镜像源 URL
+        timeout (int, optional): 超时时间（秒），默认5秒
+
+    Returns:
+        float: 延迟时间（毫秒），如果测试失败则返回无穷大
+    """
+    try:
+        start_time = time.time()
+        test_url = source_url
+
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=timeout)
+        ) as session:
+            async with session.get(test_url, allow_redirects=True) as response:
+                response.raise_for_status()
+                latency = (time.time() - start_time) * 1000  # 转换为毫秒
+                logger.debug(f"镜像源 {source_url} 延迟: {latency:.2f}ms")
+                return latency
+    except Exception as e:
+        logger.debug(f"测试镜像源 {source_url} 延迟失败: {e}")
+        return float("inf")
+
+
+async def get_best_source() -> dict:
+    """
+    获取延迟最低的镜像源
+
+    Returns:
+        dict: 延迟最低的镜像源配置
+    """
+    try:
+        logger.info("开始测试所有镜像源的延迟...")
+
+        # 并发测试所有镜像源
+        tasks = []
+        for source in UPDATE_SOURCES:
+            task = test_source_latency(source["url"])
+            tasks.append(task)
+
+        # 等待所有测试完成
+        latencies = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # 找到延迟最低的镜像源
+        best_source = None
+        best_latency = float("inf")
+
+        for i, latency in enumerate(latencies):
+            if isinstance(latency, Exception):
+                logger.debug(f"镜像源 {UPDATE_SOURCES[i]['name']} 测试失败")
+                continue
+
+            if latency < best_latency:
+                best_latency = latency
+                best_source = UPDATE_SOURCES[i]
+
+        if best_source:
+            logger.info(
+                f"选择延迟最低的镜像源: {best_source['name']} ({best_source['url']}) - 延迟: {best_latency:.2f}ms"
+            )
+        else:
+            logger.warning("所有镜像源测试失败，使用默认源")
+            best_source = UPDATE_SOURCES[0]  # 使用第一个源作为默认
+
+        return best_source
+    except Exception as e:
+        logger.error(f"获取最佳镜像源失败: {e}")
+        return UPDATE_SOURCES[0]  # 返回默认源
+
+
 def get_update_source_url() -> str:
     """
-    获取更新源 URL
+    获取更新源 URL（自动选择延迟最低的源）
 
     Returns:
         str: 更新源 URL，如果获取失败则返回默认值
     """
     try:
-        # 从设置中读取更新源
-        update_source = readme_settings("update", "update_source")
-        source_url = SOURCE_MAP.get(update_source, "https://github.com")
-        logger.debug(f"获取更新源 URL 成功: {source_url}")
-        return source_url
+        # 异步获取最佳镜像源
+        best_source = _run_async_func(get_best_source)
+        if best_source:
+            source_url = best_source["url"]
+            logger.debug(f"获取更新源 URL 成功: {source_url}")
+            return source_url
+        else:
+            return "https://github.com"
+    except Exception as e:
+        logger.error(f"获取更新源 URL 失败: {e}")
+        return "https://github.com"
+
+
+async def get_update_source_url_async() -> str:
+    """
+    获取更新源 URL（自动选择延迟最低的源）- 异步版本
+
+    Returns:
+        str: 更新源 URL，如果获取失败则返回默认值
+    """
+    try:
+        best_source = await get_best_source()
+        if best_source:
+            source_url = best_source["url"]
+            logger.debug(f"获取更新源 URL 成功: {source_url}")
+            return source_url
+        else:
+            return "https://github.com"
     except Exception as e:
         logger.error(f"获取更新源 URL 失败: {e}")
         return "https://github.com"
@@ -169,6 +406,30 @@ def get_update_check_url() -> str:
     return update_check_url
 
 
+async def get_update_check_url_async() -> str:
+    """
+    获取更新检查 URL - 异步版本
+
+    Returns:
+        str: 更新检查 URL
+    """
+    source_url = await get_update_source_url_async()
+    repo_url = GITHUB_WEB
+
+    # 构建完整的 GitHub URL
+    github_raw_url = f"{repo_url}/raw/master/metadata.yaml"
+
+    # 如果是默认源（GitHub），直接返回
+    if source_url == "https://github.com":
+        update_check_url = github_raw_url
+    else:
+        # 其他镜像源，在 GitHub URL 前添加镜像源 URL
+        update_check_url = f"{source_url}/{github_raw_url}"
+
+    logger.debug(f"生成更新检查 URL 成功: {update_check_url}")
+    return update_check_url
+
+
 async def get_metadata_info_async() -> dict | None:
     """
     异步获取 metadata.yaml 文件信息
@@ -176,20 +437,41 @@ async def get_metadata_info_async() -> dict | None:
     Returns:
         dict: metadata.yaml 文件的内容，如果读取失败则返回 None
     """
-    try:
-        update_check_url = get_update_check_url()
-        logger.debug(f"从网络获取 metadata.yaml: {update_check_url}")
+    # 按优先级排序的镜像源列表
+    sources = sorted(UPDATE_SOURCES, key=lambda x: x["priority"])
+    repo_url = GITHUB_WEB
+    github_raw_url = f"{repo_url}/raw/master/metadata.yaml"
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(update_check_url, timeout=10) as response:
-                response.raise_for_status()
-                content = await response.text()
-                metadata = yaml.safe_load(content)
-                logger.debug("成功从网络读取 metadata.yaml 文件")
-                return metadata
-    except Exception as e:
-        logger.error(f"从网络获取 metadata.yaml 文件失败: {e}")
-        return None
+    # 依次尝试每个镜像源
+    for source in sources:
+        try:
+            source_url = source["url"]
+            logger.debug(f"尝试使用镜像源 {source['name']} 获取 metadata.yaml")
+
+            # 构建更新检查 URL
+            if source_url == "https://github.com":
+                update_check_url = github_raw_url
+            else:
+                update_check_url = f"{source_url}/{github_raw_url}"
+
+            logger.debug(f"从网络获取 metadata.yaml: {update_check_url}")
+
+            async with aiohttp.ClientSession() as session:
+                async with session.get(update_check_url, timeout=30) as response:
+                    response.raise_for_status()
+                    content = await response.text()
+                    metadata = yaml.safe_load(content)
+                    logger.debug(
+                        f"成功使用镜像源 {source['name']} 读取 metadata.yaml 文件"
+                    )
+                    return metadata
+        except Exception as e:
+            logger.warning(f"使用镜像源 {source['name']} 获取 metadata.yaml 失败: {e}")
+            continue
+
+    # 所有镜像源都失败了
+    logger.error("所有镜像源都获取 metadata.yaml 文件失败")
+    return None
 
 
 def get_metadata_info() -> dict | None:
@@ -385,13 +667,63 @@ def get_update_download_url(
         return f"https://github.com/SECTL/SecRandom/releases/download/{version}/SecRandom-{system}-{version}-{arch}-{struct}.zip"
 
 
+async def get_update_download_url_async(
+    version: str, system: str = SYSTEM, arch: str = ARCH, struct: str = STRUCT
+) -> str:
+    """
+    获取更新下载 URL - 异步版本
+
+    Args:
+        version (str): 版本号，格式为 "vX.X.X.X"
+        system (str, optional): 系统，默认为当前系统
+        arch (str, optional): 架构，默认为当前架构
+        struct (str, optional): 结构，默认为当前结构
+
+    Returns:
+        str: 更新下载 URL
+    """
+    try:
+        # 获取更新源 URL
+        source_url = await get_update_source_url_async()
+
+        # 获取 GitHub 仓库 URL
+        repo_url = GITHUB_WEB
+
+        # 从 metadata.yaml 获取文件名格式
+        name_format = "SecRandom-[system]-[version]-[arch]-[struct].zip"
+
+        # 替换占位符生成实际文件名
+        file_name = name_format.replace("[system]", system)
+        file_name = file_name.replace("[version]", version)
+        file_name = file_name.replace("[arch]", arch)
+        file_name = file_name.replace("[struct]", struct)
+
+        # 构建完整的 GitHub 下载 URL
+        github_download_url = f"{repo_url}/releases/download/{version}/{file_name}"
+
+        # 如果是默认源（GitHub），直接返回
+        if source_url == "https://github.com":
+            download_url = github_download_url
+        else:
+            # 其他镜像源，在 GitHub URL 前添加镜像源 URL
+            download_url = f"{source_url}/{github_download_url}"
+
+        logger.debug(f"生成更新下载 URL 成功: {download_url}")
+        return download_url
+    except Exception as e:
+        logger.error(f"生成更新下载 URL 失败: {e}")
+        # 返回默认的 GitHub 下载 URL
+        return f"https://github.com/SECTL/SecRandom/releases/download/{version}/SecRandom-{system}-{version}-{arch}-{struct}.zip"
+
+
 async def download_update_async(
     version: str,
     system: str = SYSTEM,
     arch: str = ARCH,
     struct: str = STRUCT,
     progress_callback: Optional[Callable] = None,
-    timeout: int = 300,  # 增加超时参数，默认300秒
+    timeout: int = 300,
+    cancel_check: Optional[Callable[[], bool]] = None,
 ) -> Optional[str]:
     """
     异步下载更新文件
@@ -403,82 +735,119 @@ async def download_update_async(
         struct (str, optional): 结构，默认为当前结构
         progress_callback (Optional[Callable]): 进度回调函数，接收已下载字节数和总字节数
         timeout (int, optional): 下载超时时间（秒），默认300秒
+        cancel_check (Optional[Callable[[], bool]]): 取消检查函数，返回True表示取消下载
 
     Returns:
         Optional[str]: 下载完成的文件路径，如果下载失败则返回 None
     """
-    try:
-        # 获取下载 URL
-        download_url = get_update_download_url(version, system, arch, struct)
-        logger.debug(f"开始下载更新文件: {download_url}")
+    # 从 metadata.yaml 获取文件名格式
+    name_format = "SecRandom-[system]-[version]-[arch]-[struct].zip"
 
-        # 从 metadata.yaml 获取文件名格式
-        name_format = "SecRandom-[system]-[version]-[arch]-[struct].zip"
+    # 替换占位符生成实际文件名
+    file_name = name_format.replace("[system]", system)
+    file_name = file_name.replace("[version]", version)
+    file_name = file_name.replace("[arch]", arch)
+    file_name = file_name.replace("[struct]", struct)
 
-        # 替换占位符生成实际文件名
-        file_name = name_format.replace("[system]", system)
-        file_name = file_name.replace("[version]", version)
-        file_name = file_name.replace("[arch]", arch)
-        file_name = file_name.replace("[struct]", struct)
+    # 确定下载保存路径
+    download_dir = get_data_path("downloads")
+    ensure_dir(download_dir)
+    file_path = download_dir / file_name
 
-        # 确定下载保存路径
-        download_dir = get_data_path("downloads")
-        ensure_dir(download_dir)
-        file_path = download_dir / file_name
+    # 按优先级排序的镜像源列表
+    sources = sorted(UPDATE_SOURCES, key=lambda x: x["priority"])
+    repo_url = GITHUB_WEB
+    github_download_url = f"{repo_url}/releases/download/{version}/{file_name}"
 
-        # 配置客户端超时设置
-        client_timeout = aiohttp.ClientTimeout(
-            total=timeout,  # 总超时时间
-            connect=30,  # 连接超时时间
-            sock_read=60,  # 读取超时时间
-            sock_connect=30,  # Socket连接超时时间
-        )
+    # 依次尝试每个镜像源
+    for source in sources:
+        try:
+            source_url = source["url"]
+            logger.debug(f"尝试使用镜像源 {source['name']} 下载更新文件")
 
-        # 发送异步请求
-        async with aiohttp.ClientSession(timeout=client_timeout) as session:
-            async with session.get(
-                download_url,
-                allow_redirects=True,
-                headers={"User-Agent": "SecRandom Update Client"},
-            ) as response:
-                response.raise_for_status()
+            # 构建下载 URL
+            if source_url == "https://github.com":
+                download_url = github_download_url
+            else:
+                download_url = f"{source_url}/{github_download_url}"
 
-                # 获取文件总大小
-                total_size = int(response.headers.get("Content-Length", 0))
-                downloaded_size = 0
-                last_progress_time = time.time()
+            logger.debug(f"开始下载更新文件: {download_url}")
 
-                # 开始下载文件
-                with open(file_path, "wb") as f:
-                    # 使用更大的块大小提高下载速度
-                    async for chunk in response.content.iter_chunked(32768):
-                        if not chunk:
-                            break
+            # 配置客户端超时设置
+            client_timeout = aiohttp.ClientTimeout(
+                total=timeout,
+                connect=30,
+                sock_read=60,
+                sock_connect=30,
+            )
 
-                        # 写入文件
-                        f.write(chunk)
-                        downloaded_size += len(chunk)
-                        last_progress_time = time.time()
+            # 发送异步请求
+            async with aiohttp.ClientSession(timeout=client_timeout) as session:
+                async with session.get(
+                    download_url,
+                    allow_redirects=True,
+                    headers={"User-Agent": "SecRandom Update Client"},
+                ) as response:
+                    response.raise_for_status()
 
-                        # 调用进度回调函数
-                        if progress_callback:
-                            progress_callback(downloaded_size, total_size)
+                    # 获取文件总大小
+                    total_size = int(response.headers.get("Content-Length", 0))
+                    downloaded_size = 0
+                    last_progress_time = time.time()
 
-        logger.debug(f"更新文件下载成功: {file_path}")
-        return file_path
-    except aiohttp.ClientTimeout as e:
-        logger.error(f"下载超时: {e}")
-        return None
-    except aiohttp.ClientError as e:
-        logger.error(f"HTTP请求失败: {e}")
-        # 尝试使用不同的超时策略重试一次
-        logger.info("尝试使用更长超时时间重试下载...")
-        return await download_update_async(
-            version, system, arch, struct, progress_callback, timeout=timeout * 2
-        )
-    except Exception as e:
-        logger.error(f"下载更新文件失败: {e}")
-        return None
+                    # 开始下载文件
+                    with open(file_path, "wb") as f:
+                        # 使用更大的块大小提高下载速度
+                        async for chunk in response.content.iter_chunked(32768):
+                            # 检查是否取消下载
+                            if cancel_check and cancel_check():
+                                logger.info("下载已被用户取消")
+                                # 删除已下载的部分文件
+                                if file_path.exists():
+                                    file_path.unlink()
+                                return None
+
+                            if not chunk:
+                                break
+
+                            # 写入文件
+                            f.write(chunk)
+                            downloaded_size += len(chunk)
+                            last_progress_time = time.time()
+
+                            # 调用进度回调函数
+                            if progress_callback:
+                                progress_callback(downloaded_size, total_size)
+
+            # 验证下载的文件完整性
+            if not check_update_file_integrity(file_path, "zip"):
+                logger.warning(f"下载的文件不完整或已损坏: {file_path}")
+                # 删除损坏的文件
+                if file_path.exists():
+                    try:
+                        file_path.unlink()
+                        logger.info(f"已删除损坏的文件: {file_path}")
+                    except Exception as unlink_error:
+                        logger.error(f"删除损坏文件失败: {unlink_error}")
+                # 继续尝试下一个镜像源
+                continue
+
+            logger.debug(f"更新文件下载成功: {file_path}")
+            return str(file_path)
+        except Exception as e:
+            logger.warning(f"使用镜像源 {source['name']} 下载更新文件失败: {e}")
+            # 删除部分下载的文件
+            if file_path.exists():
+                try:
+                    file_path.unlink()
+                    logger.info(f"已删除部分下载文件: {file_path}")
+                except Exception as unlink_error:
+                    logger.error(f"删除部分下载文件失败: {unlink_error}")
+            continue
+
+    # 所有镜像源都失败了
+    logger.error("所有镜像源都下载更新文件失败")
+    return None
 
 
 def download_update(
@@ -487,7 +856,8 @@ def download_update(
     arch: str = ARCH,
     struct: str = STRUCT,
     progress_callback: Optional[Callable] = None,
-    timeout: int = 300,  # 增加超时参数，默认300秒
+    timeout: int = 300,
+    cancel_check: Optional[Callable[[], bool]] = None,
 ) -> Optional[str]:
     """
     下载更新文件（同步版本）
@@ -499,12 +869,20 @@ def download_update(
         struct (str, optional): 结构，默认为当前结构
         progress_callback (Optional[Callable]): 进度回调函数，接收已下载字节数和总字节数
         timeout (int, optional): 下载超时时间（秒），默认300秒
+        cancel_check (Optional[Callable[[], bool]]): 取消检查函数，返回True表示取消下载
 
     Returns:
         Optional[str]: 下载完成的文件路径，如果下载失败则返回 None
     """
     return _run_async_func(
-        download_update_async, version, system, arch, struct, progress_callback, timeout
+        download_update_async,
+        version,
+        system,
+        arch,
+        struct,
+        progress_callback,
+        timeout,
+        cancel_check,
     )
 
 
@@ -527,6 +905,17 @@ async def install_update_async(file_path: str) -> bool:
         # 验证更新文件存在
         if not Path(file_path).exists():
             logger.error(f"更新文件不存在: {file_path}")
+            return False
+
+        # 检查更新文件完整性
+        if not check_update_file_integrity(file_path):
+            logger.error(f"更新文件不完整或已损坏: {file_path}")
+            # 删除损坏的文件
+            try:
+                Path(file_path).unlink()
+                logger.info(f"已删除损坏的更新文件: {file_path}")
+            except Exception as e:
+                logger.error(f"删除损坏的更新文件失败: {e}")
             return False
 
         # 判断是否是开发环境
@@ -552,6 +941,14 @@ async def install_update_async(file_path: str) -> bool:
                 if old_version_dir.exists():
                     shutil.rmtree(old_version_dir)
                     logger.info(f"删除旧版本目录: {old_version_dir}")
+
+                # 删除下载的更新文件
+                logger.info(f"准备删除更新文件: {file_path}")
+                try:
+                    Path(file_path).unlink()
+                    logger.info(f"更新文件已删除: {file_path}")
+                except Exception as e:
+                    logger.error(f"删除更新文件失败: {e}")
 
                 logger.info(f"开发环境更新文件安装成功: {file_path}")
                 return True
