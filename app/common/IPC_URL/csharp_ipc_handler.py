@@ -12,15 +12,15 @@ load("coreclr", runtime_config=get_data_path("dlls", "dotnet.runtimeconfig.json"
 # 加载 .NET CoreCLR 程序集
 import clr
 clr.AddReference("ClassIsland.Shared.IPC")
-clr.AddReference("SecRandom4CiTest.Interface")
+clr.AddReference("SecRandom4Ci.Interface")
 
 # 导入程序集
 from System import Action
 from ClassIsland.Shared.IPC import IpcClient, IpcRoutedNotifyIds
-from ClassIsland.Shared.IPC.Abstractions.Services import IPublicLessonsService, IFooService
+from ClassIsland.Shared.IPC.Abstractions.Services import IPublicLessonsService
 from dotnetCampus.Ipc.CompilerServices.GeneratedProxies import GeneratedIpcFactory
-from SecRandom4CiTest.Interface.Services import ISecRandomService
-from SecRandom4CiTest.Interface.Models import CallResult, Student
+from SecRandom4Ci.Interface.Services import ISecRandomService
+from SecRandom4Ci.Interface.Models import CallResult, Student
 
 
 class CSharpIPCHandler:
