@@ -1082,6 +1082,10 @@ class LevitationWindow(QWidget):
         if hasattr(self, "storage_window") and self.storage_window:
             self.storage_window.deleteLater()
             self.storage_window = None
+        # 同时删除arrow_widget引用
+        if hasattr(self, "arrow_widget") and self.arrow_widget:
+            self.arrow_widget.deleteLater()
+            self.arrow_widget = None
 
     def _on_storage_press(self, event):
         """收纳浮窗按下事件 - 增强拖动体验"""
@@ -1351,7 +1355,16 @@ class LevitationWindow(QWidget):
         self.arrow_button = TransparentToolButton()
         self.arrow_button.setFixedSize(30, 30)
         self.arrow_button.setAttribute(Qt.WA_TranslucentBackground)
-        self.arrow_button.setStyleSheet("background: transparent; border: none;")
+        # 设置收纳浮窗背景样式，使用主浮窗的透明度
+        dark = is_dark_theme(qconfig)
+        if dark:
+            self.arrow_button.setStyleSheet(
+                f"background-color: rgba(32,32,32,{self._opacity}); color: rgba(255,255,255,200); border-radius: 6px; border: 1px solid rgba(255,255,255,20);"
+            )
+        else:
+            self.arrow_button.setStyleSheet(
+                f"background-color: rgba(255,255,255,{self._opacity}); color: rgba(0,0,0,180); border-radius: 6px; border: 1px solid rgba(0,0,0,12);"
+            )
 
         # 根据指示器样式设置按钮内容
         if self._stick_indicator_style == 1:  # 文字模式
@@ -1409,6 +1422,9 @@ class LevitationWindow(QWidget):
         self.arrow_widget.raise_()
         self.arrow_widget.show()
         logger.debug(f"DraggableWidget箭头按钮已显示，位置: {self.arrow_widget.pos()}")
+
+        # 将arrow_widget赋值给storage_window，供其他地方使用
+        self.storage_window = self.arrow_widget
 
     def _show_hidden_window(self, direction):
         """显示隐藏的窗口（带动画效果）"""
