@@ -40,15 +40,26 @@
 
 ## 📖 目录
 
-- [🎯 为什么选择公平抽取](#-为什么选择公平抽取)
-- [🌟 核心亮点](#-核心亮点)
-- [📥 下载](#-下载)
-- [📸 软件截图](#-软件截图)
-- [🙏 贡献者](#-贡献者和特别感谢)
-- [💝 捐献支持](#-捐献支持)
-- [📞 联系方式](#-联系方式)
-- [📄 官方文档](#-官方文档)
-- [✨ Star历程](#-star历程)
+- [SecRandom - 公平随机抽取系统](#secrandom---公平随机抽取系统)
+  - [📖 目录](#-目录)
+  - [🎯 为什么选择公平抽取](#-为什么选择公平抽取)
+  - [🌟 核心亮点](#-核心亮点)
+    - [🎯 智能公平抽取系统](#-智能公平抽取系统)
+    - [🎨 现代化用户体验](#-现代化用户体验)
+    - [🚀 强大功能集](#-强大功能集)
+    - [💻 系统兼容性](#-系统兼容性)
+  - [📥 下载](#-下载)
+    - [🌐 官方下载页面](#-官方下载页面)
+  - [📸 软件截图](#-软件截图)
+  - [🙏 贡献者和特别感谢](#-贡献者和特别感谢)
+  - [第三方依赖与代码](#第三方依赖与代码)
+    - [PythonNET-Stubs-Generator](#pythonnet-stubs-generator)
+  - [💝 捐献支持](#-捐献支持)
+    - [爱发电支持](#爱发电支持)
+  - [📞 联系方式](#-联系方式)
+  - [📄 官方文档](#-官方文档)
+  - [贡献指南与 Actions 构建工作流](#贡献指南与-actions-构建工作流)
+  - [✨ Star历程](#-star历程)
 
 ## 🎯 为什么选择公平抽取
 
@@ -138,6 +149,20 @@
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+
+## 第三方依赖与代码
+
+本项目使用了以下第三方代码：
+
+### PythonNET-Stubs-Generator
+- **路径**：`vendors/pythonnet-stub-generator/`
+- **来源**：[MHDante/pythonnet-stub-generator](https://github.com/MHDante/pythonnet-stub-generator)
+- **许可证**：MIT License
+- **版权**
+  - Copyright (c) 2019 Robert McNeel & Associates
+  - Copyright (c) 2022 Dante Camarena
+- **状态**：修改了编译目标平台为 .NET 9.0
+- *注：原始 MIT License 文本保留在 `vendors/pythonnet-stub-generator/LICENSE.md` 中。*
 
 ## 💝 捐献支持
 

@@ -19,6 +19,7 @@ from app.core.single_instance import (
 from app.core.font_manager import configure_dpi_scale
 from app.core.window_manager import WindowManager
 from app.core.url_handler_setup import create_url_handler
+from app.core.cs_ipc_handler_setup import create_cs_ipc_handler
 from app.core.app_init import AppInitializer
 from app.tools.update_utils import update_check_thread
 import app.core.window_manager as wm
@@ -68,6 +69,7 @@ def main():
 
     window_manager = WindowManager()
     url_handler = create_url_handler()
+    cs_ipc_handler = create_cs_ipc_handler()
     window_manager.set_url_handler(url_handler)
 
     local_server = setup_local_server(

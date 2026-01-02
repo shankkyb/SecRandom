@@ -45,15 +45,26 @@
 
 ## 📖 Table of Contents
 
-- [🎯 Why Choose Fair Selection](#-why-choose-fair-selection)
-- [🌟 Core Features](#-core-features)
-- [📥 Download](#-download)
-- [📸 Software Screenshots](#-software-screenshots)
-- [🙏 Contributors and Special Thanks](#-contributors-and-special-thanks)
-- [💝 Support Us](#-support-us)
-- [📞 Contact](#-contact)
-- [📄 Official Documentation](#-official-documentation)
-- [✨ Star History](#-star-history)
+- [SecRandom - Fair Random Selection System](#secrandom---fair-random-selection-system)
+  - [📖 Table of Contents](#-table-of-contents)
+  - [🎯 Why Choose Fair Selection](#-why-choose-fair-selection)
+  - [🌟 Core Features](#-core-features)
+    - [🎯 Intelligent Fair Selection System](#-intelligent-fair-selection-system)
+    - [🎨 Modern User Experience](#-modern-user-experience)
+    - [🚀 Powerful Feature Set](#-powerful-feature-set)
+    - [💻 System Compatibility](#-system-compatibility)
+  - [📥 Download](#-download)
+    - [🌐 Official Download Page](#-official-download-page)
+  - [📸 Software Screenshots](#-software-screenshots)
+  - [🙏 Contributors and Special Thanks](#-contributors-and-special-thanks)
+  - [Third-Party Dependencies and Code](#third-party-dependencies-and-code)
+    - [PythonNET-Stubs-Generator](#pythonnet-stubs-generator)
+  - [💝 Support Us](#-support-us)
+    - [Afdian Support](#afdian-support)
+  - [📞 Contact](#-contact)
+  - [📄 Official Documentation](#-official-documentation)
+  - [Contributing Guidelines and Actions Build Workflow](#contributing-guidelines-and-actions-build-workflow)
+  - [✨ Star History](#-star-history)
 
 ## 🎯 Why Choose Fair Selection
 
@@ -137,6 +148,20 @@ Traditional random selection often has the problem of "repeatedly selecting cert
     </tr>
   </tbody>
 </table>
+
+## Third-Party Dependencies and Code
+
+This project uses the following third-party code:
+
+### PythonNET-Stubs-Generator
+- **Path**: `vendors/pythonnet-stub-generator/`
+- **Source**: [MHDante/pythonnet-stub-generator](https://github.com/MHDante/pythonnet-stub-generator)
+- **License**: MIT License
+- **Copyright**
+  - Copyright (c) 2019 Robert McNeel & Associates
+  - Copyright (c) 2022 Dante Camarena
+- **Status**: Modified compilation target platform to .NET 9.0
+- *Note: The original MIT License text is preserved in `vendors/pythonnet-stub-generator/LICENSE.md`.*
 
 ## 💝 Support Us
 

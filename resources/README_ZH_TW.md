@@ -42,15 +42,26 @@
 
 ## 📖 目錄
 
-- [🎯 為何選擇公平選擇](#-為何選擇公平選擇)
-- [🌟 核心亮點](#-核心亮點)
-- [📥 下載](#-下載)
-- [📸 軟體截圖](#-軟體截圖)
-- [🙏 貢獻者與特別感謝](#-貢獻者與特別感謝)
-- [💝 支持我們](#-支持我們)
-- [📞 聯絡方式](#-聯絡方式)
-- [📄 官方文檔](#-官方文檔)
-- [✨ Star 歷程](#-star-歷程)
+- [SecRandom - 公平隨機選擇系統](#secrandom---公平隨機選擇系統)
+  - [📖 目錄](#-目錄)
+  - [🎯 為何選擇公平選擇](#-為何選擇公平選擇)
+  - [🌟 核心亮點](#-核心亮點)
+    - [🎯 智能公平選擇系統](#-智能公平選擇系統)
+    - [🎨 現代化用戶體驗](#-現代化用戶體驗)
+    - [🚀 強大功能集](#-強大功能集)
+    - [💻 系統兼容性](#-系統兼容性)
+  - [📥 下載](#-下載)
+    - [🌐 官方下載頁面](#-官方下載頁面)
+  - [📸 軟體截圖](#-軟體截圖)
+  - [🙏 貢獻者與特別感謝](#-貢獻者與特別感謝)
+  - [第三方依賴與程式碼](#第三方依賴與程式碼)
+    - [PythonNET-Stubs-Generator](#pythonnet-stubs-generator)
+  - [💝 支持我們](#-支持我們)
+    - [愛發電支援](#愛發電支援)
+  - [📞 聯絡方式](#-聯絡方式)
+  - [📄 官方文檔](#-官方文檔)
+  - [貢獻指南與 Actions 構建工作流](#貢獻指南與-actions-構建工作流)
+  - [✨ Star 歷程](#-star-歷程)
 
 ## 🎯 為何選擇公平選擇
 
@@ -137,6 +148,20 @@
     </tr>
   </tbody>
 </table>
+
+## 第三方依賴與程式碼
+
+本專案使用了以下第三方程式碼：
+
+### PythonNET-Stubs-Generator
+- **路徑**: `vendors/pythonnet-stub-generator/`
+- **來源**: [MHDante/pythonnet-stub-generator](https://github.com/MHDante/pythonnet-stub-generator)
+- **授權**: MIT License (MIT 授權)
+- **版權**
+  - Copyright (c) 2019 Robert McNeel & Associates
+  - Copyright (c) 2022 Dante Camarena
+- **狀態**: 已修改編譯目標平台為 .NET 9.0
+- *註：原始的 MIT License 文字保留於 `vendors/pythonnet-stub-generator/LICENSE.md` 中。*
 
 ## 💝 支持我們
 
