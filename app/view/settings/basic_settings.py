@@ -426,7 +426,7 @@ class basic_settings_function(GroupHeaderCardWidget):
                                 "basic_settings", "url_protocol"
                             ),
                             content=get_any_position_value_async(
-                                "basic_settings", "url_protocol_notification.enable"
+                                "basic_settings", "url_protocol_notification", "enable"
                             ),
                         ),
                         parent=self.window(),
@@ -490,13 +490,13 @@ class basic_settings_function(GroupHeaderCardWidget):
             logger.error(f"URL协议设置错误: {e}")
             # 发生错误时恢复原状态
             self.url_protocol_switch.setChecked(not checked)
-            error_msg = str(e)
-            if "Access is denied" in error_msg or "WinError 5" in error_msg:
-                content = get_any_position_value_async(
-                    "basic_settings", "url_protocol_notification", "permission_error"
-                )
-            else:
-                content = f"URL协议设置错误: {error_msg}"
+
+            # 获取错误提示文本，如果获取失败则使用默认文本
+            error_text = get_any_position_value_async(
+                "basic_settings", "url_protocol_notification", "error"
+            )
+            if error_text:
+                content = error_text.format(error=str(e))
 
             show_notification(
                 NotificationType.ERROR,

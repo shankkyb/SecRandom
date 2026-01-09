@@ -23,7 +23,6 @@ class URLCommandHandler(QObject):
     showSettingsRequested = Signal(str)  # 请求显示设置页面
     showMainPageRequested = Signal(str)  # 请求显示主页面
     showTrayActionRequested = Signal(str)  # 请求执行托盘操作
-    securityVerificationRequested = Signal(str, dict)  # 请求安全验证
 
     def __init__(self, main_window=None):
         super().__init__()
@@ -58,20 +57,7 @@ class URLCommandHandler(QObject):
             "tray/float": self._handle_tray_float,
             "tray/restart": self._handle_tray_restart,
             "tray/exit": self._handle_tray_exit,
-            # 通用命令
-            "open": self._handle_open,
-            "action": self._handle_action,
-            "verify": self._handle_verify,
         }
-
-        # 需要密码验证的命令列表
-        self.secure_commands = [
-            "settings/safety",
-            "settings/custom",
-            "tray/restart",
-            "tray/exit",
-            "action/secure",
-        ]
 
         # 设置页面映射
         self.settings_page_map = {
@@ -195,19 +181,21 @@ class URLCommandHandler(QObject):
         if url.startswith("secrandom://"):
             url = url[12:]  # 移除 "secrandom://"
 
-        # 分割命令和参数
-        parts = url.split("/")
-        command = parts[0] if parts else ""
+        # 分离路径和查询参数
+        path = url.split("?")[0] if "?" in url else url
+
+        # 完整路径作为命令
+        command = path
 
         # 构建参数
         params = {
-            "args": parts[1:] if len(parts) > 1 else [],
+            "args": [],
             "full_url": f"secrandom://{url}",
         }
 
         # 解析查询参数
-        if "?" in command:
-            command, query = command.split("?", 1)
+        if "?" in url:
+            query = url.split("?", 1)[1]
             params["query"] = self._parse_query_string(query)
 
         logger.debug(f"URL解析结果 - 命令: {command}, 参数: {params}")
@@ -230,16 +218,107 @@ class URLCommandHandler(QObject):
 
     def _requires_verification(self, command: str) -> bool:
         """检查命令是否需要验证"""
-        requires = command in self.secure_commands
-        logger.debug(f"检查命令是否需要验证 - 命令: {command}, 结果: {requires}")
-        return requires or command.startswith("settings/safety")
+        from app.tools.settings_access import readme_settings_async
+        from app.common.safety.password import is_configured as password_is_configured
+
+        # 未配置密码则不需要验证
+        if not password_is_configured():
+            logger.debug(f"命令无需验证（未配置密码）：{command}")
+            return False
+
+        # 检查安全总开关
+        if not readme_settings_async("basic_safety_settings", "safety_switch"):
+            logger.debug(f"命令无需验证（安全总开关关闭）：{command}")
+            return False
+
+        # 命令到操作类型的映射
+        command_to_op = {
+            "settings/basic": "open_settings",
+            "settings/list": "open_settings",
+            "settings/extraction": "open_settings",
+            "settings/floating": "open_settings",
+            "settings/notification": "open_settings",
+            "settings/safety": "open_settings",
+            "settings/custom": "open_settings",
+            "settings/voice": "open_settings",
+            "settings/history": "open_settings",
+            "settings/more": "open_settings",
+            "settings/update": "open_settings",
+            "settings/about": "open_settings",
+            "settings": "open_settings",
+            "tray/settings": "open_settings",
+            "tray/float": "show_hide_floating_window",
+            "tray/restart": "restart",
+            "tray/exit": "exit",
+        }
+
+        # 操作类型到开关的映射
+        op_to_switch = {
+            "open_settings": "open_settings_switch",
+            "show_hide_floating_window": "show_hide_floating_window_switch",
+            "restart": "restart_switch",
+            "exit": "exit_switch",
+        }
+
+        # 获取操作类型
+        op = command_to_op.get(command)
+        if not op:
+            logger.debug(f"命令需验证（默认受控）：{command}")
+            return True
+
+        # 获取对应的开关
+        switch = op_to_switch.get(op)
+        if not switch:
+            logger.debug(f"命令需验证（默认受控）：{command}")
+            return True
+
+        # 检查开关状态
+        requires = bool(readme_settings_async("basic_safety_settings", switch))
+        logger.debug(
+            f"检查命令是否需要验证 - 命令: {command}, 操作: {op}, 开关: {switch}, 结果: {requires}"
+        )
+        return requires
 
     def _request_verification(
         self, command: str, params: Dict[str, Any]
     ) -> Dict[str, Any]:
         """请求验证"""
         logger.debug(f"请求验证 - 命令: {command}, 参数: {params}")
-        result = {
+
+        # 获取操作类型
+        command_to_op = {
+            "settings/basic": "open_settings",
+            "settings/list": "open_settings",
+            "settings/extraction": "open_settings",
+            "settings/floating": "open_settings",
+            "settings/notification": "open_settings",
+            "settings/safety": "open_settings",
+            "settings/custom": "open_settings",
+            "settings/voice": "open_settings",
+            "settings/history": "open_settings",
+            "settings/more": "open_settings",
+            "settings/update": "open_settings",
+            "settings/about": "open_settings",
+            "settings": "open_settings",
+            "tray/settings": "open_settings",
+            "tray/float": "show_hide_floating_window",
+            "tray/restart": "restart",
+            "tray/exit": "exit",
+        }
+
+        op = command_to_op.get(command, command)
+
+        # 创建验证窗口
+        from app.page_building.security_window import create_verify_password_window
+
+        def execute_command():
+            """验证通过后执行命令"""
+            return self._execute_command(command, params)
+
+        # 调用验证窗口
+        create_verify_password_window(on_verified=execute_command, operation_type=op)
+
+        return {
             "success": False,
             "error": "需要验证",
             "requires_verification": True,
@@ -247,10 +326,6 @@ class URLCommandHandler(QObject):
             "params": params,
             "message": "此命令需要安全验证",
         }
-        logger.debug(f"验证请求已发送: {command}")
-        # 发送验证请求信号
-        self.securityVerificationRequested.emit(command, params)
-        return result
 
     def _execute_command(self, command: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """执行命令"""
@@ -582,57 +657,6 @@ class URLCommandHandler(QObject):
         logger.debug("执行退出操作")
         self.showTrayActionRequested.emit("exit_app")
         return {"status": "success", "message": "应用退出中..."}
-
-    def _handle_open(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        """处理打开命令"""
-        args = params.get("args", [])
-        if not args:
-            return {"status": "error", "message": "缺少打开目标参数"}
-
-        target = args[0]
-        logger.debug(f"打开目标: {target}")
-
-        # 根据目标类型路由到相应处理器
-        if target in ["settings", "config"]:
-            return self._handle_settings({"args": args[1:] if len(args) > 1 else []})
-        elif target in ["main", "window"]:
-            return self._handle_main_window({"args": args[1:] if len(args) > 1 else []})
-        elif target in ["tray", "menu"]:
-            return self._handle_tray_toggle(params)
-        else:
-            return {
-                "status": "error",
-                "message": f"不支持的打开目标: {target}",
-                "available_targets": ["settings", "main", "tray"],
-            }
-
-    def _handle_action(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        """处理动作命令"""
-        args = params.get("args", [])
-        if not args:
-            return {"status": "error", "message": "缺少动作类型参数"}
-
-        action_type = args[0]
-        logger.debug(f"执行动作: {action_type}")
-
-        # 路由到具体动作
-        if action_type == "roll":
-            return self._handle_roll_call(params)
-        elif action_type == "lottery":
-            return self._handle_lottery(params)
-        elif action_type == "settings":
-            return self._handle_settings({"args": args[1:] if len(args) > 1 else []})
-        else:
-            return {
-                "status": "error",
-                "message": f"不支持的动作类型: {action_type}",
-                "available_actions": ["roll", "lottery", "settings"],
-            }
-
-    def _handle_verify(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        """处理验证命令"""
-        # 这里可以实现具体的验证逻辑
-        return {"status": "success", "message": "验证通过", "verified": True}
 
     def register_command(
         self,

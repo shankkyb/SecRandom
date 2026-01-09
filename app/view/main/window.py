@@ -1,10 +1,11 @@
 # ==================================================
 # 导入库
 # ==================================================
+import os
 import sys
+import shutil
 import subprocess
 
-import loguru
 from loguru import logger
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtGui import QIcon
@@ -628,12 +629,10 @@ class MainWindow(FluentWindow):
         if self.pre_class_reset_timer.isActive():
             self.pre_class_reset_timer.stop()
 
+        # 快速清理快捷键
         self.cleanup_shortcuts()
-        try:
-            loguru.logger.remove()
-        except Exception as e:
-            logger.error(f"日志系统关闭出错: {e}")
 
+        # 直接退出，不等待日志清理
         QApplication.quit()
         CSharpIPCHandler.instance().stop_ipc_client()
         sys.exit(0)
@@ -754,9 +753,7 @@ class MainWindow(FluentWindow):
     def _on_shortcut_settings_changed(
         self, first_level_key: str, second_level_key: str, value
     ):
-        """当快捷键设置发生变化时的处理函数"""
-        logger.debug(f"快捷键设置变化: {first_level_key}.{second_level_key} = {value}")
-
+        """当设置发生变化时的处理函数"""
         if first_level_key == "shortcut_settings":
             if second_level_key == "enable_shortcut":
                 logger.debug(f"快捷键启用状态变化: {value}")
@@ -768,23 +765,42 @@ class MainWindow(FluentWindow):
                 self.shortcut_manager.update_shortcut(config_key, shortcut_str)
 
     def restart_app(self):
-        """重启应用程序
+        """重启应用程序（跨平台支持）
         执行安全验证后重启程序，清理所有资源"""
         try:
             working_dir = get_app_root()
 
+            # 过滤掉 --url 等参数
             filtered_args = [arg for arg in sys.argv if not arg.startswith("--")]
 
-            startup_info = subprocess.STARTUPINFO()
-            startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            # 获取可执行文件路径
+            if getattr(sys, "frozen", False):
+                # 打包后的可执行文件
+                executable = sys.executable
+            else:
+                # 开发环境
+                executable = sys.executable
 
-            subprocess.Popen(
-                [sys.executable] + filtered_args,
-                cwd=working_dir,
-                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
-                | subprocess.DETACHED_PROCESS,
-                startupinfo=startup_info,
-            )
+            # 跨平台启动新进程
+            if sys.platform.startswith("win"):
+                # Windows 特定参数
+                startup_info = subprocess.STARTUPINFO()
+                startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                subprocess.Popen(
+                    [executable] + filtered_args,
+                    cwd=working_dir,
+                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
+                    | subprocess.DETACHED_PROCESS,
+                    startupinfo=startup_info,
+                )
+            else:
+                # Linux/macOS
+                subprocess.Popen(
+                    [executable] + filtered_args,
+                    cwd=working_dir,
+                    start_new_session=True,
+                )
+
         except Exception as e:
             logger.error(f"启动新进程失败: {e}")
             return
@@ -793,12 +809,8 @@ class MainWindow(FluentWindow):
         if self.pre_class_reset_timer.isActive():
             self.pre_class_reset_timer.stop()
 
+        # 快速清理快捷键
         self.cleanup_shortcuts()
-
-        try:
-            loguru.logger.remove()
-        except Exception as e:
-            logger.error(f"日志系统关闭出错: {e}")
 
         # 完全退出当前应用程序
         QApplication.quit()
@@ -858,34 +870,26 @@ class MainWindow(FluentWindow):
                 self.lottery_page.clear_result()
                 logger.info("已清除抽奖页面结果")
 
-            # 清除所有班级的临时记录
+            # 清除 TEMP 文件夹
             from app.tools.path_utils import get_data_path
-            import os
 
-            list_dir = get_data_path("list/roll_call_list")
-            if os.path.exists(list_dir):
-                for file_name in os.listdir(list_dir):
-                    if file_name.endswith(".json"):
-                        file_path = os.path.join(list_dir, file_name)
-                        try:
-                            os.remove(file_path)
-                            class_name = file_name[:-5]
-                            logger.info(f"已清除班级 {class_name} 的临时记录")
-                        except Exception as e:
-                            logger.error(f"清除班级 {file_name} 的临时记录失败: {e}")
+            temp_dir = get_data_path("TEMP")
+            if os.path.exists(temp_dir):
+                try:
+                    # Windows 上处理只读文件
+                    def handle_remove_readonly(func, path, exc):
+                        import stat
 
-            # 清除奖池的临时记录
-            pool_dir = get_data_path("list/lottery_list")
-            if os.path.exists(pool_dir):
-                for file_name in os.listdir(pool_dir):
-                    if file_name.endswith(".json"):
-                        file_path = os.path.join(pool_dir, file_name)
-                        try:
-                            os.remove(file_path)
-                            pool_name = file_name[:-5]
-                            logger.info(f"已清除奖池 {pool_name} 的临时记录")
-                        except Exception as e:
-                            logger.error(f"清除奖池 {file_name} 的临时记录失败: {e}")
+                        if not os.access(path, os.W_OK):
+                            os.chmod(path, stat.S_IWUSR)
+                            func(path)
+                        else:
+                            raise
+
+                    shutil.rmtree(temp_dir, onerror=handle_remove_readonly)
+                    logger.info("已清除 TEMP 文件夹")
+                except Exception as e:
+                    logger.error(f"清除 TEMP 文件夹失败: {e}")
 
             # 刷新点名页面的剩余人数显示
             if self.roll_call_page and hasattr(

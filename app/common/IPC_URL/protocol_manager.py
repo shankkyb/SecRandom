@@ -72,40 +72,13 @@ class ProtocolManager:
             return False
 
     def _register_windows_protocol(self) -> bool:
-        """Windows系统注册协议"""
+        """Windows系统注册协议（单用户模式，无需管理员权限）"""
         try:
             # 获取当前可执行文件路径
             exe_path = self._get_executable_path()
 
-            # 首先尝试注册到HKEY_CLASSES_ROOT
-            try:
-                # 注册协议到HKEY_CLASSES_ROOT
-                with winreg.CreateKey(
-                    winreg.HKEY_CLASSES_ROOT, self.protocol_name
-                ) as key:
-                    winreg.SetValueEx(
-                        key, "", 0, winreg.REG_SZ, f"URL:{self.app_name} Protocol"
-                    )
-                    winreg.SetValueEx(key, "URL Protocol", 0, winreg.REG_SZ, "")
-
-                # 注册命令
-                command_key_path = f"{self.protocol_name}\\shell\\open\\command"
-                with winreg.CreateKey(
-                    winreg.HKEY_CLASSES_ROOT, command_key_path
-                ) as key:
-                    winreg.SetValueEx(
-                        key, "", 0, winreg.REG_SZ, f'"{exe_path}" --url "%1"'
-                    )
-
-                return True
-
-            except (OSError, PermissionError) as e:
-                # 如果HKEY_CLASSES_ROOT失败，尝试注册到HKEY_CURRENT_USER
-                if e.errno == 5 or "Access is denied" in str(e):  # WinError 5
-                    logger.error(f"管理员权限不足，尝试注册到当前用户: {e}")
-                    return self._register_windows_protocol_current_user(exe_path)
-                else:
-                    raise
+            # 直接注册到HKEY_CURRENT_USER（单用户模式，无需管理员权限）
+            return self._register_windows_protocol_current_user(exe_path)
 
         except Exception as e:
             logger.error(f"Windows协议注册失败: {e}")
@@ -136,28 +109,10 @@ class ProtocolManager:
             return False
 
     def _unregister_windows_protocol(self) -> bool:
-        """Windows系统注销协议"""
+        """Windows系统注销协议（单用户模式，无需管理员权限）"""
         try:
-            # 首先尝试删除系统级注册（HKEY_CLASSES_ROOT）
-            try:
-                winreg.DeleteKey(
-                    winreg.HKEY_CLASSES_ROOT,
-                    f"{self.protocol_name}\\shell\\open\\command",
-                )
-                winreg.DeleteKey(
-                    winreg.HKEY_CLASSES_ROOT, f"{self.protocol_name}\\shell\\open"
-                )
-                winreg.DeleteKey(
-                    winreg.HKEY_CLASSES_ROOT, f"{self.protocol_name}\\shell"
-                )
-                winreg.DeleteKey(winreg.HKEY_CLASSES_ROOT, self.protocol_name)
-                return True
-            except (OSError, PermissionError) as e:
-                if e.errno == 5 or "Access is denied" in str(e):  # WinError 5
-                    # 如果系统级删除失败，尝试删除当前用户注册
-                    return self._unregister_windows_protocol_current_user()
-                else:
-                    raise
+            # 直接删除当前用户注册表项（单用户模式，无需管理员权限）
+            return self._unregister_windows_protocol_current_user()
 
         except Exception as e:
             logger.error(f"Windows协议注销失败: {e}")
@@ -187,19 +142,14 @@ class ProtocolManager:
             return False
 
     def _is_windows_protocol_registered(self) -> bool:
-        """检查Windows协议是否已注册"""
+        """检查Windows协议是否已注册（单用户模式）"""
         try:
-            # 首先检查HKEY_CLASSES_ROOT（系统级）
-            with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, self.protocol_name) as key:
+            # 检查HKEY_CURRENT_USER（用户级）
+            key_path = f"Software\\Classes\\{self.protocol_name}"
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path) as key:
                 return True
         except (OSError, FileNotFoundError):
-            try:
-                # 如果没找到，检查HKEY_CURRENT_USER（用户级）
-                key_path = f"Software\\Classes\\{self.protocol_name}"
-                with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path) as key:
-                    return True
-            except (OSError, FileNotFoundError):
-                return False
+            return False
 
     def _register_linux_protocol(self) -> bool:
         """Linux系统注册协议"""

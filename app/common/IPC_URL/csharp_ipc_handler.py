@@ -171,7 +171,7 @@ if CSHARP_AVAILABLE:
                     should_log = True
                     self._last_on_class_left_log_time = current_time
 
-                if should_log:
+                if should_log and total_seconds != 0:
                     logger.debug(f"获取到的距离上课剩余时间: {total_seconds} 秒")
 
                 return total_seconds

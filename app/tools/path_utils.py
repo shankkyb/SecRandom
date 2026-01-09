@@ -191,9 +191,9 @@ class PathGetter:
             Path: 临时文件的绝对路径
         """
         if filename:
-            return self._path_manager.get_absolute_path(f"app/Temp/{filename}")
+            return self._path_manager.get_absolute_path(f"data/TEMP/{filename}")
         else:
-            return self._path_manager.get_absolute_path("app/Temp")
+            return self._path_manager.get_absolute_path("data/TEMP")
 
     def get_audio_path(self, filename: str) -> Path:
         """获取音频文件路径

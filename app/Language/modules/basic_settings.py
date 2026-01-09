@@ -68,9 +68,9 @@ basic_settings = {
         "url_protocol_notification": {
             "enable": "已开启URL协议注册",
             "disable": "已关闭URL协议注册",
-            "register_failure": "URL协议注册失败，需要管理员权限",
-            "unregister_failure": "URL协议注销失败，可能需要管理员权限",
-            "permission_error": "权限不足，URL协议注册/注销失败",
+            "register_failure": "URL协议注册失败",
+            "unregister_failure": "URL协议注销失败",
+            "error": "URL协议设置错误: {error}",
         },
         "export_diagnostic_data": {
             "name": "导出诊断数据",
@@ -291,6 +291,14 @@ basic_settings = {
         "url_protocol": {
             "name": "URL protocol register",
             "description": "Sign up for custom URL protocol (secrandom://), support to launch app via link",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "url_protocol_notification": {
+            "enable": "URL protocol registration enabled",
+            "disable": "URL protocol registration disabled",
+            "register_failure": "Failed to register URL protocol",
+            "unregister_failure": "Failed to unregister URL protocol",
+            "error": "URL protocol setting error: {error}",
         },
         "ipc_port": {
             "name": "IPC port setting",

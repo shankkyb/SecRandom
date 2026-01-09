@@ -220,11 +220,12 @@ class ShortcutManager(QObject):
         return self._enabled
 
     def cleanup(self):
-        """清理所有快捷键"""
+        """清理所有快捷键（快速清理）"""
         logger.info("清理所有快捷键")
-        for config_key, hotkey in self.shortcuts.items():
-            try:
-                keyboard.remove_hotkey(hotkey)
-            except Exception as e:
-                logger.error(f"注销快捷键失败 {config_key}: {e}")
+        try:
+            # 使用 keyboard.unhook_all() 一次性清理所有钩子，比逐个 remove_hotkey 快得多
+            keyboard.unhook_all()
+            logger.debug("已清理所有 keyboard 钩子")
+        except Exception as e:
+            logger.error(f"清理 keyboard 钩子失败: {e}")
         self.shortcuts.clear()
