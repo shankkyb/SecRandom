@@ -43,6 +43,7 @@ class roll_call_history_table(GroupHeaderCardWidget):
         self.current_row = 0  # 当前加载到的行数
         self.total_rows = 0  # 总行数
         self.is_loading = False  # 是否正在加载数据
+        self.has_class_record = False  # 是否有课程记录
 
         # 创建班级选择区域
         QTimer.singleShot(APPLY_DELAY, self.create_class_selection)
@@ -240,17 +241,50 @@ class roll_call_history_table(GroupHeaderCardWidget):
         def sort_key(row):
             # 尝试将数据转换为数字，如果失败则使用字符串比较
             try:
-                # 对于权重列（列索引5），需要特殊处理
-                if self.sort_column == 5 and self.current_mode == 0:
-                    # 权重列可能包含非数字字符，尝试提取数字部分
-                    weight_str = row[self.sort_column]
-                    # 移除可能的前导零
-                    weight_str = weight_str.lstrip("0")
-                    if not weight_str:
-                        return 0.0
-                    return float(weight_str)
-                else:
-                    return float(row[self.sort_column])
+                # 对于权重列，需要特殊处理
+                # 在模式0（学生数据）中：
+                #   - 有课程时：权重列索引为6
+                #   - 无课程时：权重列索引为5
+                # 在模式1（会话数据）中：
+                #   - 有课程时：权重列索引为6
+                #   - 无课程时：权重列索引为5
+                # 在模式2（统计数据）中：
+                #   - 有课程时：权重列索引为6
+                #   - 无课程时：权重列索引为5
+                if self.current_mode == 0:
+                    # 模式0：学生数据
+                    if self.sort_column == 5:
+                        # 列5可能是课程或权重
+                        if self.has_class_record:
+                            # 有课程，列5是课程，列6是权重
+                            return row[self.sort_column]
+                        else:
+                            # 无课程，列5是权重
+                            weight_str = row[self.sort_column]
+                            weight_str = weight_str.lstrip("0")
+                            if not weight_str:
+                                return 0.0
+                            return float(weight_str)
+                    elif self.sort_column == 6 and self.has_class_record:
+                        # 有课程时，列6是权重
+                        weight_str = row[self.sort_column]
+                        weight_str = weight_str.lstrip("0")
+                        if not weight_str:
+                            return 0.0
+                        return float(weight_str)
+                elif self.current_mode in [1, 2]:
+                    # 模式1和2：会话数据和统计数据
+                    if self.sort_column == 5:
+                        # 有课程，列5是课程
+                        return row[self.sort_column]
+                    elif self.sort_column == 6 and self.has_class_record:
+                        # 有课程时，列6是权重
+                        weight_str = row[self.sort_column]
+                        weight_str = weight_str.lstrip("0")
+                        if not weight_str:
+                            return 0.0
+                        return float(weight_str)
+                return float(row[self.sort_column])
             except (ValueError, IndexError):
                 return row[self.sort_column]
 
@@ -560,9 +594,18 @@ class roll_call_history_table(GroupHeaderCardWidget):
                                 "name": name,
                                 "gender": gender,
                                 "group": group,
+                                "class_name": record.get("class_name", ""),
                                 "weight": record.get("weight", ""),
                             }
                         )
+
+            # 检查是否有课程记录
+            self.has_class_record = any(
+                student.get("class_name", "") for student in students_data
+            )
+
+            # 更新表头，确保 has_class_record 设置后表头正确显示
+            self.update_table_headers()
 
             # 使用权重格式化函数
             format_weight, _, _ = format_weight_for_display(students_data, "weight")
@@ -581,7 +624,9 @@ class roll_call_history_table(GroupHeaderCardWidget):
                         return student.get("gender", "")
                     elif self.sort_column == 4:  # 小组
                         return student.get("group", "")
-                    elif self.sort_column == 5:  # 权重
+                    elif self.sort_column == 5:  # 课程或权重
+                        return student.get("class_name", "")
+                    elif self.sort_column == 6:  # 权重（仅在有课程时）
                         return student.get("weight", "")
                     return ""
 
@@ -640,6 +685,15 @@ class roll_call_history_table(GroupHeaderCardWidget):
                     group = student.get("group", "")
                     group_item = create_table_item(str(group) if group else "")
                     self.table.setItem(row, col, group_item)
+                    col += 1
+
+                # 课程（如果有课程记录）
+                if self.has_class_record:
+                    class_name = student.get("class_name", "")
+                    class_item = create_table_item(
+                        str(class_name) if class_name else ""
+                    )
+                    self.table.setItem(row, col, class_item)
                     col += 1
 
                 # 如果需要显示权重
@@ -710,9 +764,18 @@ class roll_call_history_table(GroupHeaderCardWidget):
                                 ),
                                 "draw_gender": str(record.get("draw_gender", "")),
                                 "draw_group": str(record.get("draw_group", "")),
+                                "class_name": record.get("class_name", ""),
                                 "weight": record.get("weight", ""),
                             }
                         )
+
+            # 检查是否有课程记录
+            self.has_class_record = any(
+                student.get("class_name", "") for student in students_data
+            )
+
+            # 更新表头，确保 has_class_record 设置后表头正确显示
+            self.update_table_headers()
 
             # 使用权重格式化函数
             format_weight, _, _ = format_weight_for_display(students_data, "weight")
@@ -731,7 +794,9 @@ class roll_call_history_table(GroupHeaderCardWidget):
                         return str(student.get("draw_gender", ""))
                     elif self.sort_column == 4:  # 小组
                         return str(student.get("draw_group", ""))
-                    elif self.sort_column == 5:  # 权重
+                    elif self.sort_column == 5:  # 课程或权重
+                        return str(student.get("class_name", ""))
+                    elif self.sort_column == 6:  # 权重（仅在有课程时）
                         return float(student.get("weight", ""))
                     return ""
 
@@ -769,7 +834,18 @@ class roll_call_history_table(GroupHeaderCardWidget):
                 col += 1
 
                 # 模式
-                mode_item = create_table_item(student.get("draw_method", ""))
+                draw_method = student.get("draw_method", "")
+                if draw_method == "0":
+                    mode_text = get_content_name_async(
+                        "roll_call_history_table", "draw_method_random"
+                    )
+                elif draw_method == "1":
+                    mode_text = get_content_name_async(
+                        "roll_call_history_table", "draw_method_weight"
+                    )
+                else:
+                    mode_text = str(draw_method)
+                mode_item = create_table_item(mode_text)
                 self.table.setItem(row, col, mode_item)
                 col += 1
 
@@ -792,6 +868,15 @@ class roll_call_history_table(GroupHeaderCardWidget):
                     draw_group = student.get("draw_group", "")
                     group_item = create_table_item(draw_group if draw_group else "")
                     self.table.setItem(row, col, group_item)
+                    col += 1
+
+                # 课程（如果有课程记录）
+                if self.has_class_record:
+                    class_name = student.get("class_name", "")
+                    class_item = create_table_item(
+                        str(class_name) if class_name else ""
+                    )
+                    self.table.setItem(row, col, class_item)
                     col += 1
 
                 # 如果需要显示权重
@@ -899,6 +984,10 @@ class roll_call_history_table(GroupHeaderCardWidget):
             self.table.setRowCount(0)
             return
         self.current_class_name = class_name
+
+        # 重置课程记录标志
+        self.has_class_record = False
+
         self.update_table_headers()
 
         # 重置数据加载状态
@@ -1039,7 +1128,7 @@ class roll_call_history_table(GroupHeaderCardWidget):
 
         # 根据是否有性别和小组动态调整表头
         # 对于模式0和1，需要隐藏性别和小组列
-        if self.current_mode in [0, 1]:
+        if self.current_mode == 0:
             # 原始表头结构: [学号, 姓名, 性别, 小组, 点名次数/时间, 权重]
             # 根据has_gender和has_group动态调整表头
             if not has_gender and not has_group:
@@ -1048,8 +1137,20 @@ class roll_call_history_table(GroupHeaderCardWidget):
                 headers = headers[:2] + headers[3:]
             elif not has_group:
                 headers = headers[:3] + headers[4:]
-        elif self.current_mode == 2:
-            # 原始表头结构: [点名时间, 点名模式, 点名人数, 性别限制, 小组限制, 权重]
+        elif self.current_mode == 1:
+            # 原始表头结构: [点名时间, 学号, 姓名, 性别, 小组, 课程, 权重]
+            # 根据has_gender和has_group动态调整表头
+            if not has_gender and not has_group:
+                headers = headers[:2] + headers[4:]  # 移除性别和小组列
+            elif not has_gender:
+                headers = headers[:2] + headers[3:]  # 移除性别列
+            elif not has_group:
+                headers = headers[:3] + headers[4:]
+            # 如果没有课程记录，移除课程列（在权重列之前）
+            if not self.has_class_record:
+                headers = headers[:-2] + headers[-1:]
+        elif self.current_mode >= 2:
+            # 原始表头结构: [点名时间, 点名模式, 点名人数, 性别限制, 小组限制, 课程, 权重]
             # 根据has_gender和has_group动态调整表头
             if not has_gender and not has_group:
                 headers = headers[:3] + headers[5:]
@@ -1057,6 +1158,9 @@ class roll_call_history_table(GroupHeaderCardWidget):
                 headers = headers[:3] + headers[4:]
             elif not has_group:
                 headers = headers[:4] + headers[5:]
+            # 如果没有课程记录，移除课程列（在权重列之前）
+            if not self.has_class_record:
+                headers = headers[:-2] + headers[-1:]
 
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)

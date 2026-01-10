@@ -139,11 +139,18 @@ roll_call_history_table = {
             "description": "点名历史记录表格列标题（按时间查看，不包含权重）",
         },
         "HeaderLabels_time_weight": {
-            "name": ["点名时间", "学号", "姓名", "性别", "小组", "权重"],
+            "name": ["点名时间", "学号", "姓名", "性别", "小组", "课程", "权重"],
             "description": "点名历史记录表格列标题（按时间查看，包含权重）",
         },
         "HeaderLabels_Individual_not_weight": {
-            "name": ["点名时间", "点名模式", "点名人数", "性别限制", "小组限制"],
+            "name": [
+                "点名时间",
+                "点名模式",
+                "点名人数",
+                "性别限制",
+                "小组限制",
+                "课程",
+            ],
             "description": "点名历史记录表格列标题（个人记录，不包含权重）",
         },
         "HeaderLabels_Individual_weight": {
@@ -153,9 +160,18 @@ roll_call_history_table = {
                 "点名人数",
                 "性别限制",
                 "小组限制",
+                "课程",
                 "权重",
             ],
             "description": "点名历史记录表格列标题（个人记录，包含权重）",
+        },
+        "draw_method_random": {
+            "name": "随机抽取",
+            "description": "随机抽取模式",
+        },
+        "draw_method_weight": {
+            "name": "公平抽取",
+            "description": "公平抽取模式",
         },
     },
     "EN_US": {
@@ -210,7 +226,8 @@ roll_call_history_table = {
                 "2": "Name",
                 "3": "Gender",
                 "4": "Group",
-                "5": "Weight",
+                "5": "Class",
+                "6": "Weight",
             },
             "description": "Title of the list of picking history tables (viewed by time, including weight)",
         },
@@ -221,6 +238,7 @@ roll_call_history_table = {
                 "2": "Picking amount",
                 "3": "Gender limit",
                 "4": "Group limit",
+                "5": "Class",
             },
             "description": "Title of the list of picking history tables (personal history, excluding weight)",
         },
@@ -231,9 +249,18 @@ roll_call_history_table = {
                 "2": "Picking amount",
                 "3": "Gender limit",
                 "4": "Group limit",
-                "5": "Weight",
+                "5": "Class",
+                "6": "Weight",
             },
             "description": "Title of the list of picking history tables (personal history, including weight)",
+        },
+        "draw_method_random": {
+            "name": "Random pick",
+            "description": "Random picking mode",
+        },
+        "draw_method_weight": {
+            "name": "Fair pick",
+            "description": "Fair picking mode",
         },
         "select_weight": {
             "name": "Show weight",
@@ -264,11 +291,11 @@ lottery_history_table = {
             "description": "抽奖历史记录表格列标题（全部记录）",
         },
         "HeaderLabels_time_weight": {
-            "name": ["抽奖时间", "序号", "名称", "权重"],
+            "name": ["抽奖时间", "序号", "名称", "课程", "权重"],
             "description": "抽奖历史记录表格列标题（按时间查看）",
         },
         "HeaderLabels_Individual_weight": {
-            "name": ["抽奖时间", "抽奖模式", "抽取数量", "权重设置"],
+            "name": ["抽奖时间", "抽取数量", "课程", "权重"],
             "description": "抽奖历史记录表格列标题（单次记录）",
         },
     },
@@ -296,17 +323,23 @@ lottery_history_table = {
             "description": "Lottery history table title column header weight (all)",
         },
         "HeaderLabels_time_weight": {
-            "name": {"0": "Lottery time", "1": "Serial", "2": "Name", "3": "Weight"},
+            "name": {
+                "0": "Lottery time",
+                "1": "Serial",
+                "2": "Name",
+                "3": "Class",
+                "4": "Weight",
+            },
             "description": "Lottery history table title column header weight (sort by time)",
         },
         "HeaderLabels_Individual_weight": {
             "name": {
                 "0": "Lottery time",
-                "1": "Lottery mode",
-                "2": "Picking quantity",
-                "3": "Weight settings",
+                "1": "Picking quantity",
+                "2": "Class",
+                "3": "Weight",
             },
-            "description": "Lottery history table title column header (single record)",
+            "description": "Lottery history table title column header weight (individual)",
         },
     },
 }

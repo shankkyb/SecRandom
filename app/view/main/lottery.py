@@ -616,6 +616,14 @@ class Lottery(QWidget):
             self.animation_timer.timeout.connect(self.animate_result)
             self.animation_timer.start(animation_interval)
             self.start_button.setEnabled(False)
+            QTimer.singleShot(
+                autoplay_count * animation_interval,
+                lambda: [
+                    self.animation_timer.stop(),
+                    self.stop_animation(),
+                    self.start_button.setEnabled(True),
+                ],
+            )
             self.start_button.clicked.connect(lambda: self.start_draw())
         elif animation == 2:
             if hasattr(self, "final_selected_students_dict") and hasattr(
@@ -936,7 +944,7 @@ class Lottery(QWidget):
         show_random = readme_settings_async("lottery_settings", "show_random")
 
         student_labels = ResultDisplayUtils.create_student_label(
-            pool_name=pool_name,
+            class_name=pool_name,
             selected_students=selected_students,
             draw_count=self.current_count,
             font_size=font_size,

@@ -183,6 +183,41 @@ if CSHARP_AVAILABLE:
                 logger.error(f"获取距离上课时间失败: {e}")
                 return 0
 
+        def get_current_class_info(self) -> dict:
+            """获取当前课程信息
+
+            Returns:
+                dict: 课程信息字典，包含 name, start_time, end_time, teacher, location
+                      如果当前没有课程或获取失败，返回空字典
+            """
+            try:
+                if not self.is_running or not self.is_connected:
+                    return {}
+
+                lessonSc = GeneratedIpcFactory.CreateIpcProxy[IPublicLessonsService](
+                    self.ipc_client.Provider, self.ipc_client.PeerProxy
+                )
+
+                # 检查是否有当前课程
+                if not lessonSc.CurrentSubject:
+                    logger.debug("ClassIsland 当前没有课程")
+                    return {}
+
+                # 获取课程名称
+                class_name = (
+                    lessonSc.CurrentSubject.Name if lessonSc.CurrentSubject else ""
+                )
+                # 如果获取到的是 class_name 为空 或者是 "???"，说明当前没有课程
+                if not class_name or class_name.strip() == "???":
+                    logger.debug("ClassIsland 当前没有课程")
+                    return {}
+                logger.info(f"从 ClassIsland 获取当前课程: {class_name}")
+                return {"name": class_name}
+
+            except Exception as e:
+                logger.error(f"从 ClassIsland 获取课程信息失败: {e}")
+                return {}
+
         @staticmethod
         def convert_to_call_result(
             class_name: str, selected_students, draw_count: int, display_duration=5.0
@@ -319,6 +354,15 @@ else:
                 int: 距离上课的剩余时间（秒），如果当前正在上课或没有下一节课程则返回0
             """
             return 0
+
+        def get_current_class_info(self) -> dict:
+            """获取当前课程信息
+
+            Returns:
+                dict: 课程信息字典，包含 name, start_time, end_time, teacher, location
+                      如果当前没有课程或获取失败，返回空字典
+            """
+            return {}
 
         @staticmethod
         def convert_to_call_result(

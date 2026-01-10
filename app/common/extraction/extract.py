@@ -192,6 +192,59 @@ def _get_class_times_by_day(day_of_week: int) -> Dict[str, str]:
     return parser.get_class_times_by_day(day_of_week)
 
 
+def _get_current_class_info() -> Dict:
+    """获取当前时间段对应的课程信息
+
+    Returns:
+        Dict: 课程信息字典，包含 name, start_time, end_time, teacher, location, day_of_week
+              如果当前时间不在任何上课时间段内，返回空字典
+    """
+    try:
+        # 优先从 ClassIsland 获取课程信息
+        use_class_island_source = readme_settings_async(
+            "course_settings", "class_island_source_enabled"
+        )
+
+        if use_class_island_source:
+            logger.debug("尝试从 ClassIsland 获取当前课程信息")
+            class_info = CSharpIPCHandler.instance().get_current_class_info()
+            if class_info:
+                return class_info
+            else:
+                logger.debug("从 ClassIsland 获取课程信息失败，回退到 CSES 文件")
+
+        # 从 CSES 文件获取课程信息
+        parser = _get_cses_parser()
+        if not parser:
+            return {}
+
+        current_day_of_week = _get_current_day_of_week()
+        current_total_seconds = _get_current_time_in_seconds()
+
+        class_info_list = parser.get_class_info()
+
+        for class_info in class_info_list:
+            if class_info.get("day_of_week") == current_day_of_week:
+                start_time_str = class_info.get("start_time", "")
+                end_time_str = class_info.get("end_time", "")
+
+                if start_time_str and end_time_str:
+                    start_seconds = _parse_time_string_to_seconds(start_time_str)
+                    end_seconds = _parse_time_string_to_seconds(end_time_str)
+
+                    if start_seconds <= current_total_seconds < end_seconds:
+                        class_name = class_info.get("name", "")
+                        logger.info(f"当前课程: {class_name}")
+                        return {"name": class_name}
+
+        logger.debug("当前时间不在任何上课时间段内")
+        return {}
+
+    except Exception as e:
+        logger.error(f"获取当前课程信息失败: {e}")
+        return {}
+
+
 def _get_seconds_to_next_class() -> int:
     """获取距离下一节课的剩余时间（秒）
 

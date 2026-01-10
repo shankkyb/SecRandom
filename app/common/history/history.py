@@ -21,6 +21,7 @@ from app.tools.settings_default import *
 from app.tools.settings_access import *
 from app.Language.obtain_language import *
 from app.common.data.list import *
+from app.common.extraction.extract import _get_current_class_info
 
 from random import SystemRandom
 
@@ -222,13 +223,17 @@ def save_lottery_history(
         bool: 保存是否成功
     """
     try:
+        # 获取当前时间
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # 获取当前课程信息
+        current_class_info = _get_current_class_info()
+
         history_data = load_history_data("lottery", pool_name)
         lotterys = history_data.get("lotterys", {})
         group_stats = history_data.get("group_stats", {})
         gender_stats = history_data.get("gender_stats", {})
         total_stats = history_data.get("total_stats", 0)
-
-        now_str = datetime.now().isoformat(timespec="seconds")
 
         for student in selected_students or []:
             name = student.get("name", "")
@@ -243,17 +248,21 @@ def save_lottery_history(
                     "history": [],
                 }
             entry["total_count"] = int(entry.get("total_count", 0)) + 1
-            entry["last_drawn_time"] = now_str
+            entry["last_drawn_time"] = current_time
             hist = entry.get("history", [])
             if not isinstance(hist, list):
                 hist = []
             hist.append(
                 {
-                    "draw_time": now_str,
+                    "draw_time": current_time,
+                    "draw_lottery_numbers": len(selected_students),
                     "draw_group": group_filter,
                     "draw_gender": gender_filter,
                 }
             )
+            # 如果能获取到课程信息，则添加到历史记录中
+            if current_class_info:
+                hist[-1]["class_name"] = current_class_info.get("name", "")
             entry["history"] = hist
             lotterys[name] = entry
 
@@ -752,6 +761,9 @@ def save_roll_call_history(
                     current_student_weight = student_with_weight.get("next_weight", 0)
                     break
 
+            # 获取当前课程信息
+            current_class_info = _get_current_class_info()
+
             history_entry = {
                 "draw_method": draw_method,
                 "draw_time": current_time,
@@ -760,6 +772,11 @@ def save_roll_call_history(
                 "draw_gender": gender_filter,
                 "weight": current_student_weight,
             }
+
+            # 如果能获取到课程信息，则添加到历史记录中
+            if current_class_info:
+                history_entry["class_name"] = current_class_info.get("name", "")
+
             student_data["history"].append(history_entry)
 
         # 更新未被选中的学生的未选中次数

@@ -42,6 +42,7 @@ class lottery_history_table(GroupHeaderCardWidget):
         self.current_row = 0  # 当前加载到的行数
         self.total_rows = 0  # 总行数
         self.is_loading = False  # 是否正在加载数据
+        self.has_class_record = False  # 是否有课程记录
 
         # 创建奖池选择区域
         QTimer.singleShot(APPLY_DELAY, self.create_pool_selection)
@@ -235,17 +236,45 @@ class lottery_history_table(GroupHeaderCardWidget):
         def sort_key(row):
             # 尝试将数据转换为数字，如果失败则使用字符串比较
             try:
-                # 对于权重列（列索引5），需要特殊处理
-                if self.sort_column == 5 and self.current_mode == 0:
-                    # 权重列可能包含非数字字符，尝试提取数字部分
-                    weight_str = row[self.sort_column]
-                    # 移除可能的前导零
-                    weight_str = weight_str.lstrip("0")
-                    if not weight_str:
-                        return 0.0
-                    return float(weight_str)
-                else:
-                    return float(row[self.sort_column])
+                # 对于权重列，需要特殊处理
+                # 在模式0（奖品数据）中：没有课程列
+                #   - 权重列索引为3
+                # 在模式1（会话数据）中：
+                #   - 有课程时：权重列索引为4
+                #   - 无课程时：权重列索引为3
+                # 在模式2（统计数据）中：
+                #   - 有课程时：权重列索引为4
+                #   - 无课程时：权重列索引为3
+                if self.current_mode == 0:
+                    # 模式0：奖品数据，权重列索引为3
+                    if self.sort_column == 3:
+                        weight_str = row[self.sort_column]
+                        weight_str = weight_str.lstrip("0")
+                        if not weight_str:
+                            return 0.0
+                        return float(weight_str)
+                elif self.current_mode in [1, 2]:
+                    # 模式1和2：会话数据和统计数据
+                    if self.sort_column == 3:
+                        # 列3可能是课程或权重
+                        if self.has_class_record:
+                            # 有课程，列3是课程，列4是权重
+                            return row[self.sort_column]
+                        else:
+                            # 无课程，列3是权重
+                            weight_str = row[self.sort_column]
+                            weight_str = weight_str.lstrip("0")
+                            if not weight_str:
+                                return 0.0
+                            return float(weight_str)
+                    elif self.sort_column == 4 and self.has_class_record:
+                        # 有课程时，列4是权重
+                        weight_str = row[self.sort_column]
+                        weight_str = weight_str.lstrip("0")
+                        if not weight_str:
+                            return 0.0
+                        return float(weight_str)
+                return float(row[self.sort_column])
             except (ValueError, IndexError):
                 return row[self.sort_column]
 
@@ -471,6 +500,9 @@ class lottery_history_table(GroupHeaderCardWidget):
                 else 0
             )
 
+            # 创建奖品名称到权重的映射
+            lottery_weight_map = {name: weight for _, name, weight in cleaned_lotterys}
+
             lotterys_data = []
             for lottery_id, name, weight in cleaned_lotterys:
                 time_records = (
@@ -484,9 +516,18 @@ class lottery_history_table(GroupHeaderCardWidget):
                                 "draw_time": draw_time,
                                 "id": str(lottery_id).zfill(max_id_length),
                                 "name": name,
-                                "weight": record.get("weight", ""),
+                                "class_name": record.get("class_name", ""),
+                                "weight": lottery_weight_map.get(name, ""),
                             }
                         )
+
+            # 检查是否有课程记录
+            self.has_class_record = any(
+                lottery.get("class_name", "") for lottery in lotterys_data
+            )
+
+            # 更新表头，确保 has_class_record 设置后表头正确显示
+            self.update_table_headers()
 
             # 使用权重格式化函数
             format_weight, _, _ = format_weight_for_display(lotterys_data, "weight")
@@ -501,7 +542,9 @@ class lottery_history_table(GroupHeaderCardWidget):
                         return lottery.get("id", "")
                     elif self.sort_column == 2:  # 名称
                         return lottery.get("name", "")
-                    elif self.sort_column == 3:  # 权重
+                    elif self.sort_column == 3:  # 课程
+                        return lottery.get("class_name", "")
+                    elif self.sort_column == 4:  # 权重
                         return lottery.get("weight", "")
                     return ""
 
@@ -536,9 +579,20 @@ class lottery_history_table(GroupHeaderCardWidget):
                 name_item = create_table_item(lottery.get("name", ""))
                 self.table.setItem(row, 2, name_item)
 
+                # 课程（如果有课程记录）
+                if self.has_class_record:
+                    class_name = lottery.get("class_name", "")
+                    class_item = create_table_item(
+                        str(class_name) if class_name else ""
+                    )
+                    self.table.setItem(row, 3, class_item)
+                    col = 4
+                else:
+                    col = 3
+
                 # 权重
                 weight_item = create_table_item(format_weight(lottery.get("weight", 0)))
-                self.table.setItem(row, 3, weight_item)
+                self.table.setItem(row, col, weight_item)
 
             # 更新当前行数
             self.current_row = end_row
@@ -572,6 +626,9 @@ class lottery_history_table(GroupHeaderCardWidget):
                         (info.get("id", ""), name, info.get("weight", ""))
                     )
 
+            # 创建奖品名称到权重的映射
+            lottery_weight_map = {name: weight for _, name, weight in cleaned_lotterys}
+
             history_data = {}
             if file_exists(history_file):
                 try:
@@ -591,17 +648,24 @@ class lottery_history_table(GroupHeaderCardWidget):
                         lotterys_data.append(
                             {
                                 "draw_time": draw_time,
-                                "draw_method": str(record.get("draw_method", "")),
                                 "draw_lottery_numbers": str(
                                     record.get("draw_lottery_numbers", 0)
                                 ),
-                                "weight": record.get("weight", ""),
+                                "class_name": record.get("class_name", ""),
+                                "weight": lottery_weight_map.get(name, ""),
                             }
                         )
 
-            max_weight_length = max(
-                len(str(lottery.get("weight", ""))) for lottery in lotterys_data
+            # 检查是否有课程记录
+            self.has_class_record = any(
+                lottery.get("class_name", "") for lottery in lotterys_data
             )
+
+            # 更新表头，确保 has_class_record 设置后表头正确显示
+            self.update_table_headers()
+
+            # 使用权重格式化函数
+            format_weight, _, _ = format_weight_for_display(lotterys_data, "weight")
 
             # 根据排序状态对数据进行排序
             if self.sort_column >= 0:
@@ -609,10 +673,10 @@ class lottery_history_table(GroupHeaderCardWidget):
                 def sort_key(lottery):
                     if self.sort_column == 0:  # 时间
                         return lottery.get("draw_time", "")
-                    elif self.sort_column == 1:  # 模式
-                        return str(lottery.get("draw_method", ""))
-                    elif self.sort_column == 2:  # 数量
+                    elif self.sort_column == 1:  # 数量
                         return int(lottery.get("draw_lottery_numbers", 0))
+                    elif self.sort_column == 2:  # 课程或权重
+                        return lottery.get("class_name", "")
                     elif self.sort_column == 3:  # 权重
                         return float(lottery.get("weight", ""))
                     return ""
@@ -640,21 +704,28 @@ class lottery_history_table(GroupHeaderCardWidget):
                 time_item = create_table_item(lottery.get("draw_time", ""))
                 self.table.setItem(row, 0, time_item)
 
-                # 模式
-                mode_item = create_table_item(lottery.get("draw_method", ""))
-                self.table.setItem(row, 1, mode_item)
-
                 # 数量
                 draw_lottery_numbers_item = create_table_item(
                     str(lottery.get("draw_lottery_numbers", 0))
                 )
-                self.table.setItem(row, 2, draw_lottery_numbers_item)
+                self.table.setItem(row, 1, draw_lottery_numbers_item)
+
+                # 课程（如果有课程记录）
+                if self.has_class_record:
+                    class_name = lottery.get("class_name", "")
+                    class_item = create_table_item(
+                        str(class_name) if class_name else ""
+                    )
+                    self.table.setItem(row, 2, class_item)
+                    col = 3
+                else:
+                    col = 2
 
                 # 权重
                 weight_item = create_table_item(
-                    str(lottery.get("weight", "")).zfill(max_weight_length)
+                    format_weight(lottery.get("weight", ""))
                 )
-                self.table.setItem(row, 3, weight_item)
+                self.table.setItem(row, col, weight_item)
 
             # 更新当前行数
             self.current_row = end_row
@@ -753,6 +824,10 @@ class lottery_history_table(GroupHeaderCardWidget):
             self.table.setRowCount(0)
             return
         self.current_pool_name = pool_name
+
+        # 重置课程记录标志
+        self.has_class_record = False
+
         self.update_table_headers()
 
         # 重置数据加载状态
@@ -880,5 +955,10 @@ class lottery_history_table(GroupHeaderCardWidget):
             headers = get_content_name_async(
                 "lottery_history_table", "HeaderLabels_Individual_weight"
             )
+
+        # 如果没有课程记录，移除课程列（在权重列之前）
+        if not self.has_class_record and self.current_mode >= 1:
+            headers = headers[:-2] + headers[-1:]
+
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
