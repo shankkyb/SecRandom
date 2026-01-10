@@ -16,7 +16,7 @@ from app.tools.settings_access import *
 from app.Language.obtain_language import *
 
 from app.common.data.list import *
-from app.common.history.history import *
+from app.common.history import *
 from app.common.display.result_display import *
 from app.tools.config import *
 from app.common.roll_call.roll_call_utils import RollCallUtils

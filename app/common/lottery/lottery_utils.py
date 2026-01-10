@@ -11,7 +11,7 @@ from app.common.data.list import (
     get_pool_list,
 )
 from app.common.roll_call.roll_call_utils import RollCallUtils
-from app.common.history.history import calculate_weight
+from app.common.history import calculate_weight
 from app.common.behind_scenes.behind_scenes_utils import BehindScenesUtils
 from app.tools.config import (
     calculate_remaining_count,

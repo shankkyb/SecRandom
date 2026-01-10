@@ -7,10 +7,11 @@ from loguru import logger
 
 from app.common.data.list import *
 from app.common.display.result_display import *
-from app.common.history.history import *
+from app.common.history import *
 from app.tools.settings_access import *
 from app.common.music.music_player import music_player
 from app.common.roll_call.roll_call_utils import RollCallUtils
+from app.Language.obtain_language import get_content_combo_name_async
 
 
 # ==================================================

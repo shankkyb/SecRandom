@@ -5,7 +5,7 @@ import json
 from random import SystemRandom
 
 from app.common.data.list import get_group_list, get_student_list, filter_students_data
-from app.common.history.history import calculate_weight
+from app.common.history import calculate_weight
 from app.common.fair_draw.avg_gap_protection import apply_avg_gap_protection
 from app.common.behind_scenes.behind_scenes_utils import BehindScenesUtils
 from app.tools.config import (
@@ -17,7 +17,12 @@ from app.tools.config import (
 from app.tools.path_utils import get_data_path, open_file
 from app.tools.settings_access import readme_settings_async, get_safe_font_size
 from app.common.display.result_display import ResultDisplayUtils
-from app.common.history.history import save_roll_call_history
+from app.common.history import save_roll_call_history
+from app.common.extraction.extract import (
+    _get_current_class_info,
+    _is_non_class_time,
+    _get_break_assignment_class_info,
+)
 
 from app.Language.obtain_language import get_any_position_value
 
@@ -253,8 +258,38 @@ class RollCallUtils:
         if not students_dict_list:
             return {"reset_required": True}
 
+        # 获取当前课程信息（用于科目过滤）
+        current_class_info = None
+        subject_history_filter_enabled = (
+            readme_settings_async("course_settings", "subject_history_filter_enabled")
+            or False
+        )
+
+        if subject_history_filter_enabled:
+            use_class_island_source = readme_settings_async(
+                "course_settings", "class_island_source_enabled"
+            )
+            if use_class_island_source:
+                from app.common.IPC_URL.csharp_ipc_handler import CSharpIPCHandler
+
+                current_class_info = (
+                    CSharpIPCHandler.instance().get_current_class_info()
+                )
+            else:
+                current_class_info = _get_current_class_info()
+
+            # 如果当前没有课程信息（课间时段），则使用课间归属的课程信息
+            if not current_class_info:
+                if _is_non_class_time():
+                    current_class_info = _get_break_assignment_class_info()
+
+        # 提取科目名称
+        subject_filter = ""
+        if current_class_info:
+            subject_filter = current_class_info.get("name", "")
+
         students_dict_list = apply_avg_gap_protection(
-            students_dict_list, current_count, class_name, "roll_call"
+            students_dict_list, current_count, class_name, "roll_call", subject_filter
         )
 
         students_dict_list, behind_scenes_weights = (
@@ -291,7 +326,9 @@ class RollCallUtils:
 
         draw_type = readme_settings_async("roll_call_settings", "draw_type")
         if draw_type == 1:
-            students_with_weight = calculate_weight(students_dict_list, class_name)
+            students_with_weight = calculate_weight(
+                students_dict_list, class_name, subject_filter
+            )
             weights = []
             for i, student in enumerate(students_with_weight):
                 # 结合内幕权重和历史权重

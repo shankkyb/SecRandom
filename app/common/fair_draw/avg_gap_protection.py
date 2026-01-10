@@ -4,7 +4,7 @@
 
 from typing import List, Dict, Any
 from loguru import logger
-from app.common.history.history import load_history_data
+from app.common.history import *
 from app.tools.settings_access import readme_settings_async
 
 
@@ -81,16 +81,16 @@ def apply_avg_gap_protection(
     draw_count: int,
     class_name: str,
     history_type: str = "roll_call",
+    subject_filter: str = "",
 ) -> List[Dict[str, Any]]:
     """
     应用平均值过滤 + 最大差距保护的公平抽取逻辑
-
     Args:
         candidates: 候选列表，每个元素包含学生信息
         draw_count: 本次要抽取的人数
         class_name: 班级名称
         history_type: 历史记录类型，默认为"roll_call"
-
+        subject_filter: 科目过滤，如果指定则只计算该科目的历史记录
     Returns:
         处理后的候选池
     """
@@ -115,7 +115,6 @@ def apply_avg_gap_protection(
         # Step 1: 获取当前抽取单位的次数
         # 加载历史记录
         history_data = load_history_data(history_type, class_name)
-
         # 初始化学生抽取次数字典
         student_counts = {}
         for student in candidates:
@@ -123,7 +122,25 @@ def apply_avg_gap_protection(
             if student_name:
                 # 从历史记录中获取该学生的抽取次数
                 student_history = history_data.get("students", {}).get(student_name, {})
-                student_counts[student_name] = student_history.get("total_count", 0)
+
+                # 如果有科目过滤，使用科目统计
+                if subject_filter and history_type == "roll_call":
+                    subject_stats = student_history.get("subject_stats", {})
+                    if subject_filter in subject_stats:
+                        student_counts[student_name] = subject_stats[
+                            subject_filter
+                        ].get("total_count", 0)
+                    else:
+                        # 如果科目统计中没有该科目，从历史记录中计算
+                        history = student_history.get("history", [])
+                        filtered_count = 0
+                        for record in history:
+                            if record.get("class_name", "") == subject_filter:
+                                filtered_count += 1
+                        student_counts[student_name] = filtered_count
+                else:
+                    # 没有科目过滤，使用总次数
+                    student_counts[student_name] = student_history.get("total_count", 0)
 
         # 获取所有学生的抽取次数列表
         counts = list(student_counts.values())

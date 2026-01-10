@@ -16,8 +16,16 @@ from app.tools.personalised import *
 from app.tools.settings_default import *
 from app.tools.settings_access import *
 from app.Language.obtain_language import *
-from app.common.history.history import *
-from app.common.data.list import get_gender_list, get_group_list
+from app.common.history import *
+from app.common.history.history_reader import (
+    get_roll_call_student_list,
+    get_roll_call_history_data,
+    filter_roll_call_history_by_subject,
+    get_roll_call_students_data,
+    get_roll_call_session_data,
+    get_roll_call_student_stats_data,
+    check_class_has_gender_or_group,
+)
 
 
 # ==================================================
@@ -371,137 +379,40 @@ class roll_call_history_table(GroupHeaderCardWidget):
         if not self.current_class_name:
             return
         try:
-            student_file = get_data_path(
-                "list/roll_call_list", f"{self.current_class_name}.json"
-            )
-            history_file = get_data_path(
-                "history/roll_call_history", f"{self.current_class_name}.json"
-            )
-            with open_file(student_file, "r", encoding="utf-8") as f:
-                class_data = json.load(f)
+            cleaned_students = get_roll_call_student_list(self.current_class_name)
+            history_data = get_roll_call_history_data(self.current_class_name)
 
-            cleaned_students = []
-            for name, info in class_data.items():
-                if isinstance(info, dict) and info.get("exist", True):
-                    cleaned_students.append(
-                        (
-                            info.get("id", ""),
-                            name,
-                            info.get("gender", ""),
-                            info.get("group", ""),
-                        )
-                    )
-
-            history_data = {}
-            if file_exists(history_file):
-                try:
-                    with open_file(history_file, "r", encoding="utf-8") as f:
-                        history_data = json.load(f)
-                except json.JSONDecodeError:
-                    pass
-
-            # 如果选择了特定课程，过滤历史数据
             if self.current_subject:
-                filtered_history_data = {"students": {}}
-                for student_name, student_info in history_data.get(
-                    "students", {}
-                ).items():
-                    filtered_history = []
-                    for record in student_info.get("history", []):
-                        if record.get("class_name", "") == self.current_subject:
-                            filtered_history.append(record)
-                    if filtered_history:
-                        filtered_history_data["students"][student_name] = {
-                            **student_info,
-                            "history": filtered_history,
-                            "total_count": len(filtered_history),
-                        }
-                history_data = filtered_history_data
-
-            max_id_length = (
-                max(len(str(student[0])) for student in cleaned_students)
-                if cleaned_students
-                else 0
-            )
-            max_total_count_length = (
-                max(
-                    len(
-                        str(
-                            history_data.get("students", {})
-                            .get(name, {})
-                            .get("total_count", 0)
-                        )
-                    )
-                    for _, name, _, _ in cleaned_students
+                history_data = filter_roll_call_history_by_subject(
+                    history_data, self.current_subject
                 )
-                if cleaned_students
-                else 0
+
+            students_data = get_roll_call_students_data(
+                cleaned_students, history_data, self.current_subject
             )
-
-            students_data = []
-            for student_id, name, gender, group in cleaned_students:
-                # 计算总次数
-                if self.current_subject:
-                    # 如果选择了特定课程，从 subject_stats 中获取统计信息
-                    student_info = history_data.get("students", {}).get(name, {})
-                    subject_stats = student_info.get("subject_stats", {})
-                    if self.current_subject in subject_stats:
-                        subject_stat = subject_stats[self.current_subject]
-                        total_count = subject_stat.get("total_count", 0)
-                    else:
-                        total_count = 0
-                else:
-                    # 统计所有历史记录
-                    count = int(
-                        history_data.get("students", {})
-                        .get(name, {})
-                        .get("total_count", 0)
-                    )
-                    group_gender_count = int(
-                        history_data.get("students", {})
-                        .get(name, {})
-                        .get("group_gender_count", 0)
-                    )
-                    total_count = count + group_gender_count
-
-                students_data.append(
-                    {
-                        "id": str(student_id).zfill(max_id_length),
-                        "name": name,
-                        "gender": gender,
-                        "group": group,
-                        "total_count": total_count,
-                        "total_count_str": str(total_count).zfill(
-                            max_total_count_length
-                        ),
-                    }
-                )
 
             students_weight_data = calculate_weight(
                 students_data, self.current_class_name, self.current_subject
             )
 
-            # 使用权重格式化函数
             format_weight, _, _ = format_weight_for_display(
                 students_weight_data, "next_weight"
             )
 
-            # 根据排序状态对数据进行排序
             if self.sort_column >= 0:
-                # 定义排序键函数
+
                 def sort_key(student):
-                    if self.sort_column == 0:  # 学号
+                    if self.sort_column == 0:
                         return student.get("id", "")
-                    elif self.sort_column == 1:  # 姓名
+                    elif self.sort_column == 1:
                         return student.get("name", "")
-                    elif self.sort_column == 2:  # 性别
+                    elif self.sort_column == 2:
                         return student.get("gender", "")
-                    elif self.sort_column == 3:  # 小组
+                    elif self.sort_column == 3:
                         return student.get("group", "")
-                    elif self.sort_column == 4:  # 总次数
+                    elif self.sort_column == 4:
                         return student.get("total_count", 0)
-                    elif self.sort_column == 5:  # 权重
-                        # 使用学生ID和姓名在权重数据中查找对应的权重
+                    elif self.sort_column == 5:
                         for weight_student in students_weight_data:
                             if weight_student.get("id") == student.get(
                                 "id"
@@ -510,10 +421,8 @@ class roll_call_history_table(GroupHeaderCardWidget):
                         return 1.0
                     return ""
 
-                # 应用排序
                 reverse_order = self.sort_order == Qt.SortOrder.DescendingOrder
                 students_data.sort(key=sort_key, reverse=reverse_order)
-                # 同步排序权重数据
                 sorted_weight_data = []
                 for student in students_data:
                     for weight_student in students_weight_data:
@@ -524,19 +433,13 @@ class roll_call_history_table(GroupHeaderCardWidget):
                             break
                 students_weight_data = sorted_weight_data
 
-            # 计算本次加载的行范围
             start_row = self.current_row
             end_row = min(start_row + self.batch_size, self.total_rows)
 
-            # 检查班级是否设置了性别和小组
-            has_gender = False
-            has_group = False
-            gender_list = get_gender_list(self.current_class_name)
-            group_list = get_group_list(self.current_class_name)
-            has_gender = bool(gender_list) and gender_list != [""]
-            has_group = bool(group_list) and group_list != [""]
+            has_gender, has_group = check_class_has_gender_or_group(
+                self.current_class_name
+            )
 
-            # 填充表格数据
             for i in range(start_row, end_row):
                 if i >= len(students_data):
                     break
@@ -545,36 +448,30 @@ class roll_call_history_table(GroupHeaderCardWidget):
                 row = i
                 col = 0
 
-                # 学号
                 id_item = create_table_item(student.get("id", str(row + 1)))
                 self.table.setItem(row, col, id_item)
                 col += 1
 
-                # 姓名
                 name_item = create_table_item(student.get("name", ""))
                 self.table.setItem(row, col, name_item)
                 col += 1
 
-                # 性别（如果设置了性别）
                 if has_gender:
                     gender_item = create_table_item(student.get("gender", ""))
                     self.table.setItem(row, col, gender_item)
                     col += 1
 
-                # 小组（如果设置了小组）
                 if has_group:
                     group_item = create_table_item(student.get("group", ""))
                     self.table.setItem(row, col, group_item)
                     col += 1
 
-                # 总次数
                 total_count_item = create_table_item(
                     str(student.get("total_count_str", student.get("total_count", 0)))
                 )
                 self.table.setItem(row, col, total_count_item)
                 col += 1
 
-                # 如果需要显示权重
                 if self.table.columnCount() > col:
                     weight_item = create_table_item(
                         str(
@@ -585,7 +482,6 @@ class roll_call_history_table(GroupHeaderCardWidget):
                     )
                     self.table.setItem(row, col, weight_item)
 
-            # 更新当前行数
             self.current_row = end_row
 
         except Exception as e:
@@ -596,127 +492,52 @@ class roll_call_history_table(GroupHeaderCardWidget):
         if not self.current_class_name:
             return
         try:
-            student_file = get_data_path(
-                "list/roll_call_list", f"{self.current_class_name}.json"
-            )
-            history_file = get_data_path(
-                "history/roll_call_history", f"{self.current_class_name}.json"
-            )
-            with open_file(student_file, "r", encoding="utf-8") as f:
-                class_data = json.load(f)
+            cleaned_students = get_roll_call_student_list(self.current_class_name)
+            history_data = get_roll_call_history_data(self.current_class_name)
 
-            cleaned_students = []
-            for name, info in class_data.items():
-                if isinstance(info, dict) and info.get("exist", True):
-                    cleaned_students.append(
-                        (
-                            info.get("id", ""),
-                            name,
-                            info.get("gender", ""),
-                            info.get("group", ""),
-                        )
-                    )
-
-            history_data = {}
-            if file_exists(history_file):
-                try:
-                    with open_file(history_file, "r", encoding="utf-8") as f:
-                        history_data = json.load(f)
-                except json.JSONDecodeError:
-                    pass
-
-            max_id_length = (
-                max(len(str(student[0])) for student in cleaned_students)
-                if cleaned_students
-                else 0
+            students_data = get_roll_call_session_data(
+                cleaned_students, history_data, self.current_subject
             )
 
-            students_data = []
-            for student_id, name, gender, group in cleaned_students:
-                time_records = (
-                    history_data.get("students", {}).get(name, {}).get("history", [{}])
-                )
-                for record in time_records:
-                    draw_time = record.get("draw_time", "")
-                    if draw_time:
-                        # 如果选择了特定课程，只显示该课程的记录
-                        if self.current_subject:
-                            if record.get("class_name", "") == self.current_subject:
-                                students_data.append(
-                                    {
-                                        "draw_time": draw_time,
-                                        "id": str(student_id).zfill(max_id_length),
-                                        "name": name,
-                                        "gender": gender,
-                                        "group": group,
-                                        "class_name": record.get("class_name", ""),
-                                        "weight": record.get("weight", ""),
-                                    }
-                                )
-                        else:
-                            students_data.append(
-                                {
-                                    "draw_time": draw_time,
-                                    "id": str(student_id).zfill(max_id_length),
-                                    "name": name,
-                                    "gender": gender,
-                                    "group": group,
-                                    "class_name": record.get("class_name", ""),
-                                    "weight": record.get("weight", ""),
-                                }
-                            )
-
-            # 检查是否有课程记录
             self.has_class_record = any(
                 student.get("class_name", "") for student in students_data
             )
 
-            # 更新表头，确保 has_class_record 设置后表头正确显示
             self.update_table_headers()
 
-            # 使用权重格式化函数
             format_weight, _, _ = format_weight_for_display(students_data, "weight")
 
-            # 根据排序状态对数据进行排序
             if self.sort_column >= 0:
-                # 定义排序键函数
+
                 def sort_key(student):
-                    if self.sort_column == 0:  # 时间
+                    if self.sort_column == 0:
                         return student.get("draw_time", "")
-                    elif self.sort_column == 1:  # 学号
+                    elif self.sort_column == 1:
                         return student.get("id", "")
-                    elif self.sort_column == 2:  # 姓名
+                    elif self.sort_column == 2:
                         return student.get("name", "")
-                    elif self.sort_column == 3:  # 性别
+                    elif self.sort_column == 3:
                         return student.get("gender", "")
-                    elif self.sort_column == 4:  # 小组
+                    elif self.sort_column == 4:
                         return student.get("group", "")
-                    elif self.sort_column == 5:  # 课程或权重
+                    elif self.sort_column == 5:
                         return student.get("class_name", "")
-                    elif self.sort_column == 6:  # 权重（仅在有课程时）
+                    elif self.sort_column == 6:
                         return student.get("weight", "")
                     return ""
 
-                # 应用排序
                 reverse_order = self.sort_order == Qt.SortOrder.DescendingOrder
                 students_data.sort(key=sort_key, reverse=reverse_order)
             else:
-                # 默认按时间降序排序
                 students_data.sort(key=lambda x: x.get("draw_time", ""), reverse=True)
 
-            # 计算本次加载的行范围
             start_row = self.current_row
             end_row = min(start_row + self.batch_size, self.total_rows)
 
-            # 检查班级是否设置了性别和小组
-            has_gender = False
-            has_group = False
-            gender_list = get_gender_list(self.current_class_name)
-            group_list = get_group_list(self.current_class_name)
-            has_gender = bool(gender_list) and gender_list != [""]
-            has_group = bool(group_list) and group_list != [""]
+            has_gender, has_group = check_class_has_gender_or_group(
+                self.current_class_name
+            )
 
-            # 填充表格数据
             for i in range(start_row, end_row):
                 if i >= len(students_data):
                     break
@@ -725,36 +546,30 @@ class roll_call_history_table(GroupHeaderCardWidget):
                 row = i
                 col = 0
 
-                # 时间
                 draw_time_item = create_table_item(student.get("draw_time", ""))
                 self.table.setItem(row, col, draw_time_item)
                 col += 1
 
-                # 学号
                 id_item = create_table_item(student.get("id", str(row + 1)))
                 self.table.setItem(row, col, id_item)
                 col += 1
 
-                # 姓名
                 name_item = create_table_item(student.get("name", ""))
                 self.table.setItem(row, col, name_item)
                 col += 1
 
-                # 性别（如果设置了性别）
                 if has_gender:
                     gender = student.get("gender", "")
                     gender_item = create_table_item(str(gender) if gender else "")
                     self.table.setItem(row, col, gender_item)
                     col += 1
 
-                # 小组（如果设置了小组）
                 if has_group:
                     group = student.get("group", "")
                     group_item = create_table_item(str(group) if group else "")
                     self.table.setItem(row, col, group_item)
                     col += 1
 
-                # 课程（如果有课程记录）
                 if self.has_class_record:
                     class_name = student.get("class_name", "")
                     class_item = create_table_item(
@@ -763,14 +578,12 @@ class roll_call_history_table(GroupHeaderCardWidget):
                     self.table.setItem(row, col, class_item)
                     col += 1
 
-                # 如果需要显示权重
                 if self.table.columnCount() > col:
                     weight_item = create_table_item(
                         str(format_weight(student.get("weight", "")))
                     )
                     self.table.setItem(row, col, weight_item)
 
-            # 更新当前行数
             self.current_row = end_row
 
         except Exception as e:
@@ -781,133 +594,52 @@ class roll_call_history_table(GroupHeaderCardWidget):
         if not self.current_class_name:
             return
         try:
-            student_file = get_data_path(
-                "list/roll_call_list", f"{self.current_class_name}.json"
+            cleaned_students = get_roll_call_student_list(self.current_class_name)
+            history_data = get_roll_call_history_data(self.current_class_name)
+
+            students_data = get_roll_call_student_stats_data(
+                cleaned_students, history_data, student_name, self.current_subject
             )
-            history_file = get_data_path(
-                "history/roll_call_history", f"{self.current_class_name}.json"
-            )
-            with open_file(student_file, "r", encoding="utf-8") as f:
-                class_data = json.load(f)
 
-            cleaned_students = []
-            for name, info in class_data.items():
-                if (
-                    isinstance(info, dict)
-                    and info.get("exist", True)
-                    and name == student_name
-                ):
-                    cleaned_students.append(
-                        (
-                            info.get("id", ""),
-                            name,
-                            info.get("gender", ""),
-                            info.get("group", ""),
-                        )
-                    )
-
-            history_data = {}
-            if file_exists(history_file):
-                try:
-                    with open_file(history_file, "r", encoding="utf-8") as f:
-                        history_data = json.load(f)
-                except json.JSONDecodeError:
-                    pass
-
-            students_data = []
-            for student_id, name, gender, group in cleaned_students:
-                time_records = (
-                    history_data.get("students", {}).get(name, {}).get("history", [{}])
-                )
-                for record in time_records:
-                    draw_time = record.get("draw_time", "")
-                    if draw_time:
-                        # 如果选择了特定课程，只显示该课程的记录
-                        if self.current_subject:
-                            if record.get("class_name", "") == self.current_subject:
-                                students_data.append(
-                                    {
-                                        "draw_time": draw_time,
-                                        "draw_method": str(
-                                            record.get("draw_method", "")
-                                        ),
-                                        "draw_people_numbers": str(
-                                            record.get("draw_people_numbers", 0)
-                                        ),
-                                        "draw_gender": str(
-                                            record.get("draw_gender", "")
-                                        ),
-                                        "draw_group": str(record.get("draw_group", "")),
-                                        "class_name": record.get("class_name", ""),
-                                        "weight": record.get("weight", ""),
-                                    }
-                                )
-                        else:
-                            students_data.append(
-                                {
-                                    "draw_time": draw_time,
-                                    "draw_method": str(record.get("draw_method", "")),
-                                    "draw_people_numbers": str(
-                                        record.get("draw_people_numbers", 0)
-                                    ),
-                                    "draw_gender": str(record.get("draw_gender", "")),
-                                    "draw_group": str(record.get("draw_group", "")),
-                                    "class_name": record.get("class_name", ""),
-                                    "weight": record.get("weight", ""),
-                                }
-                            )
-
-            # 检查是否有课程记录
             self.has_class_record = any(
                 student.get("class_name", "") for student in students_data
             )
 
-            # 更新表头，确保 has_class_record 设置后表头正确显示
             self.update_table_headers()
 
-            # 使用权重格式化函数
             format_weight, _, _ = format_weight_for_display(students_data, "weight")
 
-            # 根据排序状态对数据进行排序
             if self.sort_column >= 0:
-                # 定义排序键函数
+
                 def sort_key(student):
-                    if self.sort_column == 0:  # 时间
+                    if self.sort_column == 0:
                         return student.get("draw_time", "")
-                    elif self.sort_column == 1:  # 模式
+                    elif self.sort_column == 1:
                         return str(student.get("draw_method", ""))
-                    elif self.sort_column == 2:  # 人数
+                    elif self.sort_column == 2:
                         return int(student.get("draw_people_numbers", 0))
-                    elif self.sort_column == 3:  # 性别
+                    elif self.sort_column == 3:
                         return str(student.get("draw_gender", ""))
-                    elif self.sort_column == 4:  # 小组
+                    elif self.sort_column == 4:
                         return str(student.get("draw_group", ""))
-                    elif self.sort_column == 5:  # 课程或权重
+                    elif self.sort_column == 5:
                         return str(student.get("class_name", ""))
-                    elif self.sort_column == 6:  # 权重（仅在有课程时）
+                    elif self.sort_column == 6:
                         return float(student.get("weight", ""))
                     return ""
 
-                # 应用排序
                 reverse_order = self.sort_order == Qt.SortOrder.DescendingOrder
                 students_data.sort(key=sort_key, reverse=reverse_order)
             else:
-                # 默认按时间降序排序
                 students_data.sort(key=lambda x: x.get("draw_time", ""), reverse=True)
 
-            # 计算本次加载的行范围
             start_row = self.current_row
             end_row = min(start_row + self.batch_size, self.total_rows)
 
-            # 检查班级是否设置了性别和小组
-            has_gender = False
-            has_group = False
-            gender_list = get_gender_list(self.current_class_name)
-            group_list = get_group_list(self.current_class_name)
-            has_gender = bool(gender_list) and gender_list != [""]
-            has_group = bool(group_list) and group_list != [""]
+            has_gender, has_group = check_class_has_gender_or_group(
+                self.current_class_name
+            )
 
-            # 填充表格数据
             for i in range(start_row, end_row):
                 if i >= len(students_data):
                     break
@@ -916,12 +648,10 @@ class roll_call_history_table(GroupHeaderCardWidget):
                 row = i
                 col = 0
 
-                # 时间
                 time_item = create_table_item(student.get("draw_time", ""))
                 self.table.setItem(row, col, time_item)
                 col += 1
 
-                # 模式
                 draw_method = student.get("draw_method", "")
                 if draw_method == "0":
                     mode_text = get_content_name_async(
@@ -937,28 +667,24 @@ class roll_call_history_table(GroupHeaderCardWidget):
                 self.table.setItem(row, col, mode_item)
                 col += 1
 
-                # 人数
                 draw_people_numbers_item = create_table_item(
                     str(student.get("draw_people_numbers", 0))
                 )
                 self.table.setItem(row, col, draw_people_numbers_item)
                 col += 1
 
-                # 性别（如果设置了性别）
                 if has_gender:
                     draw_gender = student.get("draw_gender", "")
                     gender_item = create_table_item(draw_gender if draw_gender else "")
                     self.table.setItem(row, col, gender_item)
                     col += 1
 
-                # 小组（如果设置了小组）
                 if has_group:
                     draw_group = student.get("draw_group", "")
                     group_item = create_table_item(draw_group if draw_group else "")
                     self.table.setItem(row, col, group_item)
                     col += 1
 
-                # 课程（如果有课程记录）
                 if self.has_class_record:
                     class_name = student.get("class_name", "")
                     class_item = create_table_item(
@@ -967,14 +693,12 @@ class roll_call_history_table(GroupHeaderCardWidget):
                     self.table.setItem(row, col, class_item)
                     col += 1
 
-                # 如果需要显示权重
                 if self.table.columnCount() > col:
                     weight_item = create_table_item(
                         str(format_weight(student.get("weight", 0)))
                     )
                     self.table.setItem(row, col, weight_item)
 
-            # 更新当前行数
             self.current_row = end_row
 
         except Exception as e:
@@ -1290,22 +1014,13 @@ class roll_call_history_table(GroupHeaderCardWidget):
                 "roll_call_history_table", "HeaderLabels_Individual_weight"
             )
 
-        # 检查班级是否设置了性别和小组
-        has_gender = False
-        has_group = False
+        has_gender, has_group = False, False
         if self.current_class_name:
-            gender_list = get_gender_list(self.current_class_name)
-            group_list = get_group_list(self.current_class_name)
-            # 如果性别列表不为空且不全是空字符串，则认为设置了性别
-            has_gender = bool(gender_list) and gender_list != [""]
-            # 如果小组列表不为空且不全是空字符串，则认为设置了小组
-            has_group = bool(group_list) and group_list != [""]
+            has_gender, has_group = check_class_has_gender_or_group(
+                self.current_class_name
+            )
 
-        # 根据是否有性别和小组动态调整表头
-        # 对于模式0和1，需要隐藏性别和小组列
         if self.current_mode == 0:
-            # 原始表头结构: [学号, 姓名, 性别, 小组, 点名次数/时间, 权重]
-            # 根据has_gender和has_group动态调整表头
             if not has_gender and not has_group:
                 headers = headers[:2] + headers[4:]
             elif not has_gender:
@@ -1313,27 +1028,21 @@ class roll_call_history_table(GroupHeaderCardWidget):
             elif not has_group:
                 headers = headers[:3] + headers[4:]
         elif self.current_mode == 1:
-            # 原始表头结构: [点名时间, 学号, 姓名, 性别, 小组, 课程, 权重]
-            # 根据has_gender和has_group动态调整表头
             if not has_gender and not has_group:
-                headers = headers[:2] + headers[4:]  # 移除性别和小组列
+                headers = headers[:2] + headers[4:]
             elif not has_gender:
-                headers = headers[:2] + headers[3:]  # 移除性别列
+                headers = headers[:2] + headers[3:]
             elif not has_group:
                 headers = headers[:3] + headers[4:]
-            # 如果没有课程记录，移除课程列（在权重列之前）
             if not self.has_class_record:
                 headers = headers[:-2] + headers[-1:]
         elif self.current_mode >= 2:
-            # 原始表头结构: [点名时间, 点名模式, 点名人数, 性别限制, 小组限制, 课程, 权重]
-            # 根据has_gender和has_group动态调整表头
             if not has_gender and not has_group:
                 headers = headers[:3] + headers[5:]
             elif not has_gender:
                 headers = headers[:3] + headers[4:]
             elif not has_group:
                 headers = headers[:4] + headers[5:]
-            # 如果没有课程记录，移除课程列（在权重列之前）
             if not self.has_class_record:
                 headers = headers[:-2] + headers[-1:]
 

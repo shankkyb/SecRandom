@@ -277,7 +277,7 @@ class SetClassNameWindow(QWidget):
                             deleted_count += 1
 
                         # 删除对应的点名历史记录
-                        from app.common.history.history import get_history_file_path
+                        from app.common.history import get_history_file_path
 
                         history_file_path = get_history_file_path(
                             "roll_call", class_name

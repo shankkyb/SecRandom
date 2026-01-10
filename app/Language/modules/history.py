@@ -296,6 +296,11 @@ lottery_history_table = {
             "description": "选择历史记录的查看方式",
             "combo_items": ["全部记录", "按时间查看"],
         },
+        "select_subject": {
+            "name": "选择课程",
+            "description": "选择要查看的课程",
+            "combo_items": ["全部课程"],
+        },
         "HeaderLabels_all_weight": {
             "name": ["序号", "名称", "中奖次数", "权重"],
             "description": "抽奖历史记录表格列标题（全部记录）",
@@ -322,6 +327,11 @@ lottery_history_table = {
             "name": "View mode",
             "description": "Choose how history is viewed",
             "combo_items": {"0": "All history", "1": "View by time"},
+        },
+        "select_subject": {
+            "name": "Select subject",
+            "description": "Choose a subject to view",
+            "combo_items": ["All subjects"],
         },
         "HeaderLabels_all_weight": {
             "name": {
