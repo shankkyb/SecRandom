@@ -172,7 +172,26 @@ jobs:
           # 复制 LICENSE 文件到zip_dist/SecRandom/data目录下
           Copy-Item LICENSE zip_dist/SecRandom/data/
 
-          # Inno Setup 打包
+      - name: 安装 Inno Setup 中文语言文件
+        if: matrix.platform == 'windows'
+        run: |
+          echo "下载 Inno Setup 中文语言文件..."
+          $langUrl = "https://raw.githubusercontent.com/kira-96/Inno-Setup-Chinese-Simplified-Translation/main/ChineseSimplified.isl"
+          $langPath = "C:\Program Files (x86)\Inno Setup 6\Languages\ChineseSimplified.isl"
+          $langDir = "C:\Program Files (x86)\Inno Setup 6\Languages"
+
+          # 确保 Languages 目录存在
+          if (!(Test-Path $langDir)) {
+            New-Item -ItemType Directory -Path $langDir -Force
+          }
+
+          # 下载中文语言文件
+          Invoke-WebRequest -Uri $langUrl -OutFile $langPath
+          echo "中文语言文件下载完成: $langPath"
+
+      - name: Inno Setup 打包
+        if: matrix.platform == 'windows'
+        run: |
           echo "开始 Inno Setup 打包..."
 
           # 确保构建输出目录存在
