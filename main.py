@@ -61,6 +61,7 @@ def main():
         ],
         before_send=before_send,
         send_default_pii=True,
+        enable_logs=True,
     )
 
     wm.app_start_time = time.perf_counter()
@@ -75,6 +76,7 @@ def main():
                 if arg.startswith("secrandom://"):
                     send_url_to_existing_instance(arg)
                     break
+
         logger.info("程序将退出，已有实例已激活")
         sys.exit(0)
 
