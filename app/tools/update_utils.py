@@ -1359,7 +1359,7 @@ class UpdateCheckThread(QThread):
                                 expected_file_path.unlink()
                                 logger.debug(f"已删除损坏的文件: {expected_file_path}")
                             except Exception as e:
-                                logger.exception(f"删除损坏文件失败: {e}")
+                                logger.error(f"删除损坏文件失败: {e}")
                             # 继续执行下载流程
 
                     # 通知更新页面开始下载

@@ -383,7 +383,7 @@ class LogViewerWindow(QWidget):
             )
 
         except Exception as e:
-            logger.exception(f"清空全部日志文件失败: {e}")
+            logger.error(f"清空全部日志文件失败: {e}")
             self.status_label.setText(
                 get_content_name_async("log_viewer", "clear_all_failed").format(str(e))
             )
@@ -402,7 +402,7 @@ class LogViewerWindow(QWidget):
             os.startfile(log_dir)
 
         except Exception as e:
-            logger.exception(f"打开日志文件夹失败: {e}")
+            logger.error(f"打开日志文件夹失败: {e}")
             self.status_label.setText(
                 get_content_name_async("log_viewer", "open_folder_failed").format(
                     str(e)

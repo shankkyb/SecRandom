@@ -902,7 +902,7 @@ class MainWindow(FluentWindow):
                     shutil.rmtree(temp_dir, onerror=handle_remove_readonly)
                     logger.info("已清除 TEMP 文件夹")
                 except Exception as e:
-                    logger.exception(f"清除 TEMP 文件夹失败: {e}")
+                    logger.error(f"清除 TEMP 文件夹失败: {e}")
 
             # 刷新点名页面的剩余人数显示
             if self.roll_call_page and hasattr(

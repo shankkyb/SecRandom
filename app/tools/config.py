@@ -2083,7 +2083,7 @@ def reset_drawn_prize_record(self, pool_name: str):
             try:
                 os.remove(fp)
             except OSError as e:
-                logger.exception(f"删除文件{fp}失败: {e}")
+                logger.error(f"删除文件{fp}失败: {e}")
         show_notification(
             NotificationType.INFO,
             NotificationConfig(

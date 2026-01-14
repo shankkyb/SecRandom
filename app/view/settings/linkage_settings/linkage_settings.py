@@ -164,7 +164,7 @@ class cses_import_settings(GroupHeaderCardWidget):
                                 class_info = parser.get_class_info()
                                 total_class_periods += len(class_info)
                         except Exception as e:
-                            logger.exception(f"解析文件{file_name}失败: {e}")
+                            logger.error(f"解析文件{file_name}失败: {e}")
 
             # 判断是否有课程表数据
             if total_class_periods > 0:

@@ -147,7 +147,7 @@ class music_management(GroupHeaderCardWidget):
                 try:
                     remove_file(audio_file_path)
                 except Exception as e:
-                    logger.exception(f"删除音乐文件失败: {current_text}, 错误: {e}")
+                    logger.error(f"删除音乐文件失败: {current_text}, 错误: {e}")
 
             # 刷新音乐文件列表
             self.refresh_music_files()
