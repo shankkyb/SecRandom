@@ -25,6 +25,7 @@ from app.core.url_handler_setup import create_url_handler
 from app.core.cs_ipc_handler_setup import create_cs_ipc_handler
 from app.core.app_init import AppInitializer
 from app.tools.update_utils import update_check_thread
+from app.tools.hardware_id import get_hardware_uuid
 import app.core.window_manager as wm
 
 
@@ -60,9 +61,12 @@ def main():
             release=VERSION,
             send_default_pii=True,
             enable_logs=True,
-            # 先1.0（100%上报）试试
+            # 先1.0（100%上报）试试，但因为代码好像没有追踪性能的所以可能没用
             traces_sample_rate=1.0,
         )
+
+        # 获取硬件ID和自动IP
+        sentry_sdk.set_user({"id": get_hardware_uuid(), "ip_address": "{{auto}}"})
 
     wm.app_start_time = time.perf_counter()
 
