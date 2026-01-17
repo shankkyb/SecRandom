@@ -62,12 +62,13 @@ def check_exe_integrity(exe_path: str) -> bool:
         logger.debug(f"检查EXE安装程序完整性: {exe_path}")
 
         # 检查文件是否存在
-        if not Path(exe_path).exists():
+        exe_file = get_path(exe_path)
+        if not exe_file.exists():
             logger.exception(f"EXE文件不存在: {exe_path}")
             return False
 
         # 检查文件大小
-        file_size = Path(exe_path).stat().st_size
+        file_size = exe_file.stat().st_size
         if file_size == 0:
             logger.exception(f"EXE文件大小为0: {exe_path}")
             return False
@@ -100,7 +101,7 @@ def check_update_file_integrity(file_path: str, file_type: str = None) -> bool:
     try:
         # 自动检测文件类型
         if file_type is None:
-            file_ext = Path(file_path).suffix.lower()
+            file_ext = get_path(file_path).suffix.lower()
             if file_ext == ".exe":
                 file_type = "exe"
             else:
@@ -134,7 +135,7 @@ async def run_installer_and_exit(exe_path: str) -> bool:
         logger.info(f"准备运行安装程序: {exe_path}")
 
         # 验证安装程序存在
-        if not Path(exe_path).exists():
+        if not get_path(exe_path).exists():
             logger.exception(f"安装程序不存在: {exe_path}")
             return False
 
@@ -911,12 +912,12 @@ async def install_update_async(file_path: str) -> bool:
         logger.debug(f"开始安装更新文件: {file_path}")
 
         # 验证更新文件存在
-        if not Path(file_path).exists():
+        if not get_path(file_path).exists():
             logger.exception(f"更新文件不存在: {file_path}")
             return False
 
         # 检查文件类型
-        file_ext = Path(file_path).suffix.lower()
+        file_ext = get_path(file_path).suffix.lower()
 
         # 只支持 exe 安装程序
         if file_ext != ".exe":
@@ -928,7 +929,7 @@ async def install_update_async(file_path: str) -> bool:
             logger.exception(f"安装程序不完整或已损坏: {file_path}")
             # 删除损坏的文件
             try:
-                Path(file_path).unlink()
+                get_path(file_path).unlink(missing_ok=True)
                 logger.info(f"已删除损坏的安装程序: {file_path}")
             except Exception as e:
                 logger.exception(f"删除损坏的安装程序失败: {e}")
@@ -1406,9 +1407,7 @@ class UpdateCheckThread(QThread):
                         logger.debug(f"自动下载更新成功: {file_path}")
 
                         # 获取文件大小
-                        from pathlib import Path
-
-                        file_size = Path(file_path).stat().st_size
+                        file_size = get_path(file_path).stat().st_size
 
                         def format_size(size_bytes):
                             """格式化文件大小"""

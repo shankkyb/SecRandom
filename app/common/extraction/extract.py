@@ -1,6 +1,4 @@
 import json
-import os
-from pathlib import Path
 from typing import Dict, Tuple
 
 from PySide6.QtCore import QDateTime
@@ -233,19 +231,19 @@ def _get_cses_parser() -> CSESParser | None:
     """
     try:
         cses_dir = get_data_path("CSES")
-        if not os.path.exists(cses_dir):
+        if not cses_dir.exists():
             logger.info("CSES目录不存在")
             return None
 
-        cses_file_path = os.path.join(cses_dir, "cses_schedule.yml")
+        cses_file_path = cses_dir / "cses_schedule.yml"
 
-        if not os.path.exists(cses_file_path):
+        if not cses_file_path.exists():
             logger.info("CSES文件不存在")
             return None
 
         parser = CSESParser()
-        if not parser.load_from_file(cses_file_path):
-            logger.exception(f"加载CSES文件失败: {cses_file_path}")
+        if not parser.load_from_file(str(cses_file_path)):
+            logger.exception(f"加载CSES文件失败: {str(cses_file_path)}")
             return None
 
         return parser
@@ -449,12 +447,11 @@ def import_cses_schedule(file_path: str) -> Tuple[bool, str]:
                 "linkage_settings", "no_valid_time_periods"
             )
 
-        original_file_name = Path(file_path).name
         cses_data_path = get_data_path("CSES", "cses_schedule.yml")
         ensure_dir(get_data_path("CSES"))
         import shutil
 
-        shutil.copy2(file_path, cses_data_path)
+        shutil.copy2(get_path(file_path), cses_data_path)
         logger.info(f"已将CSES文件保存到: {cses_data_path}")
 
         summary = parser.get_summary()

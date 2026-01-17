@@ -115,7 +115,7 @@ class music_management(GroupHeaderCardWidget):
 
             # 复制选中的文件到音频目录
             for file_path in selected_files:
-                src_file = Path(file_path)
+                src_file = get_path(file_path)
                 dst_file = audio_dir / src_file.name
 
                 # 如果文件已存在，跳过或覆盖

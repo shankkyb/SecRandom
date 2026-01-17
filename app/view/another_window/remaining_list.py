@@ -29,7 +29,7 @@ from app.Language.obtain_language import (
     get_content_name_async,
 )
 from app.tools.config import read_drawn_record, read_drawn_record_simple
-from app.tools.path_utils import get_data_path
+from app.tools.path_utils import get_data_path, get_path
 from app.tools.personalised import load_custom_font
 from app.tools.variable import (
     APP_INIT_DELAY,
@@ -58,7 +58,7 @@ class StudentLoader(QThread):
         info_template: Optional[str],
     ) -> None:
         super().__init__()
-        self._students_file = Path(students_file)
+        self._students_file = get_path(students_file)
         self._class_name = class_name
         self._group_index = int(group_index or 0)
         self._gender_index = int(gender_index or 0)

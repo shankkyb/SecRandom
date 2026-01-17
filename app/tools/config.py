@@ -9,6 +9,7 @@ from pathlib import Path
 from datetime import datetime
 import platform
 import sys
+import time
 import psutil
 
 from PySide6.QtWidgets import QWidget, QFileDialog
@@ -940,11 +941,14 @@ def _export_diagnostic_files(file_path: str, app_dir: Path) -> int:
         导出的文件数量
     """
     export_folders = [
-        Path("config"),
-        Path("app") / "data" / "list",
-        Path("app") / "data" / "Language",
-        Path("app") / "data" / "history",
-        Path("logs"),
+        get_path("config"),
+        get_data_path("list"),
+        get_data_path("Language"),
+        get_data_path("history"),
+        get_data_path("audio"),
+        get_data_path("CSES"),
+        get_data_path("images"),
+        get_path(LOG_DIR),
     ]
 
     exported_count = 0
@@ -1061,11 +1065,14 @@ def _collect_system_info(
             "export_folders": [
                 str(folder)
                 for folder in [
-                    Path("config"),
-                    Path("app") / "data" / "list",
-                    Path("app") / "data" / "Language",
-                    Path("app") / "data" / "history",
-                    Path("logs"),
+                    get_path("config"),
+                    get_data_path("list"),
+                    get_data_path("Language"),
+                    get_data_path("history"),
+                    get_data_path("audio"),
+                    get_data_path("CSES"),
+                    get_data_path("images"),
+                    get_path(LOG_DIR),
                 ]
             ],
             "export_location": str(file_path),
@@ -1272,11 +1279,14 @@ def export_all_data(parent: Optional[QWidget] = None) -> None:
             file_path += ".zip"
 
         dirs_to_backup = [
-            ("config", Path("config")),
-            ("list", Path("app") / "data" / "list"),
-            ("Language", Path("app") / "data" / "Language"),
-            ("history", Path("app") / "data" / "history"),
-            ("logs", Path("logs")),
+            ("config", get_path("config")),
+            ("list", get_data_path("list")),
+            ("Language", get_data_path("Language")),
+            ("history", get_data_path("history")),
+            ("audio", get_data_path("audio")),
+            ("CSES", get_data_path("CSES")),
+            ("images", get_data_path("images")),
+            ("logs", get_path(LOG_DIR)),
         ]
 
         with zipfile.ZipFile(file_path, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -1360,7 +1370,7 @@ def import_all_data(parent: Optional[QWidget] = None) -> None:
             if not _confirm_import(parent):
                 return
 
-            _extract_data_files(file_path)
+            skipped_files = _extract_data_files(file_path)
 
             success_dialog = MessageBox(
                 get_any_position_value_async(
@@ -1369,11 +1379,20 @@ def import_all_data(parent: Optional[QWidget] = None) -> None:
                     "import_success_title",
                     "name",
                 ),
-                get_any_position_value_async(
-                    "basic_settings",
-                    "data_import_export",
-                    "import_success_content",
-                    "name",
+                (
+                    get_any_position_value_async(
+                        "basic_settings",
+                        "data_import_export",
+                        "import_success_content_skipped",
+                        "name",
+                    ).format(count=len(skipped_files))
+                    if skipped_files
+                    else get_any_position_value_async(
+                        "basic_settings",
+                        "data_import_export",
+                        "import_success_content",
+                        "name",
+                    )
                 ),
                 parent,
             )
@@ -1480,11 +1499,14 @@ def _check_existing_files(file_path: str) -> list:
     """检查已存在的文件"""
     existing_files = []
     target_dirs = {
-        "config": Path("config"),
-        "list": Path("data/list"),
-        "Language": Path("data/Language"),
-        "history": Path("data/history"),
-        "logs": Path("logs"),
+        "config": get_path("config"),
+        "list": get_data_path("list"),
+        "Language": get_data_path("Language"),
+        "history": get_data_path("history"),
+        "audio": get_data_path("audio"),
+        "CSES": get_data_path("CSES"),
+        "images": get_data_path("images"),
+        "logs": get_path(LOG_DIR),
     }
 
     with zipfile.ZipFile(file_path, "r") as zipf:
@@ -1562,15 +1584,21 @@ def _confirm_import(parent: Optional[QWidget]) -> bool:
     return dialog.exec()
 
 
-def _extract_data_files(file_path: str) -> None:
+def _extract_data_files(file_path: str) -> list:
     """提取数据文件"""
     target_dirs = {
-        "config": Path("config"),
-        "list": Path("data/list"),
-        "Language": Path("data/Language"),
-        "history": Path("data/history"),
-        "logs": Path("logs"),
+        "config": get_path("config"),
+        "list": get_data_path("list"),
+        "Language": get_data_path("Language"),
+        "history": get_data_path("history"),
+        "CSES": get_data_path("CSES"),
+        "images": get_data_path("images"),
+        "audio": get_data_path("audio"),
+        "logs": get_path(LOG_DIR),
     }
+
+    skipped_files = []
+    logs_root = get_path(LOG_DIR).resolve()
 
     with zipfile.ZipFile(file_path, "r") as zipf:
         for member in zipf.namelist():
@@ -1586,8 +1614,49 @@ def _extract_data_files(file_path: str) -> None:
                     target_path = target_dirs[dir_name] / relative_path
                     target_path.parent.mkdir(parents=True, exist_ok=True)
 
-                    with zipf.open(member) as source, open(target_path, "wb") as target:
+                    tmp_path = target_path.with_name(f"{target_path.name}.import_tmp")
+                    if tmp_path.exists():
+                        try:
+                            tmp_path.unlink()
+                        except Exception:
+                            pass
+
+                    with zipf.open(member) as source, open(tmp_path, "wb") as target:
                         shutil.copyfileobj(source, target)
+
+                    for attempt in range(3):
+                        try:
+                            os.replace(tmp_path, target_path)
+                            break
+                        except PermissionError as e:
+                            if attempt < 2:
+                                time.sleep(0.2)
+                                continue
+
+                            is_logs_file = False
+                            try:
+                                is_logs_file = target_path.resolve().is_relative_to(
+                                    logs_root
+                                )
+                            except Exception:
+                                is_logs_file = (
+                                    str(target_path)
+                                    .replace("\\", "/")
+                                    .startswith(str(logs_root).replace("\\", "/") + "/")
+                                )
+
+                            if is_logs_file:
+                                skipped_files.append(str(target_path))
+                                try:
+                                    tmp_path.unlink()
+                                except Exception:
+                                    pass
+                                logger.warning(f"导入文件被占用，已跳过: {target_path}")
+                                break
+
+                            raise e
+
+    return skipped_files
 
 
 # ==================== 记录管理模块 ====================

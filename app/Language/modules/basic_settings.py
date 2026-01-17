@@ -173,6 +173,9 @@ basic_settings = {
             "import_success_content": {
                 "name": "数据已成功导入\n重启应用程序以使更改生效"
             },
+            "import_success_content_skipped": {
+                "name": "数据已成功导入（跳过 {count} 个占用文件）\n重启应用程序以使更改生效"
+            },
             "import_success_button": {"name": "我知道了"},
             "import_failure_title": {"name": "导入所有数据"},
             "import_failure_content": {"name": "导入所有数据失败:\n{error}"},
@@ -377,6 +380,9 @@ basic_settings = {
             "import_success_title": {"name": "Import all data"},
             "import_success_content": {
                 "name": "Data imported successfully into\nRestart APP to take effect"
+            },
+            "import_success_content_skipped": {
+                "name": "Data imported successfully (skipped {count} locked files)\nRestart APP to take effect"
             },
             "import_success_button": {"name": "Got it"},
             "import_failure_title": {"name": "Import all data"},

@@ -8,6 +8,8 @@ from PySide6.QtCore import QFileSystemWatcher, Signal, QObject
 from typing import Dict, Set, Callable, Any
 import weakref
 
+from app.tools.path_utils import get_path
+
 
 class SharedFileWatcherManager(QObject):
     """共享文件系统监视器管理器"""
@@ -57,10 +59,10 @@ class SharedFileWatcherManager(QObject):
         Returns:
             是否成功添加监视器
         """
-        path_str = str(Path(path).resolve())
+        path_str = str(get_path(path).resolve())
 
         # 检查路径是否存在
-        if not Path(path_str).exists():
+        if not get_path(path_str).exists():
             return False
 
         # 增加引用计数
@@ -97,7 +99,7 @@ class SharedFileWatcherManager(QObject):
         Returns:
             是否成功移除监视器
         """
-        path_str = str(Path(path).resolve())
+        path_str = str(get_path(path).resolve())
 
         if path_str not in self._reference_counts:
             return False
@@ -135,7 +137,7 @@ class SharedFileWatcherManager(QObject):
         Args:
             path: 发生变化的目录路径
         """
-        path_str = str(Path(path).resolve())
+        path_str = str(get_path(path).resolve())
 
         # 调用所有有效的回调函数
         if path_str in self._callbacks:

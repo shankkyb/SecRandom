@@ -595,9 +595,7 @@ class update(QWidget):
                 )
             elif file_path:
                 # 下载成功，获取文件大小
-                from pathlib import Path
-
-                file_size = Path(file_path).stat().st_size
+                file_size = get_path(file_path).stat().st_size
 
                 def format_size(size_bytes):
                     """格式化文件大小"""
