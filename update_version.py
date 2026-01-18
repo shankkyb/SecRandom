@@ -3,51 +3,47 @@ import re
 
 
 def get_version_from_env():
-    raw_version = os.getenv("VERSION", "v0.0.0")
-    stripped_version = re.sub(r"^v", "", raw_version)
-
-    pre_release_suffix = ""
-    if "-" in stripped_version:
-        _, pre_release_suffix = stripped_version.split("-", 1)
-        pre_release_suffix = f"-{pre_release_suffix}"
-
+    original_version = os.getenv("VERSION", "v0.0.0")
+    stripped_version = re.sub(r"^v", "", original_version)
     # 匹配数字版本部分，包括预发布版本标识符之前的部分
     numeric_version = re.search(
         r"^(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:\.(\d+))?", stripped_version
     )
     if numeric_version:
-        major = int(numeric_version.group(1))
-        minor = int(numeric_version.group(2) or 0)
-        patch = int(numeric_version.group(3) or 0)
-
-        version_3 = f"{major}.{minor}.{patch}"
-        original_version = f"v{version_3}{pre_release_suffix}"
+        parts = numeric_version.groups(default="0")
+        # 确保至少有三位数字
+        if parts[2] is None:
+            stripped_version = f"{parts[0]}.{parts[1]}.0"
+        elif parts[3] is None:
+            stripped_version = f"{parts[0]}.{parts[1]}.{parts[2]}"
+        else:
+            stripped_version = ".".join(parts)
     else:
-        version_3 = "0.0.0"
+        stripped_version = "0.0.0"
         original_version = "v0.0.0"
-    return original_version, version_3
+    return original_version, stripped_version
 
 
 def update_version_info(version):
-    # 处理三位数字的版本号
+    # 处理三位或四位数字的版本号
     version_parts = version.split(".")
-    # 确保有三位数字
-    while len(version_parts) < 3:
+    # 确保有四位数字
+    while len(version_parts) < 4:
         version_parts.append("0")
-    # 只取前三位
-    major, minor, patch = map(int, version_parts[:3])
+    # 只取前四位
+    major, minor, patch, build = map(int, version_parts[:4])
 
-    version_tuple = (major, minor, patch)
-    version_str = f"{major}.{minor}.{patch}"
+    version_tuple = (major, minor, patch, build)
+    version_str = f"{major}.{minor}.{patch}.{build}"
 
     with open("version_info.txt", "r", encoding="utf-8") as f:
         content = f.read()
 
     content = re.sub(
-        r"filevers=\(\d, \d, \d(?:, \d)?\)", f"filevers={version_tuple}", content
+        r"filevers=\(\d, \d, \d, \d\)", f"filevers={version_tuple}", content
     )
     content = re.sub(
-        r"prodvers=\(\d, \d, \d(?:, \d)?\)", f"prodvers={version_tuple}", content
+        r"prodvers=\(\d, \d, \d, \d\)", f"prodvers={version_tuple}", content
     )
     content = re.sub(
         r"StringStruct\(u\'FileVersion\', u\'[^\']+\'\)",
@@ -87,7 +83,7 @@ def update_iss_version(stripped_version):
 
 
 if __name__ == "__main__":
-    original_version, version_3 = get_version_from_env()
-    update_version_info(version_3)
+    original_version, stripped_version = get_version_from_env()
+    update_version_info(stripped_version)
     update_config_py(original_version)
-    update_iss_version(version_3)
+    update_iss_version(stripped_version)
