@@ -15,6 +15,7 @@ from app.view.another_window.prize.prize_weight_setting import PrizeWeightSettin
 from app.view.another_window.remaining_list import RemainingListPage
 from app.view.another_window.current_config_viewer import CurrentConfigViewerWindow
 from app.view.another_window.log_viewer import LogViewerWindow
+from app.view.another_window.backup_manager import BackupManagerWindow
 from app.Language.obtain_language import *
 from app.tools.variable import *
 
@@ -594,5 +595,21 @@ def create_log_viewer_window():
     window.switch_to_page("log_viewer")
     _window_instances["log_viewer"] = window
     window.windowClosed.connect(lambda: _window_instances.pop("log_viewer", None))
+    window.show()
+    return
+
+
+class backup_manager_window_template(PageTemplate):
+    def __init__(self, parent=None):
+        super().__init__(content_widget_class=BackupManagerWindow, parent=parent)
+
+
+def create_backup_manager_window():
+    title = get_content_name_async("basic_settings", "backup_manager")
+    window = SimpleWindowTemplate(title, width=900, height=650)
+    window.add_page_from_template("backup_manager", backup_manager_window_template)
+    window.switch_to_page("backup_manager")
+    _window_instances["backup_manager"] = window
+    window.windowClosed.connect(lambda: _window_instances.pop("backup_manager", None))
     window.show()
     return

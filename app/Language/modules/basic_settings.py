@@ -92,6 +92,136 @@ basic_settings = {
             "description": "查看和管理程序日志文件",
             "pushbutton_name": "查看日志",
         },
+        "backup_manager": {
+            "name": "备份管理",
+            "description": "管理自动备份与手动备份",
+            "pushbutton_name": "备份管理",
+        },
+        "backup_auto_settings": {"name": "自动备份", "description": "配置自动备份策略"},
+        "backup_manual_settings": {
+            "name": "手动备份",
+            "description": "立即备份并管理备份文件",
+        },
+        "backup_auto_enabled": {
+            "name": "是否启用",
+            "description": "是否启用自动备份",
+            "switchbutton_name": {"enable": "开启", "disable": "关闭"},
+        },
+        "backup_auto_interval_days": {
+            "name": "自动备份间隔",
+            "description": "设置自动备份间隔（天）",
+        },
+        "backup_auto_max_count": {
+            "name": "自动备份上限",
+            "description": "设置自动备份最多保留数量（个）",
+        },
+        "backup_last_success": {
+            "name": "上次成功备份",
+            "description": "显示上次成功备份时间",
+        },
+        "backup_now": {
+            "name": "立即备份",
+            "description": "立即创建一份全量备份",
+            "pushbutton_name": "立即备份",
+        },
+        "backup_open_folder": {
+            "name": "查看备份文件",
+            "description": "打开备份文件夹",
+            "pushbutton_name": "查看备份文件",
+        },
+        "backup_folder_size": {"name": "占用大小", "description": "备份文件夹占用大小"},
+        "backup_content_settings": {
+            "name": "备份内容",
+            "description": "选择需要包含在备份文件中的数据",
+        },
+        "backup_content_tip": {
+            "text": "关闭某一项后，该文件夹不会被打包进备份文件。",
+        },
+        "backup_restore_settings": {
+            "name": "还原备份",
+            "description": "选择一个备份文件并还原（重启后生效）",
+        },
+        "backup_restore_tip": {
+            "text": "还原会覆盖当前数据。还原完成后请重启应用程序以使更改生效。",
+        },
+        "backup_restore_file_list": {
+            "name": "备份文件列表",
+            "description": "选择要还原的备份文件",
+        },
+        "backup_restore_refresh": {
+            "name": "刷新列表",
+            "description": "刷新备份文件列表",
+            "pushbutton_name": "刷新",
+        },
+        "backup_restore_start": {
+            "name": "开始还原",
+            "description": "使用选中的备份文件还原数据",
+            "pushbutton_name": "还原",
+        },
+        "backup_restore_no_selection": {
+            "text": "请先选择要还原的备份文件",
+        },
+        "backup_restore_confirm": {
+            "title": "确认还原",
+            "content": "确定要还原该备份文件吗？\n\n{file}\n\n此操作会覆盖当前数据，还原完成后需要重启应用程序以生效。",
+        },
+        "backup_restore_refresh_result": {
+            "success": "已刷新，共 {count} 个备份文件",
+            "empty": "已刷新，未发现备份文件",
+            "failure": "刷新失败：{error}",
+        },
+        "backup_restore_table_headers": ["备份文件", "创建时间", "大小"],
+        "include_config": {
+            "name": "配置文件",
+            "description": "软件设置与配置文件（config）",
+            "switchbutton_name": {"enable": "包含", "disable": "不包含"},
+        },
+        "include_list": {
+            "name": "名单数据",
+            "description": "点名/抽奖名单等数据（list）",
+            "switchbutton_name": {"enable": "包含", "disable": "不包含"},
+        },
+        "include_language": {
+            "name": "语言文件",
+            "description": "多语言文本配置（Language）",
+            "switchbutton_name": {"enable": "包含", "disable": "不包含"},
+        },
+        "include_history": {
+            "name": "历史记录",
+            "description": "抽取历史记录数据（history）",
+            "switchbutton_name": {"enable": "包含", "disable": "不包含"},
+        },
+        "include_audio": {
+            "name": "音频资源",
+            "description": "音频资源文件（audio）",
+            "switchbutton_name": {"enable": "包含", "disable": "不包含"},
+        },
+        "include_cses": {
+            "name": "CSES 联动",
+            "description": "CSES 相关联动数据（CSES）",
+            "switchbutton_name": {"enable": "包含", "disable": "不包含"},
+        },
+        "include_images": {
+            "name": "图片资源",
+            "description": "学生/奖品图片资源（images）",
+            "switchbutton_name": {"enable": "包含", "disable": "不包含"},
+        },
+        "include_logs": {
+            "name": "运行日志",
+            "description": "程序运行日志，可能包含敏感信息（logs）",
+            "switchbutton_name": {"enable": "包含", "disable": "不包含"},
+        },
+        "backup_tabs": {
+            "auto": "自动备份",
+            "manual": "手动备份",
+            "restore": "还原备份",
+            "content": "备份内容",
+        },
+        "backup_last_success_text": {"none": "没有上次备份记录"},
+        "backup_now_result": {
+            "success": "备份成功:\n{path}",
+            "failure": "备份失败:\n{error}",
+        },
         "dpiScale": {
             "name": "DPI缩放",
             "description": "调整软件界面缩放比例（重启软件后生效）",
@@ -262,6 +392,142 @@ basic_settings = {
             "name": "Viewer Log",
             "description": "View and manage program log files",
             "pushbutton_name": "Viewer Log",
+        },
+        "backup_manager": {
+            "name": "Backup manager",
+            "description": "Manage automatic and manual backups",
+            "pushbutton_name": "Backup manager",
+        },
+        "backup_auto_settings": {
+            "name": "Automatic backup",
+            "description": "Configure automatic backup policy",
+        },
+        "backup_manual_settings": {
+            "name": "Manual backup",
+            "description": "Create backups and manage backup files",
+        },
+        "backup_auto_enabled": {
+            "name": "Enabled",
+            "description": "Enable automatic backups",
+            "switchbutton_name": {"enable": "On", "disable": "Off"},
+        },
+        "backup_auto_interval_days": {
+            "name": "Backup interval",
+            "description": "Set automatic backup interval (days)",
+        },
+        "backup_auto_max_count": {
+            "name": "Backup limit",
+            "description": "Maximum number of backups to keep",
+        },
+        "backup_last_success": {
+            "name": "Last successful backup",
+            "description": "Show last successful backup time",
+        },
+        "backup_now": {
+            "name": "Backup now",
+            "description": "Create a full backup now",
+            "pushbutton_name": "Backup now",
+        },
+        "backup_open_folder": {
+            "name": "View backups",
+            "description": "Open backup folder",
+            "pushbutton_name": "View backups",
+        },
+        "backup_folder_size": {
+            "name": "Storage usage",
+            "description": "Backup folder size",
+        },
+        "backup_content_settings": {
+            "name": "Backup content",
+            "description": "Choose what to include in the backup file",
+        },
+        "backup_content_tip": {
+            "text": "When an item is off, its folder will not be included in the backup file.",
+        },
+        "backup_restore_settings": {
+            "name": "Restore backup",
+            "description": "Select a backup file to restore (restart required)",
+        },
+        "backup_restore_tip": {
+            "text": "Restoring will overwrite current data. Restart the app for changes to take effect.",
+        },
+        "backup_restore_file_list": {
+            "name": "Backup files",
+            "description": "Select a backup file to restore",
+        },
+        "backup_restore_refresh": {
+            "name": "Refresh list",
+            "description": "Refresh backup file list",
+            "pushbutton_name": "Refresh",
+        },
+        "backup_restore_start": {
+            "name": "Restore",
+            "description": "Restore data from the selected backup file",
+            "pushbutton_name": "Restore",
+        },
+        "backup_restore_no_selection": {
+            "text": "Please select a backup file to restore first",
+        },
+        "backup_restore_confirm": {
+            "title": "Confirm restore",
+            "content": "Are you sure you want to restore this backup file?\n\n{file}\n\nThis will overwrite current data. Restart the app for changes to take effect.",
+        },
+        "backup_restore_refresh_result": {
+            "success": "Refreshed. {count} backup file(s) found",
+            "empty": "Refreshed. No backup files found",
+            "failure": "Refresh failed: {error}",
+        },
+        "backup_restore_table_headers": ["Backup file", "Created at", "Size"],
+        "include_config": {
+            "name": "Config",
+            "description": "App settings and configuration files (config)",
+            "switchbutton_name": {"enable": "Include", "disable": "Exclude"},
+        },
+        "include_list": {
+            "name": "Lists",
+            "description": "Roll-call/prize lists and related data (list)",
+            "switchbutton_name": {"enable": "Include", "disable": "Exclude"},
+        },
+        "include_language": {
+            "name": "Language",
+            "description": "Localization and language resources (Language)",
+            "switchbutton_name": {"enable": "Include", "disable": "Exclude"},
+        },
+        "include_history": {
+            "name": "History",
+            "description": "Extraction history records (history)",
+            "switchbutton_name": {"enable": "Include", "disable": "Exclude"},
+        },
+        "include_audio": {
+            "name": "Audio",
+            "description": "Audio resources (audio)",
+            "switchbutton_name": {"enable": "Include", "disable": "Exclude"},
+        },
+        "include_cses": {
+            "name": "CSES linkage",
+            "description": "CSES integration data (CSES)",
+            "switchbutton_name": {"enable": "Include", "disable": "Exclude"},
+        },
+        "include_images": {
+            "name": "Images",
+            "description": "Student/prize image resources (images)",
+            "switchbutton_name": {"enable": "Include", "disable": "Exclude"},
+        },
+        "include_logs": {
+            "name": "Logs",
+            "description": "Runtime logs, may contain sensitive info (logs)",
+            "switchbutton_name": {"enable": "Include", "disable": "Exclude"},
+        },
+        "backup_tabs": {
+            "auto": "Automatic backup",
+            "manual": "Manual backup",
+            "restore": "Restore backup",
+            "content": "Backup content",
+        },
+        "backup_last_success_text": {"none": "No backup record"},
+        "backup_now_result": {
+            "success": "Backup succeeded:\n{path}",
+            "failure": "Backup failed:\n{error}",
         },
         "dpiScale": {
             "name": "DPI scale settings",

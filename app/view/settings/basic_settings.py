@@ -41,7 +41,10 @@ from app.tools.config import (
     NotificationConfig,
 )
 from app.common.IPC_URL import URLIPCHandler
-from app.page_building.another_window import create_log_viewer_window
+from app.page_building.another_window import (
+    create_log_viewer_window,
+    create_backup_manager_window,
+)
 
 
 # ==================================================
@@ -680,12 +683,23 @@ class basic_settings_data_management(GroupHeaderCardWidget):
         )
         self.log_viewer_button.clicked.connect(self.open_log_viewer)
 
+        self.backup_manager_button = PushButton(
+            get_content_pushbutton_name_async("basic_settings", "backup_manager")
+        )
+        self.backup_manager_button.clicked.connect(self.open_backup_manager)
+
         # 添加设置项到分组
         self.addGroup(
             get_theme_icon("ic_fluent_document_20_filled"),
             get_content_name_async("basic_settings", "log_viewer"),
             get_content_description_async("basic_settings", "log_viewer"),
             self.log_viewer_button,
+        )
+        self.addGroup(
+            get_theme_icon("ic_fluent_save_20_filled"),
+            get_content_name_async("basic_settings", "backup_manager"),
+            get_content_description_async("basic_settings", "backup_manager"),
+            self.backup_manager_button,
         )
         self.addGroup(
             get_theme_icon("ic_fluent_database_arrow_down_20_filled"),
@@ -729,6 +743,20 @@ class basic_settings_data_management(GroupHeaderCardWidget):
                 NotificationConfig(
                     title=get_content_name_async("basic_settings", "log_viewer"),
                     content=f"打开日志查看窗口失败: {str(e)}",
+                ),
+                parent=self.window(),
+            )
+
+    def open_backup_manager(self):
+        try:
+            create_backup_manager_window()
+        except Exception as e:
+            logger.exception(f"打开备份管理窗口失败: {e}")
+            show_notification(
+                NotificationType.ERROR,
+                NotificationConfig(
+                    title=get_content_name_async("basic_settings", "backup_manager"),
+                    content=f"打开备份管理窗口失败: {str(e)}",
                 ),
                 parent=self.window(),
             )

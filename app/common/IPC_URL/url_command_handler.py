@@ -4,6 +4,7 @@
 from typing import Dict, Any, Optional, Callable, List
 from loguru import logger
 from PySide6.QtCore import QObject, Signal
+from urllib.parse import urlparse
 
 
 # ==================================================
@@ -57,6 +58,11 @@ class URLCommandHandler(QObject):
             "tray/float": self._handle_tray_float,
             "tray/restart": self._handle_tray_restart,
             "tray/exit": self._handle_tray_exit,
+            # 数据获取命令（只读）
+            "data/roll_call_list": self._handle_get_roll_call_list,
+            "data/lottery_list": self._handle_get_lottery_list,
+            "data/roll_call_history": self._handle_get_roll_call_history,
+            "data/lottery_history": self._handle_get_lottery_history,
         }
 
         # 设置页面映射
@@ -177,26 +183,39 @@ class URLCommandHandler(QObject):
         """
         logger.debug(f"解析URL: {url}")
 
-        # 移除协议前缀
-        if url.startswith("secrandom://"):
-            url = url[12:]  # 移除 "secrandom://"
+        parsed = urlparse(url)
+        query = parsed.query or ""
 
-        # 分离路径和查询参数
-        path = url.split("?")[0] if "?" in url else url
+        if parsed.scheme and parsed.scheme.lower() == "secrandom":
+            if parsed.netloc and parsed.path:
+                full_path = f"{parsed.netloc}{parsed.path}"
+            elif parsed.netloc:
+                full_path = parsed.netloc
+            else:
+                full_path = parsed.path
 
-        # 完整路径作为命令
-        command = path
+            command = full_path.lstrip("/")
+            params = {"args": [], "full_url": f"secrandom://{command}"}
 
-        # 构建参数
-        params = {
-            "args": [],
-            "full_url": f"secrandom://{url}",
-        }
+            if query:
+                params["query"] = self._parse_query_string(query)
+                params["full_url"] = f"{params['full_url']}?{query}"
+        else:
+            raw = url
+            raw_no_scheme = raw
+            if raw.lower().startswith("secrandom://"):
+                raw_no_scheme = raw[len("secrandom://") :]
 
-        # 解析查询参数
-        if "?" in url:
-            query = url.split("?", 1)[1]
-            params["query"] = self._parse_query_string(query)
+            path = (
+                raw_no_scheme.split("?")[0] if "?" in raw_no_scheme else raw_no_scheme
+            )
+            command = path
+
+            params = {"args": [], "full_url": f"secrandom://{raw_no_scheme}"}
+
+            if "?" in raw_no_scheme:
+                q = raw_no_scheme.split("?", 1)[1]
+                params["query"] = self._parse_query_string(q)
 
         logger.debug(f"URL解析结果 - 命令: {command}, 参数: {params}")
         return command, params
@@ -220,6 +239,10 @@ class URLCommandHandler(QObject):
         """检查命令是否需要验证"""
         from app.tools.settings_access import readme_settings_async
         from app.common.safety.password import is_configured as password_is_configured
+
+        if command.startswith("data/"):
+            logger.debug(f"命令无需验证（数据只读）：{command}")
+            return False
 
         # 未配置密码则不需要验证
         if not password_is_configured():
@@ -662,6 +685,110 @@ class URLCommandHandler(QObject):
         logger.debug("执行退出操作")
         self.showTrayActionRequested.emit("exit_app")
         return {"status": "success", "message": "应用退出中..."}
+
+    def _handle_get_roll_call_list(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """获取点名名单（只读）"""
+        from app.common.data.list import get_student_list
+
+        query = params.get("query", {}) or {}
+        class_name = (
+            query.get("class_name")
+            or query.get("class")
+            or query.get("name")
+            or query.get("className")
+        )
+
+        if not class_name:
+            return {
+                "status": "error",
+                "message": "缺少参数: class_name",
+            }
+
+        student_list = get_student_list(class_name)
+        return {
+            "status": "success",
+            "message": "点名名单获取成功",
+            "class_name": class_name,
+            "data": student_list,
+        }
+
+    def _handle_get_lottery_list(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """获取抽奖名单（只读）"""
+        from app.common.data.list import get_pool_list
+
+        query = params.get("query", {}) or {}
+        pool_name = (
+            query.get("pool_name")
+            or query.get("pool")
+            or query.get("name")
+            or query.get("poolName")
+        )
+
+        if not pool_name:
+            return {
+                "status": "error",
+                "message": "缺少参数: pool_name",
+            }
+
+        pool_list = get_pool_list(pool_name)
+        return {
+            "status": "success",
+            "message": "抽奖名单获取成功",
+            "pool_name": pool_name,
+            "data": pool_list,
+        }
+
+    def _handle_get_roll_call_history(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """获取点名历史记录（只读）"""
+        from app.common.history.history_reader import get_roll_call_history_data
+
+        query = params.get("query", {}) or {}
+        class_name = (
+            query.get("class_name")
+            or query.get("class")
+            or query.get("name")
+            or query.get("className")
+        )
+
+        if not class_name:
+            return {
+                "status": "error",
+                "message": "缺少参数: class_name",
+            }
+
+        history_data = get_roll_call_history_data(class_name)
+        return {
+            "status": "success",
+            "message": "点名历史记录获取成功",
+            "class_name": class_name,
+            "data": history_data,
+        }
+
+    def _handle_get_lottery_history(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """获取抽奖历史记录（只读）"""
+        from app.common.history.history_reader import get_lottery_history_data
+
+        query = params.get("query", {}) or {}
+        pool_name = (
+            query.get("pool_name")
+            or query.get("pool")
+            or query.get("name")
+            or query.get("poolName")
+        )
+
+        if not pool_name:
+            return {
+                "status": "error",
+                "message": "缺少参数: pool_name",
+            }
+
+        history_data = get_lottery_history_data(pool_name)
+        return {
+            "status": "success",
+            "message": "抽奖历史记录获取成功",
+            "pool_name": pool_name,
+            "data": history_data,
+        }
 
     def register_command(
         self,

@@ -3,10 +3,11 @@ URL和IPC混合处理器 - 跨平台通用实现
 """
 
 import json
-import socket
 import threading
+from multiprocessing.connection import Client, Listener
 from pathlib import Path
 from typing import Optional, Dict, Any, Callable
+import os
 from loguru import logger
 from urllib.parse import urlparse, parse_qs
 
@@ -18,7 +19,13 @@ from .security_verifier import SimplePasswordVerifier
 class URLIPCHandler:
     """URL和IPC混合处理器"""
 
-    def __init__(self, app_name: str, protocol_name: str, password: str = None):
+    def __init__(
+        self,
+        app_name: str,
+        protocol_name: str,
+        password: str = None,
+        ipc_name: str | None = None,
+    ):
         """
         初始化URL IPC处理器
 
@@ -29,10 +36,14 @@ class URLIPCHandler:
         """
         self.app_name = app_name
         self.protocol_name = protocol_name
+        self.ipc_name = self._normalize_ipc_name(
+            ipc_name or self._build_ipc_name(app_name, protocol_name)
+        )
         self.protocol_manager = ProtocolManager(app_name, protocol_name)
         self.server_thread: Optional[threading.Thread] = None
         self.is_running = False
         self.message_handlers: Dict[str, Callable] = {}
+        self._listener: Optional[Listener] = None
 
         # 初始化命令处理器
         self.command_handler = URLCommandHandler()
@@ -91,76 +102,87 @@ class URLIPCHandler:
             return True
 
         try:
-            self.server_thread = threading.Thread(target=self._run_server, args=(port,))
-            self.server_thread.daemon = True
-            self.server_thread.start()
+            address, family = self._get_ipc_address_for_name(self.ipc_name)
+            authkey = self._get_authkey(self.ipc_name)
+
+            if family == "AF_UNIX":
+                try:
+                    Path(address).unlink(missing_ok=True)
+                except Exception:
+                    pass
+
+            self._listener = Listener(address=address, family=family, authkey=authkey)
+
             self.is_running = True
+            self.server_thread = threading.Thread(target=self._run_server, daemon=True)
+            self.server_thread.start()
             return True
         except Exception as e:
+            self.is_running = False
+            self._listener = None
             logger.exception(f"启动IPC服务器失败: {e}")
             return False
 
     def stop_ipc_server(self):
         """停止IPC服务器"""
         self.is_running = False
+        try:
+            if self._listener is not None:
+                self._listener.close()
+        except Exception:
+            pass
+        finally:
+            self._listener = None
+
         if self.server_thread and self.server_thread.is_alive():
             self.server_thread.join(timeout=1)
+            self.server_thread = None
 
-    def _run_server(self, port: int):
-        """运行IPC服务器"""
         try:
-            server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            address, family = self._get_ipc_address_for_name(self.ipc_name)
+            if family == "AF_UNIX":
+                Path(address).unlink(missing_ok=True)
+        except Exception:
+            pass
 
-            if port == 0:
-                # 自动分配端口
-                server_socket.bind(("localhost", 0))
-                port = server_socket.getsockname()[1]
-            else:
-                server_socket.bind(("localhost", port))
+    def _run_server(self):
+        """运行IPC服务器"""
+        if self._listener is None:
+            return
 
-            server_socket.listen(5)
-
-            # 保存端口信息到配置文件
-            self._save_port_config(port)
-
-            while self.is_running:
+        try:
+            while self.is_running and self._listener is not None:
                 try:
-                    server_socket.settimeout(1.0)  # 1秒超时
-                    client_socket, address = server_socket.accept()
-
-                    # 处理客户端连接
-                    client_thread = threading.Thread(
-                        target=self._handle_client, args=(client_socket, address)
-                    )
-                    client_thread.daemon = True
-                    client_thread.start()
-
-                except socket.timeout:
-                    continue
-                except Exception as e:
-                    if self.is_running:
-                        logger.exception(f"IPC服务器错误: {e}")
+                    conn = self._listener.accept()
+                except (OSError, EOFError):
                     break
 
+                client_thread = threading.Thread(
+                    target=self._handle_connection, args=(conn,), daemon=True
+                )
+                client_thread.start()
         except Exception as e:
-            logger.exception(f"IPC服务器启动错误: {e}")
-        finally:
-            if "server_socket" in locals():
-                server_socket.close()
+            if self.is_running:
+                logger.exception(f"IPC服务器错误: {e}")
 
-    def _handle_client(self, client_socket: socket.socket, address: tuple):
-        """处理客户端连接"""
+    def _handle_connection(self, conn):
         try:
-            data = client_socket.recv(4096).decode("utf-8")
-            if data:
-                message = json.loads(data)
-                response = self._process_message(message)
-                client_socket.send(json.dumps(response).encode("utf-8"))
+            data = conn.recv_bytes()
+            if not data:
+                return
+
+            message = json.loads(data.decode("utf-8"))
+            response = self._process_message(message)
+            conn.send_bytes(json.dumps(response, ensure_ascii=False).encode("utf-8"))
+        except EOFError:
+            return
         except Exception as e:
             logger.exception(f"处理IPC消息错误: {e}")
         finally:
-            client_socket.close()
+            try:
+                conn.close()
+            except Exception:
+                pass
 
     def _process_message(self, message: Dict[str, Any]) -> Dict[str, Any]:
         """处理接收到的消息"""
@@ -169,13 +191,6 @@ class URLIPCHandler:
 
         logger.debug(f"收到消息 - 类型: {message_type}, 负载: {payload}")
 
-        # 处理URL消息
-        if message_type == "url":
-            result = self._handle_url_message(payload)
-            logger.debug(f"URL消息处理结果: {result}")
-            return result
-
-        # 处理其他消息类型
         if message_type in self.message_handlers:
             try:
                 result = self.message_handlers[message_type](payload)
@@ -190,14 +205,19 @@ class URLIPCHandler:
                 }
                 logger.exception(f"消息处理失败 - 类型: {message_type}, 错误: {e}")
                 return error_response
-        else:
-            unknown_response = {
-                "success": False,
-                "type": message_type,
-                "error": f"未知的消息类型: {message_type}",
-            }
-            logger.warning(f"未知消息类型: {message_type}")
-            return unknown_response
+
+        if message_type == "url":
+            result = self._handle_url_message(payload)
+            logger.debug(f"URL消息处理结果: {result}")
+            return result
+
+        unknown_response = {
+            "success": False,
+            "type": message_type,
+            "error": f"未知的消息类型: {message_type}",
+        }
+        logger.warning(f"未知消息类型: {message_type}")
+        return unknown_response
 
     def _handle_url_message(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """处理URL消息"""
@@ -220,7 +240,7 @@ class URLIPCHandler:
         # 处理URL命令
         try:
             logger.debug(f"执行URL命令: {url}")
-            result = self.command_handler.handle_url(url)
+            result = self.command_handler.handle_url_command(url)
             logger.info(f"URL命令执行成功: {url}, 结果: {result}")
             return {"success": True, "result": result}
         except Exception as e:
@@ -250,24 +270,92 @@ class URLIPCHandler:
         Returns:
             响应内容，失败返回None
         """
+        return self.send_ipc_message_by_name(message)
+
+    def send_ipc_message_by_name(
+        self,
+        message: Dict[str, Any],
+        target_ipc_name: str | None = None,
+        timeout: float = 5.0,
+    ) -> Optional[Dict[str, Any]]:
         try:
-            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket.settimeout(5.0)  # 5秒超时
-            client_socket.connect(("localhost", port))
+            target_name = self._normalize_ipc_name(target_ipc_name or self.ipc_name)
+            address, family = self._get_ipc_address_for_name(target_name)
+            authkey = self._get_authkey(target_name)
 
-            client_socket.send(json.dumps(message).encode("utf-8"))
-            response_data = client_socket.recv(4096).decode("utf-8")
+            conn = Client(address=address, family=family, authkey=authkey)
+            conn.send_bytes(json.dumps(message, ensure_ascii=False).encode("utf-8"))
+            response_data = conn.recv_bytes()
+            conn.close()
 
-            client_socket.close()
-            return json.loads(response_data)
-
+            if not response_data:
+                return None
+            return json.loads(response_data.decode("utf-8"))
         except Exception as e:
             logger.exception(f"发送IPC消息失败: {e}")
             return None
 
+    def send_ipc_message_to_app(
+        self,
+        target_app_name: str,
+        target_protocol_name: str,
+        message: Dict[str, Any],
+        timeout: float = 5.0,
+    ) -> Optional[Dict[str, Any]]:
+        target_name = self._build_ipc_name(target_app_name, target_protocol_name)
+        return self.send_ipc_message_by_name(
+            message, target_ipc_name=target_name, timeout=timeout
+        )
+
+    def _get_authkey(self, ipc_name: str | None = None) -> bytes:
+        return self._normalize_ipc_name(ipc_name or self.ipc_name).encode("utf-8")
+
+    def _build_ipc_name(self, app_name: str, protocol_name: str) -> str:
+        return f"{app_name}.{protocol_name}"
+
+    def _normalize_ipc_name(self, ipc_name: str) -> str:
+        value = str(ipc_name or "").strip()
+        if not value:
+            value = "ipc"
+        value = value.replace(" ", "_").replace("/", "_").replace("\\", "_")
+        value = value.replace(":", "_")
+        return value
+
+    def _get_ipc_address_for_name(self, ipc_name: str) -> tuple[str, str]:
+        name = self._normalize_ipc_name(ipc_name)
+        if os.name == "nt":
+            return rf"\\.\pipe\{name}", "AF_PIPE"
+
+        socket_path = Path("/tmp") / f"{name}.sock"
+        return str(socket_path), "AF_UNIX"
+
+    def _get_config_dir(self) -> Path:
+        return Path.home() / ".config" / self.app_name
+
+    def _save_ipc_config(self, address: str, family: str):
+        config_dir = self._get_config_dir()
+        config_dir.mkdir(parents=True, exist_ok=True)
+
+        config_file = config_dir / "ipc_config.json"
+        config = {"address": address, "family": family}
+
+        with open(config_file, "w", encoding="utf-8") as f:
+            json.dump(config, f, ensure_ascii=False, indent=2)
+
+    def _load_ipc_config(self) -> Optional[Dict[str, Any]]:
+        config_file = self._get_config_dir() / "ipc_config.json"
+        if not config_file.exists():
+            return None
+        try:
+            with open(config_file, "r", encoding="utf-8") as f:
+                value = json.load(f)
+                return value if isinstance(value, dict) else None
+        except Exception:
+            return None
+
     def _save_port_config(self, port: int):
         """保存端口配置"""
-        config_dir = Path.home() / ".config" / self.app_name
+        config_dir = self._get_config_dir()
         config_dir.mkdir(parents=True, exist_ok=True)
 
         config_file = config_dir / "ipc_config.json"
@@ -278,7 +366,7 @@ class URLIPCHandler:
 
     def load_port_config(self) -> Optional[int]:
         """加载端口配置"""
-        config_file = Path.home() / ".config" / self.app_name / "ipc_config.json"
+        config_file = self._get_config_dir() / "ipc_config.json"
 
         if config_file.exists():
             try:
@@ -357,7 +445,7 @@ class URLIPCHandler:
 
         # 执行命令
         try:
-            result = self.command_handler.handle_url(url)
+            result = self.command_handler.handle_url_command(url)
             logger.info(f"URL命令执行成功: {url}, 结果: {result}")
             return {"success": True, "result": result}
         except Exception as e:

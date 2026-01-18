@@ -7,7 +7,7 @@ import shutil
 from loguru import logger
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtGui import QIcon
-from PySide6.QtCore import QTimer, QEvent, Signal
+from PySide6.QtCore import QTimer, QEvent, Signal, QThreadPool, QRunnable
 from qfluentwidgets import FluentWindow, NavigationItemPosition
 
 from app.common.IPC_URL.csharp_ipc_handler import CSharpIPCHandler
@@ -89,6 +89,47 @@ class MainWindow(FluentWindow):
         self.pre_class_reset_timer.timeout.connect(self._check_pre_class_reset)
 
         QTimer.singleShot(1000, self._init_pre_class_reset)
+
+        self._auto_backup_running = False
+        self.backup_timer = QTimer(self)
+        self.backup_timer.timeout.connect(self._check_and_run_auto_backup)
+        self.backup_timer.start(60 * 60 * 1000)
+        QTimer.singleShot(5000, self._check_and_run_auto_backup)
+
+    def _check_and_run_auto_backup(self):
+        if self._auto_backup_running:
+            return
+        try:
+            from app.tools.backup_utils import (
+                create_backup,
+                get_auto_backup_max_count,
+                is_backup_due,
+                prune_backups,
+                set_last_success_backup,
+            )
+        except Exception:
+            return
+
+        try:
+            if not is_backup_due():
+                return
+        except Exception:
+            return
+
+        self._auto_backup_running = True
+
+        def task():
+            try:
+                result = create_backup(kind="auto")
+                set_last_success_backup(result)
+                prune_backups(get_auto_backup_max_count())
+                logger.info(f"自动备份完成: {result.file_path}")
+            except Exception as e:
+                logger.exception(f"自动备份失败: {e}")
+            finally:
+                self._auto_backup_running = False
+
+        QThreadPool.globalInstance().start(QRunnable.create(task))
 
     def _setup_shortcuts(self):
         """设置快捷键管理器"""
@@ -172,14 +213,14 @@ class MainWindow(FluentWindow):
                 url_handler.url_ipc_handler.stop_ipc_server()
                 logger.info("旧IPC服务器已停止")
 
-                if url_handler.url_ipc_handler.start_ipc_server(new_port):
+                if url_handler.url_ipc_handler.start_ipc_server():
                     url_handler.url_ipc_handler.register_message_handler(
                         "url", url_handler._handle_ipc_url_message
                     )
-                    logger.info(f"IPC服务器已在端口 {new_port} 上重新启动")
+                    logger.info("IPC服务器已重新启动")
                     return True
                 else:
-                    logger.exception(f"IPC服务器在端口 {new_port} 上启动失败")
+                    logger.exception("IPC服务器启动失败")
                     return False
             else:
                 logger.exception("无法访问URLHandler实例")

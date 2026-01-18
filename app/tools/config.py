@@ -1552,6 +1552,22 @@ def import_all_data(
         return False
 
 
+def import_all_data_from_file_path(
+    file_path: str,
+    parent: Optional[QWidget] = None,
+    on_success: Optional[Callable[[], None]] = None,
+) -> bool:
+    """从指定文件路径导入所有数据"""
+    try:
+        if not file_path:
+            return False
+        _start_import_all_data_flow(file_path, parent, on_success)
+        return True
+    except Exception as e:
+        _show_import_all_data_failure(parent, e)
+        return False
+
+
 def _check_version_info(file_path: str) -> dict:
     """检查版本信息"""
     version_info = {}

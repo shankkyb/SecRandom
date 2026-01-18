@@ -72,7 +72,7 @@ class URLHandler(QObject):
             如果有URL参数则返回解析结果，否则返回None
         """
         for arg in args:
-            if arg.startswith("secrandom://"):
+            if str(arg).lower().startswith("secrandom://"):
                 return self.handle_url(arg)
         return None
 
@@ -149,11 +149,7 @@ class URLHandler(QObject):
         Returns:
             如果是第一个实例返回True，否则返回False
         """
-        # 尝试启动IPC服务器
-        config_port = self.url_ipc_handler.load_port_config()
-        port = config_port if config_port is not None else 0
-
-        if self.url_ipc_handler.start_ipc_server(port):
+        if self.url_ipc_handler.start_ipc_server():
             # 注册消息处理器
             self.url_ipc_handler.register_message_handler(
                 "url", self._handle_ipc_url_message
@@ -182,14 +178,9 @@ class URLHandler(QObject):
         Returns:
             发送成功返回True，失败返回False
         """
-        port = self.url_ipc_handler.load_port_config()
-        if port:
-            message = {"type": "url", "payload": {"url": url}}
-
-            response = self.url_ipc_handler.send_ipc_message(port, message)
-            return response is not None and response.get("success", False)
-        else:
-            return False
+        message = {"type": "url", "payload": {"url": url}}
+        response = self.url_ipc_handler.send_ipc_message_by_name(message)
+        return response is not None and response.get("success", False)
 
 
 def handle_url_arguments() -> Optional[Dict[str, Any]]:

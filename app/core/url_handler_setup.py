@@ -13,6 +13,11 @@ def create_url_handler():
 
         url_handler = URLHandler()
 
+        try:
+            url_handler.check_single_instance()
+        except Exception as e:
+            logger.exception(f"启动 URL IPC 失败（已忽略）: {e}")
+
         if len(sys.argv) > 1:
             url_handler.handle_command_line_args(sys.argv[1:])
 
