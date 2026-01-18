@@ -135,26 +135,6 @@ basic_safety_settings = {
             "description": "启用后打开设置窗口时需要安全验证",
             "switchbutton_name": {"enable": "", "disable": ""},
         },
-        "diagnostic_export_switch": {
-            "name": "诊断数据导出验证",
-            "description": "启用后导出诊断数据前需要安全验证",
-            "switchbutton_name": {"enable": "", "disable": ""},
-        },
-        "data_export_switch": {
-            "name": "数据导出验证",
-            "description": "启用后导出所有数据前需要安全验证",
-            "switchbutton_name": {"enable": "", "disable": ""},
-        },
-        "import_overwrite_switch": {
-            "name": "导入覆盖验证",
-            "description": "启用后导入时覆盖已存在文件需验证",
-            "switchbutton_name": {"enable": "", "disable": ""},
-        },
-        "import_version_mismatch_switch": {
-            "name": "版本不匹配导入验证",
-            "description": "启用后导入版本不匹配时需验证",
-            "switchbutton_name": {"enable": "", "disable": ""},
-        },
         "preview_settings": {"name": "预览设置"},
         "preview_settings_switch": {
             "name": "设置预览开关",
@@ -298,22 +278,6 @@ basic_safety_settings = {
         "open_settings_switch": {
             "name": "Open settings validation",
             "description": "Secure authentication is required when opening settings",
-        },
-        "diagnostic_export_switch": {
-            "name": "Diagnostic data export validation",
-            "description": "Secure validation to export diagnostic data when enabled",
-        },
-        "data_export_switch": {
-            "name": "Data export Validation",
-            "description": "Secure verification before all data are exported when enabled",
-        },
-        "import_overwrite_switch": {
-            "name": "Import Overwrite Verification",
-            "description": "Authentication is required to overwrite existing files after import",
-        },
-        "import_version_mismatch_switch": {
-            "name": "Version mismatch import validation",
-            "description": "Authentication is required for importing versions when they do not match",
         },
         "preview_settings": {"name": "Preview settings"},
         "preview_settings_switch": {

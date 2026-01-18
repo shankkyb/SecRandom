@@ -682,90 +682,6 @@ class basic_safety_security_operations(GroupHeaderCardWidget):
             self.__on_ops_open_settings_changed
         )
 
-        self.diagnostic_export_switch = SwitchButton()
-        self.diagnostic_export_switch.setOffText(
-            get_content_switchbutton_name_async(
-                "basic_safety_settings", "diagnostic_export_switch", "disable"
-            )
-        )
-        self.diagnostic_export_switch.setOnText(
-            get_content_switchbutton_name_async(
-                "basic_safety_settings", "diagnostic_export_switch", "enable"
-            )
-        )
-        self.diagnostic_export_switch.setChecked(
-            bool(
-                readme_settings_async(
-                    "basic_safety_settings", "diagnostic_export_switch"
-                )
-            )
-        )
-        self.diagnostic_export_switch.checkedChanged.connect(
-            self.__on_ops_diagnostic_export_changed
-        )
-
-        self.data_export_switch = SwitchButton()
-        self.data_export_switch.setOffText(
-            get_content_switchbutton_name_async(
-                "basic_safety_settings", "data_export_switch", "disable"
-            )
-        )
-        self.data_export_switch.setOnText(
-            get_content_switchbutton_name_async(
-                "basic_safety_settings", "data_export_switch", "enable"
-            )
-        )
-        self.data_export_switch.setChecked(
-            bool(readme_settings_async("basic_safety_settings", "data_export_switch"))
-        )
-        self.data_export_switch.checkedChanged.connect(
-            self.__on_ops_data_export_changed
-        )
-
-        self.import_overwrite_switch = SwitchButton()
-        self.import_overwrite_switch.setOffText(
-            get_content_switchbutton_name_async(
-                "basic_safety_settings", "import_overwrite_switch", "disable"
-            )
-        )
-        self.import_overwrite_switch.setOnText(
-            get_content_switchbutton_name_async(
-                "basic_safety_settings", "import_overwrite_switch", "enable"
-            )
-        )
-        self.import_overwrite_switch.setChecked(
-            bool(
-                readme_settings_async(
-                    "basic_safety_settings", "import_overwrite_switch"
-                )
-            )
-        )
-        self.import_overwrite_switch.checkedChanged.connect(
-            self.__on_ops_import_overwrite_changed
-        )
-
-        self.import_version_mismatch_switch = SwitchButton()
-        self.import_version_mismatch_switch.setOffText(
-            get_content_switchbutton_name_async(
-                "basic_safety_settings", "import_version_mismatch_switch", "disable"
-            )
-        )
-        self.import_version_mismatch_switch.setOnText(
-            get_content_switchbutton_name_async(
-                "basic_safety_settings", "import_version_mismatch_switch", "enable"
-            )
-        )
-        self.import_version_mismatch_switch.setChecked(
-            bool(
-                readme_settings_async(
-                    "basic_safety_settings", "import_version_mismatch_switch"
-                )
-            )
-        )
-        self.import_version_mismatch_switch.checkedChanged.connect(
-            self.__on_ops_import_version_mismatch_changed
-        )
-
         # 预览设置开关
         self.preview_settings_switch = SwitchButton()
         self.preview_settings_switch.setOffText(
@@ -833,50 +749,6 @@ class basic_safety_security_operations(GroupHeaderCardWidget):
             ),
             self.open_settings_switch,
         )
-        if is_setting_visible("basic_safety_settings", "diagnostic_export_switch"):
-            self.addGroup(
-                get_theme_icon("ic_fluent_data_pie_20_filled"),
-                get_content_name_async(
-                    "basic_safety_settings", "diagnostic_export_switch"
-                ),
-                get_content_description_async(
-                    "basic_safety_settings", "diagnostic_export_switch"
-                ),
-                self.diagnostic_export_switch,
-            )
-        if is_setting_visible("basic_safety_settings", "data_export_switch"):
-            self.addGroup(
-                get_theme_icon("ic_fluent_arrow_export_20_filled"),
-                get_content_name_async("basic_safety_settings", "data_export_switch"),
-                get_content_description_async(
-                    "basic_safety_settings", "data_export_switch"
-                ),
-                self.data_export_switch,
-            )
-        if is_setting_visible(
-            "basic_safety_settings", "import_version_mismatch_switch"
-        ):
-            self.addGroup(
-                get_theme_icon("ic_fluent_arrow_sync_checkmark_20_filled"),
-                get_content_name_async(
-                    "basic_safety_settings", "import_version_mismatch_switch"
-                ),
-                get_content_description_async(
-                    "basic_safety_settings", "import_version_mismatch_switch"
-                ),
-                self.import_version_mismatch_switch,
-            )
-        if is_setting_visible("basic_safety_settings", "import_overwrite_switch"):
-            self.addGroup(
-                get_theme_icon("ic_fluent_folder_swap_20_filled"),
-                get_content_name_async(
-                    "basic_safety_settings", "import_overwrite_switch"
-                ),
-                get_content_description_async(
-                    "basic_safety_settings", "import_overwrite_switch"
-                ),
-                self.import_overwrite_switch,
-            )
 
         self._ensure_ops_disabled_if_no_password()
 
@@ -914,34 +786,6 @@ class basic_safety_security_operations(GroupHeaderCardWidget):
             self.open_settings_switch.setChecked(bool(value))
             self.open_settings_switch.blockSignals(False)
         elif (
-            second_level_key == "diagnostic_export_switch"
-            and self.diagnostic_export_switch.isChecked() != bool(value)
-        ):
-            self.diagnostic_export_switch.blockSignals(True)
-            self.diagnostic_export_switch.setChecked(bool(value))
-            self.diagnostic_export_switch.blockSignals(False)
-        elif (
-            second_level_key == "data_export_switch"
-            and self.data_export_switch.isChecked() != bool(value)
-        ):
-            self.data_export_switch.blockSignals(True)
-            self.data_export_switch.setChecked(bool(value))
-            self.data_export_switch.blockSignals(False)
-        elif (
-            second_level_key == "import_overwrite_switch"
-            and self.import_overwrite_switch.isChecked() != bool(value)
-        ):
-            self.import_overwrite_switch.blockSignals(True)
-            self.import_overwrite_switch.setChecked(bool(value))
-            self.import_overwrite_switch.blockSignals(False)
-        elif (
-            second_level_key == "import_version_mismatch_switch"
-            and self.import_version_mismatch_switch.isChecked() != bool(value)
-        ):
-            self.import_version_mismatch_switch.blockSignals(True)
-            self.import_version_mismatch_switch.setChecked(bool(value))
-            self.import_version_mismatch_switch.blockSignals(False)
-        elif (
             second_level_key == "preview_settings_switch"
             and self.preview_settings_switch.isChecked() != bool(value)
         ):
@@ -955,10 +799,6 @@ class basic_safety_security_operations(GroupHeaderCardWidget):
         self.restart_switch.setEnabled(enabled)
         self.exit_switch.setEnabled(enabled)
         self.open_settings_switch.setEnabled(enabled)
-        self.diagnostic_export_switch.setEnabled(enabled)
-        self.data_export_switch.setEnabled(enabled)
-        self.import_overwrite_switch.setEnabled(enabled)
-        self.import_version_mismatch_switch.setEnabled(enabled)
         self.preview_settings_switch.setEnabled(enabled)
         if not enabled:
             for key, sw in [
@@ -969,10 +809,6 @@ class basic_safety_security_operations(GroupHeaderCardWidget):
                 ("restart_switch", self.restart_switch),
                 ("exit_switch", self.exit_switch),
                 ("open_settings_switch", self.open_settings_switch),
-                ("diagnostic_export_switch", self.diagnostic_export_switch),
-                ("data_export_switch", self.data_export_switch),
-                ("import_overwrite_switch", self.import_overwrite_switch),
-                ("import_version_mismatch_switch", self.import_version_mismatch_switch),
                 ("preview_settings_switch", self.preview_settings_switch),
             ]:
                 try:
@@ -1123,152 +959,6 @@ class basic_safety_security_operations(GroupHeaderCardWidget):
         finally:
             self._busy = False
 
-    def __on_ops_diagnostic_export_changed(self):
-        if self._busy:
-            return
-        self._busy = True
-        try:
-            if not password_is_configured():
-                try:
-                    self.diagnostic_export_switch.blockSignals(True)
-                    self.diagnostic_export_switch.setChecked(False)
-                    self.diagnostic_export_switch.blockSignals(False)
-                    update_settings(
-                        "basic_safety_settings", "diagnostic_export_switch", False
-                    )
-                except Exception:
-                    pass
-                return
-            desired = bool(self.diagnostic_export_switch.isChecked())
-            prev = bool(
-                readme_settings_async(
-                    "basic_safety_settings", "diagnostic_export_switch"
-                )
-            )
-            self.diagnostic_export_switch.blockSignals(True)
-            self.diagnostic_export_switch.setChecked(prev)
-            self.diagnostic_export_switch.blockSignals(False)
-
-            def apply():
-                update_settings(
-                    "basic_safety_settings",
-                    "diagnostic_export_switch",
-                    desired,
-                )
-
-            require_and_run("toggle_diagnostic_export_switch", self, apply)
-        finally:
-            self._busy = False
-
-    def __on_ops_data_export_changed(self):
-        if self._busy:
-            return
-        self._busy = True
-        try:
-            if not password_is_configured():
-                try:
-                    self.data_export_switch.blockSignals(True)
-                    self.data_export_switch.setChecked(False)
-                    self.data_export_switch.blockSignals(False)
-                    update_settings(
-                        "basic_safety_settings", "data_export_switch", False
-                    )
-                except Exception:
-                    pass
-                return
-            desired = bool(self.data_export_switch.isChecked())
-            prev = bool(
-                readme_settings_async("basic_safety_settings", "data_export_switch")
-            )
-            self.data_export_switch.blockSignals(True)
-            self.data_export_switch.setChecked(prev)
-            self.data_export_switch.blockSignals(False)
-
-            def apply():
-                update_settings(
-                    "basic_safety_settings",
-                    "data_export_switch",
-                    desired,
-                )
-
-            require_and_run("toggle_data_export_switch", self, apply)
-        finally:
-            self._busy = False
-
-    def __on_ops_import_overwrite_changed(self):
-        if self._busy:
-            return
-        self._busy = True
-        try:
-            if not password_is_configured():
-                try:
-                    self.import_overwrite_switch.blockSignals(True)
-                    self.import_overwrite_switch.setChecked(False)
-                    self.import_overwrite_switch.blockSignals(False)
-                    update_settings(
-                        "basic_safety_settings", "import_overwrite_switch", False
-                    )
-                except Exception:
-                    pass
-                return
-            desired = bool(self.import_overwrite_switch.isChecked())
-            prev = bool(
-                readme_settings_async(
-                    "basic_safety_settings", "import_overwrite_switch"
-                )
-            )
-            self.import_overwrite_switch.blockSignals(True)
-            self.import_overwrite_switch.setChecked(prev)
-            self.import_overwrite_switch.blockSignals(False)
-
-            def apply():
-                update_settings(
-                    "basic_safety_settings",
-                    "import_overwrite_switch",
-                    desired,
-                )
-
-            require_and_run("toggle_import_overwrite_switch", self, apply)
-        finally:
-            self._busy = False
-
-    def __on_ops_import_version_mismatch_changed(self):
-        if self._busy:
-            return
-        self._busy = True
-        try:
-            if not password_is_configured():
-                try:
-                    self.import_version_mismatch_switch.blockSignals(True)
-                    self.import_version_mismatch_switch.setChecked(False)
-                    self.import_version_mismatch_switch.blockSignals(False)
-                    update_settings(
-                        "basic_safety_settings", "import_version_mismatch_switch", False
-                    )
-                except Exception:
-                    pass
-                return
-            desired = bool(self.import_version_mismatch_switch.isChecked())
-            prev = bool(
-                readme_settings_async(
-                    "basic_safety_settings", "import_version_mismatch_switch"
-                )
-            )
-            self.import_version_mismatch_switch.blockSignals(True)
-            self.import_version_mismatch_switch.setChecked(prev)
-            self.import_version_mismatch_switch.blockSignals(False)
-
-            def apply():
-                update_settings(
-                    "basic_safety_settings",
-                    "import_version_mismatch_switch",
-                    desired,
-                )
-
-            require_and_run("toggle_import_version_mismatch_switch", self, apply)
-        finally:
-            self._busy = False
-
     def __on_ops_preview_settings_changed(self):
         if self._busy:
             return
@@ -1321,10 +1011,6 @@ class basic_safety_security_operations(GroupHeaderCardWidget):
             self.restart_switch.setEnabled(False)
             self.exit_switch.setEnabled(False)
             self.open_settings_switch.setEnabled(False)
-            self.diagnostic_export_switch.setEnabled(False)
-            self.data_export_switch.setEnabled(False)
-            self.import_overwrite_switch.setEnabled(False)
-            self.import_version_mismatch_switch.setEnabled(False)
             self.preview_settings_switch.setEnabled(False)
         else:
             # 全局安全总开关开启时，根据密码配置状态决定其他组件是否启用
@@ -1333,8 +1019,4 @@ class basic_safety_security_operations(GroupHeaderCardWidget):
             self.restart_switch.setEnabled(password_configured)
             self.exit_switch.setEnabled(password_configured)
             self.open_settings_switch.setEnabled(password_configured)
-            self.diagnostic_export_switch.setEnabled(password_configured)
-            self.data_export_switch.setEnabled(password_configured)
-            self.import_overwrite_switch.setEnabled(password_configured)
-            self.import_version_mismatch_switch.setEnabled(password_configured)
             self.preview_settings_switch.setEnabled(password_configured)

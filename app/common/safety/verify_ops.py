@@ -17,6 +17,7 @@ def should_require_password(op: str) -> bool:
     if not readme_settings_async("basic_safety_settings", "safety_switch"):
         logger.debug(f"操作无需验证（安全总开关关闭）：{op}")
         return False
+
     key_map = {
         "show_hide_floating_window": "show_hide_floating_window_switch",
         "restart": "restart_switch",
@@ -32,14 +33,6 @@ def should_require_password(op: str) -> bool:
         "toggle_exit_switch": "safety_switch",
         "open_settings": "open_settings_switch",
         "toggle_open_settings_switch": "safety_switch",
-        "diagnostic_export": "diagnostic_export_switch",
-        "data_export": "data_export_switch",
-        "import_overwrite": "import_overwrite_switch",
-        "import_version_mismatch": "import_version_mismatch_switch",
-        "toggle_diagnostic_export_switch": "safety_switch",
-        "toggle_data_export_switch": "safety_switch",
-        "toggle_import_overwrite_switch": "safety_switch",
-        "toggle_import_version_mismatch_switch": "safety_switch",
         "roll_call_start": "safety_switch",
         "roll_call_reset": "safety_switch",
         "lottery_start": "safety_switch",

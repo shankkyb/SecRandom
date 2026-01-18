@@ -35,10 +35,6 @@ SETTINGS_VISIBILITY_CONFIG = {
     "basic_safety_settings": {
         "totp_switch": False,
         "restart_switch": False,
-        "diagnostic_export_switch": False,
-        "data_export_switch": False,
-        "import_overwrite_switch": False,
-        "import_version_mismatch_switch": False,
     },
     "floating_window_management": {
         "floating_window_long_press_duration": False,
