@@ -83,6 +83,15 @@ roll_call_settings = {
             "name": "自动播放次数",
             "description": "设置点名动画自动播放次数",
         },
+        "result_flow_animation_style": {
+            "name": "结果布局动画",
+            "description": "设置点名结果布局出现动画效果",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "result_flow_animation_duration": {
+            "name": "结果布局动画时长",
+            "description": "设置点名结果布局动画时长（毫秒）",
+        },
         "animation_color_theme": {
             "name": "动画/结果颜色主题",
             "description": "设置点名动画/结果颜色主题",
@@ -199,6 +208,15 @@ roll_call_settings = {
         "autoplay_count": {
             "name": "Autoplay count",
             "description": "Set the number of times to animate",
+        },
+        "result_flow_animation_style": {
+            "name": "Result layout animation",
+            "description": "Set result flow layout intro animation",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "result_flow_animation_duration": {
+            "name": "Result layout duration",
+            "description": "Set result layout animation duration (ms)",
         },
         "animation_color_theme": {
             "name": "Animation/Result Color Theme",
@@ -544,6 +562,15 @@ lottery_settings = {
             "name": "自动播放次数",
             "description": "设置抽奖动画自动播放次数",
         },
+        "result_flow_animation_style": {
+            "name": "结果布局动画",
+            "description": "设置抽奖结果布局出现动画效果",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "result_flow_animation_duration": {
+            "name": "结果布局动画时长",
+            "description": "设置抽奖结果布局动画时长（毫秒）",
+        },
         "animation_color_theme": {
             "name": "动画/结果颜色主题",
             "description": "设置抽奖动画/结果颜色主题",
@@ -669,6 +696,15 @@ lottery_settings = {
         "autoplay_count": {
             "name": "Autoplay count",
             "description": "Set the number of times to animate",
+        },
+        "result_flow_animation_style": {
+            "name": "Result layout animation",
+            "description": "Set result flow layout intro animation",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "result_flow_animation_duration": {
+            "name": "Result layout duration",
+            "description": "Set result layout animation duration (ms)",
         },
         "animation_color_theme": {
             "name": "Animation color theme",

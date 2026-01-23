@@ -10,7 +10,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 from PySide6.QtNetwork import *
-from qfluentwidgets import *
+from qfluentwidgets import PushButton
 
 # ==================================================
 # 本地模块导入
@@ -169,9 +169,26 @@ class roll_call(QWidget):
         Args:
             parent_layout: 父布局对象
         """
+        from app.view.components.center_flow_layout import (
+            CenterFlowLayout as FlowLayout,
+        )
+
         self.result_widget = QWidget()
         self.result_layout = QVBoxLayout(self.result_widget)
-        self.result_grid = QGridLayout()
+        self.result_grid = FlowLayout()
+        self.result_grid.setContentsMargins(0, 0, 0, 0)
+        self.result_grid.setVerticalSpacing(GRID_ITEM_SPACING)
+        self.result_grid.setHorizontalSpacing(GRID_ITEM_SPACING)
+        self.result_grid.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.result_grid.setAnimation(
+            readme_settings_async(
+                "roll_call_settings", "result_flow_animation_duration"
+            ),
+            QEasingCurve.OutQuad,
+        )
+        self.result_grid.setAnimationStyle(
+            readme_settings_async("roll_call_settings", "result_flow_animation_style")
+        )
         self.result_layout.addLayout(self.result_grid)
         parent_layout.addWidget(self.result_widget)
 

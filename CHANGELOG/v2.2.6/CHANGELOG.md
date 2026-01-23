@@ -13,7 +13,6 @@ v2.3 - Shirako (砂狼白子) beta 1
 ## 🐛 修复问题
 
 - 修复 **版本号更新脚本**，修复 DEV_VERSION 被误更新的问题
-- 修复 **导入错误**，修复 QParallelAnimationGroup 导入位置错误
 
 ## 🔧 其它变更
 

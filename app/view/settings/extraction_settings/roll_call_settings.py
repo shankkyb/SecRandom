@@ -494,6 +494,46 @@ class roll_call_basic_animation_settings(GroupHeaderCardWidget):
             )
         )
 
+        self.result_flow_animation_style_switch = SwitchButton()
+        self.result_flow_animation_style_switch.setOffText(
+            get_content_switchbutton_name_async(
+                "roll_call_settings", "result_flow_animation_style", "disable"
+            )
+        )
+        self.result_flow_animation_style_switch.setOnText(
+            get_content_switchbutton_name_async(
+                "roll_call_settings", "result_flow_animation_style", "enable"
+            )
+        )
+        result_flow_animation_style = readme_settings_async(
+            "roll_call_settings", "result_flow_animation_style"
+        )
+        self.result_flow_animation_style_switch.setChecked(result_flow_animation_style)
+        self.result_flow_animation_style_switch.checkedChanged.connect(
+            lambda: update_settings(
+                "roll_call_settings",
+                "result_flow_animation_style",
+                self.result_flow_animation_style_switch.isChecked(),
+            )
+        )
+
+        self.result_flow_animation_duration_spin = SpinBox()
+        self.result_flow_animation_duration_spin.setFixedWidth(WIDTH_SPINBOX)
+        self.result_flow_animation_duration_spin.setRange(0, 2000)
+        self.result_flow_animation_duration_spin.setSuffix("ms")
+        self.result_flow_animation_duration_spin.setValue(
+            readme_settings_async(
+                "roll_call_settings", "result_flow_animation_duration"
+            )
+        )
+        self.result_flow_animation_duration_spin.valueChanged.connect(
+            lambda: update_settings(
+                "roll_call_settings",
+                "result_flow_animation_duration",
+                self.result_flow_animation_duration_spin.value(),
+            )
+        )
+
         # 添加设置项到分组
         self.addGroup(
             get_theme_icon("ic_fluent_sanitize_20_filled"),
@@ -517,6 +557,24 @@ class roll_call_basic_animation_settings(GroupHeaderCardWidget):
                 get_content_description_async("roll_call_settings", "autoplay_count"),
                 self.autoplay_count_spin,
             )
+        self.addGroup(
+            get_theme_icon("ic_fluent_sanitize_20_filled"),
+            get_content_name_async("roll_call_settings", "result_flow_animation_style"),
+            get_content_description_async(
+                "roll_call_settings", "result_flow_animation_style"
+            ),
+            self.result_flow_animation_style_switch,
+        )
+        self.addGroup(
+            get_theme_icon("ic_fluent_timeline_20_filled"),
+            get_content_name_async(
+                "roll_call_settings", "result_flow_animation_duration"
+            ),
+            get_content_description_async(
+                "roll_call_settings", "result_flow_animation_duration"
+            ),
+            self.result_flow_animation_duration_spin,
+        )
 
 
 class roll_call_color_theme_settings(GroupHeaderCardWidget):

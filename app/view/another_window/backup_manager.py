@@ -588,12 +588,12 @@ class BackupManagerWindow(QWidget):
         )
         dialog.yesButton.setText(
             get_any_position_value_async(
-                "basic_settings", "data_import_export", "import_confirm_button", "name"
+                "basic_settings", "backup_restore_confirm", "confirm_button"
             )
         )
         dialog.cancelButton.setText(
             get_any_position_value_async(
-                "basic_settings", "data_import_export", "import_cancel_button", "name"
+                "basic_settings", "backup_restore_confirm", "cancel_button"
             )
         )
         if not dialog.exec():

@@ -167,8 +167,10 @@ basic_settings = {
             "text": "请先选择要还原的备份文件",
         },
         "backup_restore_confirm": {
-            "title": "确认还原",
-            "content": "确定要还原该备份文件吗？\n\n{file}\n\n此操作会覆盖当前数据，还原完成后需要重启应用程序以生效。",
+            "title": "恢复备份",
+            "content": "确定要从备份文件「{file}」恢复数据吗？\n\n此操作将覆盖当前所有设置和数据，且无法撤销。",
+            "confirm_button": "恢复",
+            "cancel_button": "取消",
         },
         "backup_restore_delete_confirm": {
             "title": "确认删除",
@@ -493,8 +495,10 @@ basic_settings = {
             "text": "Please select a backup file to restore first",
         },
         "backup_restore_confirm": {
-            "title": "Confirm restore",
-            "content": "Are you sure you want to restore this backup file?\n\n{file}\n\nThis will overwrite current data. Restart the app for changes to take effect.",
+            "title": "Restore backup",
+            "content": "Are you sure you want to restore data from backup file '{file}'?\n\nThis will overwrite all current settings and data, and cannot be undone.",
+            "confirm_button": "Restore",
+            "cancel_button": "Cancel",
         },
         "backup_restore_delete_confirm": {
             "title": "Confirm delete",

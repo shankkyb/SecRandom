@@ -29,9 +29,6 @@ from app.tools.variable import (
     DARK_THEME_MIN_VALUE,
     DARK_THEME_MAX_VALUE,
     RGB_COLOR_FORMAT,
-    GRID_ITEM_MARGIN,
-    GRID_ITEM_SPACING,
-    DEFAULT_AVAILABLE_WIDTH,
 )
 from app.tools.path_utils import file_exists, get_data_path
 from app.tools.personalised import is_dark_theme
@@ -602,38 +599,56 @@ class ResultDisplayUtils:
         if alignment is None:
             alignment = Qt.AlignmentFlag.AlignCenter
         result_grid.setAlignment(alignment)
+        parent_widget = None
+        if hasattr(result_grid, "parentWidget"):
+            try:
+                parent_widget = result_grid.parentWidget()
+            except Exception:
+                parent_widget = None
+        if parent_widget is None and hasattr(result_grid, "parent"):
+            try:
+                obj = result_grid.parent()
+                while obj is not None and not isinstance(obj, QWidget):
+                    obj = obj.parent()
+                if isinstance(obj, QWidget):
+                    parent_widget = obj
+            except Exception:
+                parent_widget = None
 
         ResultDisplayUtils.clear_grid(result_grid)
 
         if not student_labels:
+            if parent_widget:
+                try:
+                    layout = parent_widget.layout()
+                    if layout is not None:
+                        layout.invalidate()
+                        layout.activate()
+                except Exception:
+                    pass
+                parent_widget.updateGeometry()
             return
 
-        label_count = len(student_labels)
+        widgets = list(student_labels)
+        for w in widgets:
+            result_grid.addWidget(w)
 
-        parent_widget = result_grid.parentWidget()
-        available_width = (
-            (parent_widget.width() - GRID_ITEM_MARGIN)
-            if parent_widget
-            else DEFAULT_AVAILABLE_WIDTH
-        )
-
-        total_width = 0
-        for label in student_labels:
-            total_width += label.sizeHint().width()
-        total_width += label_count * GRID_ITEM_SPACING
-
-        if total_width > available_width and label_count > 0:
-            avg_label_width = total_width / label_count
-            max_columns = max(1, int(available_width // avg_label_width))
-        else:
-            max_columns = label_count if label_count > 0 else 1
-
-        for i in range(label_count):
-            row = i // max_columns
-            col = i % max_columns
-            result_grid.addWidget(student_labels[i], row, col)
+        if hasattr(result_grid, "removeAllWidgets"):
+            try:
+                result_grid.removeAllWidgets()
+                for w in widgets:
+                    result_grid.addWidget(w)
+            except Exception:
+                pass
 
         if parent_widget:
+            try:
+                layout = parent_widget.layout()
+                if layout is not None:
+                    layout.invalidate()
+                    layout.activate()
+            except Exception:
+                pass
             parent_widget.updateGeometry()
 
     @staticmethod
@@ -729,21 +744,54 @@ class ResultDisplayUtils:
             result_grid: QGridLayout 网格布局
             log_debug: 是否输出调试日志（默认为False）
         """
-        count = result_grid.count()
-        if count == 0:
+        if not hasattr(result_grid, "count") or not hasattr(result_grid, "takeAt"):
+            if hasattr(result_grid, "removeAllWidgets"):
+                try:
+                    result_grid.removeAllWidgets()
+                except Exception:
+                    pass
+            ResultDisplayUtils._color_cache.clear()
             return
 
-        items_to_delete = []
-        for i in range(count):
-            item = result_grid.takeAt(0)
-            if item and item.widget():
-                widget = item.widget()
-                widget.hide()
-                widget.deleteLater()
-                items_to_delete.append(item)
+        count = result_grid.count()
+        if count == 0:
+            ResultDisplayUtils._color_cache.clear()
+            return
 
-        if log_debug and count > 0:
-            logger.debug(f"本次销毁了{count}个组件")
+        removed_count = 0
+        while result_grid.count():
+            item = result_grid.takeAt(0)
+            if not item:
+                break
+            widget = None
+            if isinstance(item, QWidget):
+                widget = item
+            elif hasattr(item, "widget"):
+                try:
+                    widget = item.widget()
+                except Exception:
+                    widget = None
+            if widget:
+                widget.hide()
+                widget.setParent(None)
+                widget.deleteLater()
+                removed_count += 1
+                continue
+            child_layout = None
+            if hasattr(item, "layout"):
+                try:
+                    child_layout = item.layout()
+                except Exception:
+                    child_layout = None
+            if child_layout:
+                ResultDisplayUtils.clear_grid(child_layout)
+                try:
+                    child_layout.deleteLater()
+                except Exception:
+                    pass
+
+        if log_debug and removed_count > 0:
+            logger.debug(f"本次销毁了{removed_count}个组件")
 
         ResultDisplayUtils._color_cache.clear()
 
