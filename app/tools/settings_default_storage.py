@@ -498,6 +498,7 @@ DEFAULT_SETTINGS = {
     },
     "user_info": {
         "first_use_time": {"default_value": ""},
+        "total_runtime_seconds": {"default_value": 0},
         "total_draw_count": {"default_value": 0},
         "roll_call_total_count": {"default_value": 0},
         "lottery_total_count": {"default_value": 0},

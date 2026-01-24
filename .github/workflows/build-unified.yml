@@ -175,6 +175,12 @@ jobs:
           # 复制 LICENSE 文件到zip_dist/SecRandom/data目录下
           Copy-Item LICENSE zip_dist/SecRandom/data/
 
+          # 使用 zip 压缩文件
+          mkdir zip -Force
+          $outputZip = "zip/SecRandom-Windows-Portable-${{ github.ref_name }}-${{ matrix.arch }}.zip"
+          Compress-Archive -Path zip_dist/SecRandom/* -DestinationPath $outputZip -Force
+          echo "目录模式打包完成: $outputZip"
+
       - name: 安装 Inno Setup 中文语言文件
         if: matrix.platform == 'windows'
         run: |
@@ -208,7 +214,7 @@ jobs:
           # 检查安装程序是否生成并移动到 zip 目录
           if (Test-Path "build/SecRandom setup x64.exe") {
             # 修改文件名以包含版本号，方便识别
-            $setupName = "SecRandom-setup-${{ github.ref_name }}-${{ matrix.arch }}.exe"
+            $setupName = "SecRandom-Windows-Setup-${{ github.ref_name }}-${{ matrix.arch }}.exe"
             Move-Item "build/SecRandom setup x64.exe" "zip/$setupName"
             echo "Inno Setup 打包完成: zip/$setupName"
           } else {
@@ -331,12 +337,14 @@ jobs:
           echo "| Linux | x64 | [下载](https://www.123684.com/s/9529jv-U4Fxh) |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
           echo "" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
           echo "**Github 镜像 下载链接**" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
-          echo "| 镜像源 | 平台 | 支持架构 | 安装程序 |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
+          echo "| 镜像源 | 平台 | 支持架构 | 便携版 | 安装程序 |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
           echo "| --- | --- | --- | --- | --- |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
-          echo "| ghfast.top | Windows | x64 | [下载 ${{ github.ref_name }}](https://ghfast.top/https://github.com/SECTL/SecRandom/releases/download/${{ github.ref_name }}/SecRandom-setup-${{ github.ref_name }}-x64.exe) |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
-          echo "| ghfast.top | Linux | x64 | [下载 ${{ github.ref_name }}](https://ghfast.top/https://github.com/SECTL/SecRandom/releases/download/${{ github.ref_name }}/SecRandom-linux-$version_no_v-amd64-deb.deb) |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
-          echo "| gh-proxy.com | Windows | x64 | [下载 ${{ github.ref_name }}](https://gh-proxy.com/https://github.com/SECTL/SecRandom/releases/download/${{ github.ref_name }}/SecRandom-setup-${{ github.ref_name }}-x64.exe) |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
-          echo "| gh-proxy.com | Linux | x64 | [下载 ${{ github.ref_name }}](https://gh-proxy.com/https://github.com/SECTL/SecRandom/releases/download/${{ github.ref_name }}/SecRandom-linux-$version_no_v-amd64-deb.deb) |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
+          echo "| ghfast.top | Windows | x64 | N/A | [下载 ${{ github.ref_name }}](https://ghfast.top/https://github.com/SECTL/SecRandom/releases/download/${{ github.ref_name }}/SecRandom-Windows-Setup-${{ github.ref_name }}-x64.exe) |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
+          echo "| ghfast.top | Windows | x64 | [下载 ${{ github.ref_name }}](https://ghfast.top/https://github.com/SECTL/SecRandom/releases/download/${{ github.ref_name }}/SecRandom-Windows-Portable-${{ github.ref_name }}-x64.exe) | N/A |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
+          echo "| ghfast.top | Linux | x64 | N/A | [下载 ${{ github.ref_name }}](https://ghfast.top/https://github.com/SECTL/SecRandom/releases/download/${{ github.ref_name }}/SecRandom-linux-Setup-$version_no_v-amd64.deb) |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
+          echo "| gh-proxy.com | Windows | x64 | N/A | [下载 ${{ github.ref_name }}](https://gh-proxy.com/https://github.com/SECTL/SecRandom/releases/download/${{ github.ref_name }}/SecRandom-Windows-Setup-${{ github.ref_name }}-x64.exe) |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
+          echo "| gh-proxy.com | Windows | x64 | [下载 ${{ github.ref_name }}](https://gh-proxy.com/https://github.com/SECTL/SecRandom/releases/download/${{ github.ref_name }}/SecRandom-Windows-Portable-${{ github.ref_name }}-x64.exe) | N/A |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
+          echo "| gh-proxy.com | Linux | x64 | N/A | [下载 ${{ github.ref_name }}](https://gh-proxy.com/https://github.com/SECTL/SecRandom/releases/download/${{ github.ref_name }}/SecRandom-linux-Setup-$version_no_v-amd64.deb) |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
           echo "" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
           echo "**SHA256 校验值-请核对下载的文件的SHA256值是否正确**" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md
           echo "| 文件名 | SHA256 值 |" >> ../CHANGELOG/${{ github.ref_name }}/CHANGELOG.md

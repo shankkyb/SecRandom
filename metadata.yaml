@@ -1,7 +1,7 @@
 latest:
-  release: v2.2.5
-  beta: v2.2.5
-  alpha: v2.2.5
+  release: v2.2.6
+  beta: v2.2.6
+  alpha: v2.2.6
 
 latest_no:
   release: 2
@@ -13,7 +13,5 @@ subchannels:
     - windows
   arch:
     - x64
-  struct:
-    - exe
 
-name_format: SecRandom-setup-[version]-[arch]-.exe
+name_format: SecRandom-Windows-Setup-[version]-[arch].exe

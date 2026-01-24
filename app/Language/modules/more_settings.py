@@ -91,9 +91,13 @@ about = {
         "user_name": {"name": "当前电脑用户名"},
         "first_use_time": {"name": "首次使用时间"},
         "runtime": {"name": "软件运行时长"},
+        "runtime_years": {"name": "{value}年"},
+        "runtime_days": {"name": "{value}天"},
+        "runtime_hms": {"name": "{hours:02d}:{minutes:02d}:{seconds:02d}"},
         "total_draw_count": {"name": "软件总抽取次数"},
         "roll_call_total_count": {"name": "点名总次数"},
         "lottery_total_count": {"name": "抽奖总次数"},
+        "copy_user_info": {"name": "复制用户信息"},
     },
     "EN_US": {
         "title": {"name": "About", "description": "APP about page"},
@@ -142,9 +146,13 @@ about = {
         "user_name": {"name": "Device Username"},
         "first_use_time": {"name": "First Use Time"},
         "runtime": {"name": "App Runtime"},
+        "runtime_years": {"name": "{value}y"},
+        "runtime_days": {"name": "{value}d"},
+        "runtime_hms": {"name": "{hours:02d}:{minutes:02d}:{seconds:02d}"},
         "total_draw_count": {"name": "Total Draws"},
         "roll_call_total_count": {"name": "Pick Draws"},
         "lottery_total_count": {"name": "Lottery Draws"},
+        "copy_user_info": {"name": "Copy User Info"},
     },
 }
 

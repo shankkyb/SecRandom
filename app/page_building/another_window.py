@@ -220,12 +220,12 @@ def create_set_pool_name_window():
     Returns:
         创建的窗口实例
     """
-    title = get_content_name_async("set_pool_name", "title")
+    title = get_content_name_async("set_prize_name", "title")
     window = SimpleWindowTemplate(title, width=800, height=600)
-    window.add_page_from_template("set_pool_name", set_pool_name_window_template)
-    window.switch_to_page("set_pool_name")
-    _window_instances["set_pool_name"] = window
-    window.windowClosed.connect(lambda: _window_instances.pop("set_pool_name", None))
+    window.add_page_from_template("set_prize_name", set_pool_name_window_template)
+    window.switch_to_page("set_prize_name")
+    _window_instances["set_prize_name"] = window
+    window.windowClosed.connect(lambda: _window_instances.pop("set_prize_name", None))
     window.show()
     return
 

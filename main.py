@@ -113,8 +113,21 @@ def add_dev_hint_to_window(window):
     if not window.isWindow() or hasattr(window, "_dev_hint_added"):
         return
 
-    dev_hint = DevHintWidget(window)
-    dev_hint.setParent(window)
+    allowed_window_classes = {
+        "GuideWindow",
+        "MainWindow",
+        "SettingsWindow",
+        "SimpleWindowTemplate",
+    }
+    window_class_name = window.__class__.__name__
+    if window_class_name not in allowed_window_classes:
+        return
+
+    title_bar = getattr(window, "titleBar", None)
+    if not title_bar:
+        return
+
+    dev_hint = DevHintWidget(title_bar, position_mode="titlebar_center")
     dev_hint.show()
 
     window._dev_hint_added = True

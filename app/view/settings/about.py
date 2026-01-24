@@ -301,10 +301,15 @@ class user_info_card(HeaderCardWidget):
                 get_content_name_async("about", "first_use_time"), first_use_time
             )
         )
+        self._runtime_base_seconds = self._normalize_count(
+            readme_settings_async("user_info", "total_runtime_seconds")
+        )
+        self._runtime_last_persist_minute = int(self._runtime_base_seconds // 60)
+
         self.runtime_label = BodyLabel(
             self._format_label_text(
                 get_content_name_async("about", "runtime"),
-                self._format_duration(self._get_runtime_seconds()),
+                self._format_duration(self._get_total_runtime_seconds()),
             )
         )
 
@@ -344,6 +349,14 @@ class user_info_card(HeaderCardWidget):
         self.stats_layout.addWidget(self.lottery_total_label)
         self.info_layout.addWidget(self.stats_widget)
 
+        self.copy_button = PushButton(get_content_name_async("about", "copy_user_info"))
+        self.copy_button.clicked.connect(self._copy_user_info)
+        self.copy_layout = QHBoxLayout()
+        self.copy_layout.setContentsMargins(0, 0, 0, 0)
+        self.copy_layout.addWidget(self.copy_button)
+        self.copy_layout.addStretch()
+        self.info_layout.addLayout(self.copy_layout)
+
         self.viewLayout.addLayout(self.info_layout)
 
         self.runtime_timer = QTimer(self)
@@ -374,21 +387,60 @@ class user_info_card(HeaderCardWidget):
 
     def _format_duration(self, seconds):
         total_seconds = max(0, int(seconds))
-        hours = total_seconds // 3600
-        minutes = (total_seconds % 3600) // 60
-        secs = total_seconds % 60
-        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+        years = total_seconds // (365 * 24 * 3600)
+        remaining = total_seconds % (365 * 24 * 3600)
+        days = remaining // (24 * 3600)
+        remaining = remaining % (24 * 3600)
+        hours = remaining // 3600
+        minutes = (remaining % 3600) // 60
+        secs = remaining % 60
+        parts = []
+        if years:
+            parts.append(
+                get_content_name_async("about", "runtime_years").format(value=years)
+            )
+        if days:
+            parts.append(
+                get_content_name_async("about", "runtime_days").format(value=days)
+            )
+        parts.append(
+            get_content_name_async("about", "runtime_hms").format(
+                hours=hours, minutes=minutes, seconds=secs
+            )
+        )
+        return " ".join(parts)
 
     def _format_label_text(self, title, value):
         return f"{title}: {value}"
 
     def _update_runtime_label(self):
-        runtime_text = self._format_duration(self._get_runtime_seconds())
+        total_seconds = self._get_total_runtime_seconds()
+        runtime_text = self._format_duration(total_seconds)
         self.runtime_label.setText(
             self._format_label_text(
                 get_content_name_async("about", "runtime"), runtime_text
             )
         )
+        # 每秒持久化一次运行时长
+        update_settings("user_info", "total_runtime_seconds", int(total_seconds))
+
+    def _get_total_runtime_seconds(self):
+        session_seconds = self._get_runtime_seconds()
+        return self._runtime_base_seconds + session_seconds
+
+    def _copy_user_info(self):
+        text = "\n".join(
+            [
+                self.user_name_label.text(),
+                self.user_id_label.text(),
+                self.first_use_time_label.text(),
+                self.runtime_label.text(),
+                self.total_draw_label.text(),
+                self.roll_call_total_label.text(),
+                self.lottery_total_label.text(),
+            ]
+        )
+        QApplication.clipboard().setText(text)
 
     def _ensure_usage_stats(self):
         total_draw_count, roll_call_total_count, lottery_total_count = (

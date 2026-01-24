@@ -294,17 +294,7 @@ class roll_call_list(GroupHeaderCardWidget):
         show_notification(NotificationType.INFO, config, parent=self)
 
     def _get_window_parent(self):
-        parent_window = self.window()
-        try:
-            if parent_window is None:
-                return None
-            if parent_window.__class__.__name__ == "GuideWindow":
-                return None
-            if parent_window.windowTitle() == "SecRandom Setup":
-                return None
-        except Exception:
-            return parent_window
-        return parent_window
+        return None
 
     # 学生名单导出功能
     def export_student_list(self):

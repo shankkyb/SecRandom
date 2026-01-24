@@ -244,7 +244,13 @@ def update_settings(first_level_key: str, second_level_key: str, value: Any):
         with open_file(settings_path, "w", encoding="utf-8") as f:
             json.dump(settings_data, f, ensure_ascii=False, indent=4)
 
-        logger.debug(f"设置更新成功: {first_level_key}.{second_level_key} = {value}")
+        if (
+            not first_level_key == "user_info"
+            and second_level_key == "total_runtime_seconds"
+        ):
+            logger.debug(
+                f"设置更新成功: {first_level_key}.{second_level_key} = {value}"
+            )
 
         # 发送设置变化信号
         get_settings_signals().settingChanged.emit(

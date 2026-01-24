@@ -9,10 +9,11 @@ from app.Language.obtain_language import get_content_name_async
 class DevHintWidget(QWidget):
     """开发中提示组件 - 显示在窗口内部左下角"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, position_mode="bottom_left"):
         super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.position_mode = position_mode
         self.setup_ui()
         self.setup_position()
 
@@ -26,37 +27,21 @@ class DevHintWidget(QWidget):
         self.main_layout.setContentsMargins(5, 5, 5, 5)
         self.main_layout.setSpacing(2)
 
-        # 创建提示标签
         hint_text = get_content_name_async("dev_hint", "hint_text")
-        self.hint_label = QLabel(hint_text)
+        date_text = datetime.now().strftime("%Y-%m-%d")
+        version_text = (
+            f"SecRandom {NEXT_VERSION} Dev | {CODENAME} ({SYSTEM}-{ARCH}) | {date_text}"
+        )
+        self.hint_text = hint_text
+        self.version_text = version_text
+
+        self.hint_label = QLabel(self._build_hint_text())
         hint_font = QFont(app_font)
-        hint_font.setBold(True)
         self.hint_label.setFont(hint_font)
-        self.hint_label.setStyleSheet("color: #FF6B6B;")
+        self.hint_label.setTextFormat(Qt.TextFormat.RichText)
         self.hint_label.setWordWrap(False)
 
-        # 创建版本标签
-        version_text = f"SecRandom {NEXT_VERSION} Dev | {CODENAME} ({SYSTEM}-{ARCH})"
-        self.version_label = QLabel(version_text)
-        version_font = QFont(app_font)
-        version_font.setPointSize(8)
-        self.version_label.setFont(version_font)
-        self.version_label.setStyleSheet("color: #888888;")
-        self.version_label.setWordWrap(False)
-
-        # 创建日期标签
-        date_text = datetime.now().strftime("%Y-%m-%d")
-        self.date_label = QLabel(date_text)
-        date_font = QFont(app_font)
-        date_font.setPointSize(8)
-        self.date_label.setFont(date_font)
-        self.date_label.setStyleSheet("color: #888888;")
-        self.date_label.setWordWrap(False)
-
-        # 添加到布局
         self.main_layout.addWidget(self.hint_label)
-        self.main_layout.addWidget(self.version_label)
-        self.main_layout.addWidget(self.date_label)
 
         # 设置最小宽度和固定大小
         self.setMinimumWidth(400)
@@ -64,11 +49,14 @@ class DevHintWidget(QWidget):
         self.setFixedSize(self.size())
 
     def setup_position(self):
-        """设置位置到父窗口左下角"""
         if self.parent():
             parent_rect = self.parent().rect()
-            x = 5
-            y = parent_rect.height() - self.height() - 5
+            if self.position_mode == "titlebar_center":
+                x = max(0, int((parent_rect.width() - self.width()) / 2))
+                y = max(0, int((parent_rect.height() - self.height()) / 2))
+            else:
+                x = 5
+                y = parent_rect.height() - self.height() - 5
             self.move(x, y)
 
     def update_position(self):
@@ -76,6 +64,14 @@ class DevHintWidget(QWidget):
         self.setup_position()
 
     def update_date(self):
-        """更新日期显示"""
         date_text = datetime.now().strftime("%Y-%m-%d")
-        self.date_label.setText(date_text)
+        self.version_text = (
+            f"SecRandom {NEXT_VERSION} Dev | {CODENAME} ({SYSTEM}-{ARCH}) | {date_text}"
+        )
+        self.hint_label.setText(self._build_hint_text())
+
+    def _build_hint_text(self):
+        return (
+            f"<span style='color:#FF6B6B; font-weight:600;'>{self.hint_text}</span> "
+            f"<span style='color:#888888; font-size:8pt;'>{self.version_text}</span>"
+        )
