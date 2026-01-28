@@ -1,10 +1,6 @@
 # ==================================================
 # 导入库
 # ==================================================
-import os
-import subprocess
-import sys
-import loguru
 from loguru import logger
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtGui import QIcon
@@ -19,6 +15,7 @@ from app.tools.variable import (
     PRE_CLASS_RESET_INTERVAL_MS,
     RESIZE_TIMER_DELAY_MS,
     MAXIMIZE_RESTORE_DELAY_MS,
+    EXIT_CODE_RESTART,
 )
 from app.tools.path_utils import get_data_path
 from app.tools.personalised import get_theme_icon
@@ -1019,29 +1016,10 @@ class MainWindow(FluentWindow):
 
         self.cleanup_shortcuts()
 
-        try:
-            working_dir = os.getcwd()
-            filtered_args = [arg for arg in sys.argv if not arg.startswith("--")]
-            startup_info = subprocess.STARTUPINFO()
-            startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            subprocess.Popen(
-                [sys.executable] + filtered_args,
-                cwd=working_dir,
-                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
-                | subprocess.DETACHED_PROCESS,
-                startupinfo=startup_info,
-            )
-        except Exception as e:
-            logger.error(f"启动新进程失败: {e}")
-            return
-
-        try:
-            loguru.logger.remove()
-        except Exception as e:
-            logger.error(f"日志系统关闭出错: {e}")
-
-        QApplication.quit()
-        sys.exit(0)
+        # 使用 EXIT_CODE_RESTART 退出码来触发重启
+        # main.py 中的 handle_exit() 函数会检测此退出码并执行重启逻辑
+        logger.info("正在退出以触发重启流程...")
+        QApplication.exit(EXIT_CODE_RESTART)
 
     def close_window_secrandom(self):
         """关闭窗口
