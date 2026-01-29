@@ -256,6 +256,11 @@ basic_settings = {
             "description": "学生/奖品图片资源（images）",
             "switchbutton_name": {"enable": "", "disable": ""},
         },
+        "include_themes": {
+            "name": "主题资源",
+            "description": "已安装的主题资源（theme）",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
         "include_logs": {
             "name": "运行日志",
             "description": "程序运行日志，可能包含敏感信息（logs）",
@@ -605,6 +610,11 @@ basic_settings = {
         "include_images": {
             "name": "Images",
             "description": "Student/prize image resources (images)",
+            "switchbutton_name": {"enable": "Include", "disable": "Exclude"},
+        },
+        "include_themes": {
+            "name": "Themes",
+            "description": "Installed theme resources (theme)",
             "switchbutton_name": {"enable": "Include", "disable": "Exclude"},
         },
         "include_logs": {

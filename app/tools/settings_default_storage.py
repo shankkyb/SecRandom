@@ -63,6 +63,7 @@ DEFAULT_SETTINGS = {
         "include_audio": {"default_value": False},
         "include_cses": {"default_value": True},
         "include_images": {"default_value": True},
+        "include_themes": {"default_value": True},
         "include_logs": {"default_value": False},
     },
     "list_management": {"title": {"default_value": None}},
@@ -368,6 +369,7 @@ DEFAULT_SETTINGS = {
         "security_settings": {"default_value": 1},
         "linkage_settings": {"default_value": 1},
         "voice_settings": {"default_value": 1},
+        "theme_management": {"default_value": 1},
         "settings_history": {"default_value": 1},
         "more_settings": {"default_value": 1},
     },
@@ -405,6 +407,13 @@ DEFAULT_SETTINGS = {
         "lottery_fields": {
             "default_value": {"id": True, "name": True, "prefix": "", "suffix": ""}
         },
+    },
+    "theme_management": {
+        "title": {"default_value": None},
+        "roll_call_theme_id": {"default_value": ""},
+        "lottery_theme_id": {"default_value": ""},
+        "roll_call_theme_type": {"default_value": ""},
+        "lottery_theme_type": {"default_value": ""},
     },
     "history": {"title": {"default_value": None}},
     "history_management": {

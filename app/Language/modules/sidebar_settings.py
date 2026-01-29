@@ -45,6 +45,11 @@ sidebar_management_settings = {
             "description": "设置历史记录项在侧边栏位置",
             "combo_items": ["顶部", "底部", "不显示"],
         },
+        "theme_management": {
+            "name": "主题管理",
+            "description": "设置主题管理项在侧边栏位置",
+            "combo_items": ["顶部", "底部", "不显示"],
+        },
         "more_settings": {
             "name": "更多设置",
             "description": "设置更多设置项在侧边栏位置",

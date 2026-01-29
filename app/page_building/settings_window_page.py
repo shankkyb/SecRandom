@@ -15,6 +15,9 @@ SAFETY_SETTINGS_PATH = "app.view.settings.safety_settings:safety_settings"
 UPDATE_PATH = "app.view.settings.update:update"
 ABOUT_PATH = "app.view.settings.about:about"
 LINKAGE_SETTINGS_PATH = "app.view.settings.linkage_settings:linkage_settings"
+THEME_MANAGEMENT_PATH = (
+    "app.view.settings.theme_management.theme_management:ThemeManagement"
+)
 
 # 导入默认设置
 from app.tools.settings_default import *
@@ -147,6 +150,17 @@ class linkage_settings_page(PageTemplate):
     def __init__(self, parent: QFrame = None, is_preview=False):
         super().__init__(
             content_widget_class=LINKAGE_SETTINGS_PATH,
+            parent=parent,
+            is_preview_mode=is_preview,
+        )
+
+
+class theme_management_page(PageTemplate):
+    """创建主题管理页面"""
+
+    def __init__(self, parent: QFrame = None, is_preview=False):
+        super().__init__(
+            content_widget_class=THEME_MANAGEMENT_PATH,
             parent=parent,
             is_preview_mode=is_preview,
         )

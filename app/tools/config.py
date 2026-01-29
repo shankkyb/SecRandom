@@ -952,6 +952,7 @@ def _export_diagnostic_files(file_path: str, app_dir: Path) -> int:
         get_audio_path(),
         get_data_path("CSES"),
         get_data_path("images"),
+        get_data_path("themes"),
         get_path(LOG_DIR),
     ]
 
@@ -1596,6 +1597,7 @@ def _check_existing_files(file_path: str) -> list:
         "audio": get_audio_path(),
         "CSES": get_data_path("CSES"),
         "images": get_data_path("images"),
+        "theme": get_data_path("themes"),
         "logs": get_path(LOG_DIR),
     }
 
@@ -1650,6 +1652,7 @@ def _extract_data_files(file_path: str) -> list:
         "history": get_data_path("history"),
         "CSES": get_data_path("CSES"),
         "images": get_data_path("images"),
+        "theme": get_data_path("themes"),
         "audio": get_audio_path(),
         "logs": get_path(LOG_DIR),
     }

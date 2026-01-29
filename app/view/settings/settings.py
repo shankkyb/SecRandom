@@ -71,6 +71,7 @@ class SettingsWindow(FluentWindow):
             "safetySettingsInterface",
             "customSettingsInterface",
             "voiceSettingsInterface",
+            "themeManagementInterface",
             "historyInterface",
             "moreSettingsInterface",
             "updateInterface",
@@ -340,6 +341,7 @@ class SettingsWindow(FluentWindow):
             ),
             "settings_safety": ("safetySettingsInterface", "safety_settings_item"),
             "settings_voice": ("voiceSettingsInterface", "voice_settings_item"),
+            "settings_theme": ("themeManagementInterface", "theme_management_item"),
             "settings_history": ("historyInterface", "history_item"),
             "settings_more": ("moreSettingsInterface", "more_settings_item"),
             "settings_update": ("updateInterface", "update_item"),
@@ -366,6 +368,10 @@ class SettingsWindow(FluentWindow):
                 "safety_settings_item",
             ),
             "voiceSettingsInterface": ("voiceSettingsInterface", "voice_settings_item"),
+            "themeManagementInterface": (
+                "themeManagementInterface",
+                "theme_management_item",
+            ),
             "historyInterface": ("historyInterface", "history_item"),
             "moreSettingsInterface": ("moreSettingsInterface", "more_settings_item"),
             "updateInterface": ("updateInterface", "update_item"),
@@ -426,6 +432,9 @@ class SettingsWindow(FluentWindow):
             "voice_settings": readme_settings_async(
                 "sidebar_management_settings", "voice_settings"
             ),
+            "theme_management": readme_settings_async(
+                "sidebar_management_settings", "theme_management"
+            ),
             "settings_history": readme_settings_async(
                 "sidebar_management_settings", "settings_history"
             ),
@@ -479,6 +488,12 @@ class SettingsWindow(FluentWindow):
                 False,
             ),
             ("voice_settings", "voiceSettingsInterface", "voice_settings_page", True),
+            (
+                "theme_management",
+                "themeManagementInterface",
+                "theme_management_page",
+                False,
+            ),
             ("settings_history", "historyInterface", "history_page", True),
             ("more_settings", "moreSettingsInterface", "more_settings_page", True),
         ]
@@ -688,6 +703,14 @@ class SettingsWindow(FluentWindow):
                 "voice_settings_item",
                 "ic_fluent_person_voice_20_filled",
                 "voice_settings",
+                "title",
+            ),
+            (
+                "theme_management",
+                "themeManagementInterface",
+                "theme_management_item",
+                "ic_fluent_paint_brush_20_filled",
+                "theme_management",
                 "title",
             ),
             (
@@ -904,6 +927,10 @@ class SettingsWindow(FluentWindow):
             ),
             "voiceSettingsInterface": lambda p=container,
             is_preview=False: settings_window_page.voice_settings_page(
+                p, is_preview=is_preview
+            ),
+            "themeManagementInterface": lambda p=container,
+            is_preview=False: settings_window_page.theme_management_page(
                 p, is_preview=is_preview
             ),
             "historyInterface": lambda p=container,

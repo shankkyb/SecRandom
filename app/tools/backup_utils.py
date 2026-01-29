@@ -67,6 +67,7 @@ def get_backup_target_defs() -> list[tuple[str, str, Path]]:
         ("include_audio", "audio", get_data_path("audio")),
         ("include_cses", "CSES", get_data_path("CSES")),
         ("include_images", "images", get_data_path("images")),
+        ("include_themes", "theme", get_data_path("themes")),
         ("include_logs", "logs", get_path(LOG_DIR)),
     ]
 
