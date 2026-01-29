@@ -1,11 +1,25 @@
 import os
 import sys
 import ctypes
-from ctypes import wintypes
 from subprocess import list2cmdline
-from app.tools.path_utils import get_data_path
 
 from loguru import logger
+
+# Only import wintypes on Windows to avoid import errors on other platforms
+if os.name == "nt":
+    from ctypes import wintypes
+else:
+    # Create a dummy wintypes module for non-Windows platforms
+    class _DummyWinTypes:
+        DWORD = int
+        BOOL = bool
+        HWND = int
+        LPCWSTR = str
+        UINT = int
+        
+    wintypes = _DummyWinTypes()
+
+from app.tools.path_utils import get_data_path
 
 _uiaccess_dll = None
 _user32 = None
