@@ -32,6 +32,7 @@ DEFAULT_SETTINGS = {
         "simplified_mode": {"default_value": True},
         "autostart": {"default_value": False},
         "show_startup_window": {"default_value": True},
+        "main_window_topmost_mode": {"default_value": 0},
         "background_resident": {"default_value": True},
         "auto_save_window_size": {"default_value": True},
         "url_protocol": {"default_value": False},

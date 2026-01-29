@@ -3,8 +3,11 @@
 # ==================================================
 
 from loguru import logger
+import os
+import ctypes
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QApplication
 from PySide6.QtGui import QFontDatabase
+from PySide6.QtCore import QSignalBlocker
 from qfluentwidgets import (
     GroupHeaderCardWidget,
     SwitchButton,
@@ -15,7 +18,10 @@ from qfluentwidgets import (
     Theme,
     setTheme,
     setThemeColor,
+    MessageBox,
 )
+
+from app.tools.variable import EXIT_CODE_RESTART
 
 from app.tools.personalised import get_theme_icon
 from app.tools.settings_access import readme_settings_async, update_settings
@@ -41,6 +47,7 @@ from app.tools.config import (
     NotificationConfig,
 )
 from app.common.IPC_URL import URLIPCHandler
+from app.common.windows.uiaccess import is_uiaccess_process
 from app.page_building.another_window import (
     create_log_viewer_window,
     create_backup_manager_window,
@@ -150,6 +157,19 @@ class basic_settings_function(GroupHeaderCardWidget):
             self.__on_auto_save_window_size_changed
         )
 
+        # 主窗口置顶设置
+        self.main_window_topmost_mode_combo_box = ComboBox()
+        self.main_window_topmost_mode_combo_box.addItems(
+            get_content_combo_name_async("basic_settings", "main_window_topmost_mode")
+        )
+        topmost_mode = readme_settings_async(
+            "basic_settings", "main_window_topmost_mode"
+        )
+        self.main_window_topmost_mode_combo_box.setCurrentIndex(int(topmost_mode or 0))
+        self.main_window_topmost_mode_combo_box.currentIndexChanged.connect(
+            self.__on_main_window_topmost_mode_changed
+        )
+
         # 后台驻留设置
         self.resident_switch = SwitchButton()
         self.resident_switch.setOffText(
@@ -214,6 +234,15 @@ class basic_settings_function(GroupHeaderCardWidget):
                     "basic_settings", "auto_save_window_size"
                 ),
                 self.auto_save_window_size_switch,
+            )
+        if is_setting_visible("basic_settings", "main_window_topmost_mode"):
+            self.addGroup(
+                get_theme_icon("ic_fluent_pin_20_filled"),
+                get_content_name_async("basic_settings", "main_window_topmost_mode"),
+                get_content_description_async(
+                    "basic_settings", "main_window_topmost_mode"
+                ),
+                self.main_window_topmost_mode_combo_box,
             )
         if is_setting_visible("basic_settings", "background_resident"):
             self.addGroup(
@@ -387,6 +416,107 @@ class basic_settings_function(GroupHeaderCardWidget):
                 ),
                 parent=self.window(),
             )
+
+    def __on_main_window_topmost_mode_changed(self, index):
+        previous_index = int(
+            readme_settings_async("basic_settings", "main_window_topmost_mode") or 0
+        )
+
+        # 如果当前已经是 UIA 进程，切换到 UIA 模式不需要重启
+        if index == 2 and is_uiaccess_process():
+            update_settings("basic_settings", "main_window_topmost_mode", index)
+            return
+
+        # 如果当前是 UIA 进程，且浮窗也是 UIA 模式，切换回非 UIA 模式不需要重启（因为进程必须保持 UIA）
+        if previous_index == 2 and index != 2 and is_uiaccess_process():
+            floating_mode = int(
+                readme_settings_async(
+                    "floating_window_management", "floating_window_topmost_mode"
+                )
+                or 0
+            )
+            if floating_mode == 2:
+                update_settings("basic_settings", "main_window_topmost_mode", index)
+                return
+
+        if previous_index == 2 and index != 2:
+            dialog = MessageBox(
+                get_content_name_async(
+                    "basic_settings", "uia_topmost_restart_dialog_title"
+                ),
+                get_content_name_async(
+                    "basic_settings",
+                    "uia_topmost_disable_restart_dialog_content",
+                ),
+                self.window(),
+            )
+            dialog.yesButton.setText(
+                get_content_name_async(
+                    "basic_settings",
+                    "uia_topmost_disable_restart_dialog_ok_btn",
+                )
+            )
+            dialog.cancelButton.setText(
+                get_content_name_async(
+                    "basic_settings",
+                    "uia_topmost_restart_dialog_cancel_btn",
+                )
+            )
+            if dialog.exec():
+                update_settings("basic_settings", "main_window_topmost_mode", index)
+            else:
+                blocker = QSignalBlocker(self.main_window_topmost_mode_combo_box)
+                self.main_window_topmost_mode_combo_box.setCurrentIndex(previous_index)
+                del blocker
+            return
+
+        if index == 2 and previous_index != 2:
+            dialog = MessageBox(
+                get_content_name_async(
+                    "basic_settings", "uia_topmost_restart_dialog_title"
+                ),
+                get_content_name_async(
+                    "basic_settings", "uia_topmost_restart_dialog_content"
+                ),
+                self.window(),
+            )
+            dialog.yesButton.setText(
+                get_content_name_async(
+                    "basic_settings",
+                    "uia_topmost_restart_dialog_restart_btn",
+                )
+            )
+            dialog.cancelButton.setText(
+                get_content_name_async(
+                    "basic_settings",
+                    "uia_topmost_restart_dialog_cancel_btn",
+                )
+            )
+            if dialog.exec():
+                update_settings("basic_settings", "main_window_topmost_mode", index)
+                try:
+                    from app.common.windows.uiaccess import (
+                        ELEVATE_RESTART_ENV,
+                        UIACCESS_RESTART_ENV,
+                    )
+
+                    os.environ[str(UIACCESS_RESTART_ENV)] = "1"
+                    try:
+                        is_admin = bool(ctypes.windll.shell32.IsUserAnAdmin())
+                    except Exception:
+                        is_admin = False
+                    if not is_admin:
+                        os.environ[str(ELEVATE_RESTART_ENV)] = "1"
+                except Exception:
+                    pass
+                QApplication.exit(EXIT_CODE_RESTART)
+            else:
+                blocker = QSignalBlocker(self.main_window_topmost_mode_combo_box)
+                self.main_window_topmost_mode_combo_box.setCurrentIndex(previous_index)
+                del blocker
+            return
+
+        update_settings("basic_settings", "main_window_topmost_mode", index)
 
     def __on_url_protocol_changed(self, checked):
         """URL协议开关变化处理"""

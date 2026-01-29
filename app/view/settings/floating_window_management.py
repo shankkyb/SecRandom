@@ -18,6 +18,7 @@ from app.tools.settings_default import *
 from app.tools.settings_access import *
 from app.Language.obtain_language import *
 from app.tools.settings_visibility_manager import is_setting_visible
+from app.common.windows.uiaccess import is_uiaccess_process
 
 
 # ==================================================
@@ -296,6 +297,25 @@ class floating_window_basic_settings(GroupHeaderCardWidget):
                 "floating_window_management", "floating_window_topmost_mode"
             )
         )
+
+        # 如果当前已经是 UIA 进程，切换到 UIA 模式不需要重启
+        if index == 2 and is_uiaccess_process():
+            update_settings(
+                "floating_window_management", "floating_window_topmost_mode", index
+            )
+            return
+
+        # 如果当前是 UIA 进程，且主窗口也是 UIA 模式，切换回非 UIA 模式不需要重启（因为进程必须保持 UIA）
+        if previous_index == 2 and index != 2 and is_uiaccess_process():
+            main_window_mode = int(
+                readme_settings_async("basic_settings", "main_window_topmost_mode") or 0
+            )
+            if main_window_mode == 2:
+                update_settings(
+                    "floating_window_management", "floating_window_topmost_mode", index
+                )
+                return
+
         if previous_index == 2 and index != 2:
             dialog = MessageBox(
                 get_content_name_async(

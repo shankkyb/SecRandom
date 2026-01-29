@@ -4,7 +4,7 @@
 from loguru import logger
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtGui import QIcon
-from PySide6.QtCore import QTimer, QEvent, Signal, QThreadPool, QRunnable
+from PySide6.QtCore import QTimer, QEvent, Signal, QThreadPool, QRunnable, Qt
 from qfluentwidgets import FluentWindow, NavigationItemPosition
 
 from app.common.IPC_URL.csharp_ipc_handler import CSharpIPCHandler
@@ -146,6 +146,37 @@ class MainWindow(FluentWindow):
             QIcon(str(get_data_path("assets/icon", "secrandom-icon-paper.png")))
         )
         self._position_window()
+        self._setup_general_settings_listener()
+        self._apply_topmost_mode()
+
+    def _setup_general_settings_listener(self):
+        """设置通用设置监听器"""
+        from app.tools.settings_access import get_settings_signals
+
+        get_settings_signals().settingChanged.connect(self._on_general_setting_changed)
+
+    def _on_general_setting_changed(self, first, second, value):
+        """处理通用设置变更"""
+        if first == "basic_settings" and second == "main_window_topmost_mode":
+            self._apply_topmost_mode(value)
+
+    def _apply_topmost_mode(self, mode=None):
+        """应用主窗口置顶模式"""
+        if mode is None:
+            mode = (
+                readme_settings_async("basic_settings", "main_window_topmost_mode") or 0
+            )
+
+        mode = int(mode)
+        flags = self.windowFlags()
+        if mode != 0:
+            flags |= Qt.WindowStaysOnTopHint
+        else:
+            flags &= ~Qt.WindowStaysOnTopHint
+
+        self.setWindowFlags(flags)
+        if self.isVisible():
+            self.show()
 
     def _setup_url_handler(self):
         """设置URL处理器"""

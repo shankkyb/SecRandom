@@ -27,6 +27,35 @@ basic_settings = {
             "description": "设置软件启动时是否自动显示主窗口",
             "switchbutton_name": {"enable": "", "disable": ""},
         },
+        "main_window_topmost_mode": {
+            "name": "主窗口置顶",
+            "description": "选择主窗口置顶方式（UIA置顶需以管理员运行）",
+            "combo_items": ["关闭置顶", "置顶", "UIA置顶"],
+        },
+        "uia_topmost_restart_dialog_title": {
+            "name": "需要重启",
+            "description": "UIA置顶切换后重启提示标题",
+        },
+        "uia_topmost_restart_dialog_content": {
+            "name": "已切换为UIA置顶模式，需要重启生效，是否立即重启？",
+            "description": "UIA置顶切换后重启提示内容",
+        },
+        "uia_topmost_disable_restart_dialog_content": {
+            "name": "已关闭UIA置顶模式，需要完全退出软件后重新启动才会生效",
+            "description": "关闭UIA置顶后提示内容",
+        },
+        "uia_topmost_disable_restart_dialog_ok_btn": {
+            "name": "知道了",
+            "description": "关闭UIA置顶后提示按钮文本",
+        },
+        "uia_topmost_restart_dialog_restart_btn": {
+            "name": "重启",
+            "description": "UIA置顶切换后重启按钮文本",
+        },
+        "uia_topmost_restart_dialog_cancel_btn": {
+            "name": "取消",
+            "description": "UIA置顶切换后取消按钮文本",
+        },
         "background_resident": {
             "name": "后台驻留",
             "description": "关闭所有窗口后是否仍在后台常驻",
@@ -383,6 +412,35 @@ basic_settings = {
         "show_startup_window": {
             "name": "Show splash screen",
             "description": "Set whether to show the splash screen on boot",
+        },
+        "main_window_topmost_mode": {
+            "name": "Main window topmost",
+            "description": "Select main window topmost mode (UIA requires run as administrator)",
+            "combo_items": ["Disable topmost", "Topmost", "UIA topmost"],
+        },
+        "uia_topmost_restart_dialog_title": {
+            "name": "Restart Required",
+            "description": "Restart dialog title after switching UIA topmost",
+        },
+        "uia_topmost_restart_dialog_content": {
+            "name": "UIA topmost mode has been enabled. Restart now to apply changes?",
+            "description": "Restart dialog content after switching UIA topmost",
+        },
+        "uia_topmost_disable_restart_dialog_content": {
+            "name": "UIA topmost mode has been disabled. Fully exit the app and relaunch to apply.",
+            "description": "Hint content after disabling UIA topmost",
+        },
+        "uia_topmost_disable_restart_dialog_ok_btn": {
+            "name": "OK",
+            "description": "OK button text after disabling UIA topmost",
+        },
+        "uia_topmost_restart_dialog_restart_btn": {
+            "name": "Restart",
+            "description": "Restart button text after switching UIA topmost",
+        },
+        "uia_topmost_restart_dialog_cancel_btn": {
+            "name": "Cancel",
+            "description": "Cancel button text after switching UIA topmost",
         },
         "export_diagnostic_data": {
             "name": "Export diagnostic data",
