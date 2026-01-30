@@ -402,6 +402,7 @@ class _TimerEngine(QObject):
 class CountdownTimerPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        
         self._font_family = load_custom_font() or QFont().family()
         self._recent_seconds: list[int] = []
         self._preset_category = "common"
@@ -444,35 +445,77 @@ class CountdownTimerPage(QWidget):
 
         self._build_ui()
         self._sync_ui_from_engine()
-        self._sync_controls_state()
+        # 不在构造时调用 _sync_controls_state()，延迟到 showEvent 中
+        # self._sync_controls_state()
         QTimer.singleShot(0, self._install_idle_filter_and_restart)
 
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        # 根据宽度动态切换紧凑模式
+        # 如果宽度小于 850，且当前不是紧凑模式（且不是强制紧凑的运行状态），则尝试调整
+        # logger.debug(f"CountdownTimerPage resizeEvent: {event.size()}, current width: {self.width()}")
+        self._sync_controls_state()
+        
+        # 特殊处理：如果布局发生了剧烈变化，可能需要强制触发布局系统
+        lay = self.layout()
+        if lay:
+            lay.activate()
+
     def _build_ui(self):
-        root = QVBoxLayout(self)
-        root.setContentsMargins(16, 16, 16, 16)
-        root.setSpacing(12)
-        self._root_layout = root
+        # logger.debug(f"CountdownTimerPage _build_ui called, current children: {len(self.children())}")
+        if hasattr(self, "_ui_built") and self._ui_built:
+            # logger.debug("CountdownTimerPage _ui_built is True, skipping")
+            return
+        
+        # 在构建 UI 期间禁用更新，防止中间状态被绘制
+        self.setUpdatesEnabled(False)
+        
+        try:
+            # 彻底清理可能存在的旧布局和子组件（深度清理）
+            if self.layout():
+                old_lay = self.layout()
+                dummy = QWidget()
+                dummy.setLayout(old_lay)
+                dummy.deleteLater()
+                
+            for child in self.findChildren(QWidget, options=Qt.FindDirectChildrenOnly):
+                child.setParent(None)
+                child.deleteLater()
+                
+            self._ui_built = True
+            
+            # 设置自身的 SizePolicy，确保填满可用空间
+            self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            
+            root = QVBoxLayout(self)
+            root.setContentsMargins(16, 16, 16, 16)
+            root.setSpacing(12)
+            self._root_layout = root
 
-        self._build_top_bar(root)
+            self._build_top_bar(root)
 
-        center = QHBoxLayout()
-        center.setSpacing(10)
+            center = QHBoxLayout()
+            center.setSpacing(10)
 
-        self._build_left_panel()
-        self._build_controls_panel()
-        self._build_right_panel()
-        self._assemble_center_layout(center)
+            self._build_left_panel()
+            self._build_right_panel()  # 先创建 right_container
+            self._build_controls_panel()  # 再创建 controls_panel（需要 right_container 作为父对象）
+            self._assemble_center_layout(center)
 
-        root.addLayout(center, 1)
+            root.addLayout(center, 1)
 
-        self._build_bottom_actions(root)
+            self._build_bottom_actions(root)
 
-        self._mode_segment_expanded_width = max(
-            1, int(self.mode_segment_container.sizeHint().width())
-        )
-        self.mode_segment_container.setMaximumWidth(self._mode_segment_expanded_width)
-        self._apply_fullscreen_layout()
-        self._install_shortcuts()
+            self._mode_segment_expanded_width = max(
+                1, int(self.mode_segment_container.sizeHint().width())
+            )
+            self.mode_segment_container.setMaximumWidth(self._mode_segment_expanded_width)
+            # 不在构造时调用 _apply_fullscreen_layout()，延迟到 showEvent
+            # self._apply_fullscreen_layout()
+            self._install_shortcuts()
+        finally:
+            # 确保在任何情况下都重新启用更新
+            self.setUpdatesEnabled(True)
 
     def _build_top_bar(self, root: QVBoxLayout):
         self.top_bar_container = QWidget(self)
@@ -480,7 +523,12 @@ class CountdownTimerPage(QWidget):
         top_bar.setContentsMargins(0, 0, 0, 0)
         top_bar.setSpacing(8)
 
-        self.mode_segment = SegmentedWidget(self)
+        self.mode_segment_container = QWidget(self.top_bar_container)
+        mode_segment_layout = QHBoxLayout(self.mode_segment_container)
+        mode_segment_layout.setContentsMargins(0, 0, 0, 0)
+        mode_segment_layout.setSpacing(0)
+
+        self.mode_segment = SegmentedWidget(self.mode_segment_container)
         self.mode_segment.setFixedHeight(30)
         self.mode_segment.addItem(
             routeKey="countdown",
@@ -498,11 +546,6 @@ class CountdownTimerPage(QWidget):
             onClick=lambda: self._switch_mode("clock"),
         )
         self.mode_segment.setCurrentItem("countdown")
-
-        self.mode_segment_container = QWidget(self.top_bar_container)
-        mode_segment_layout = QHBoxLayout(self.mode_segment_container)
-        mode_segment_layout.setContentsMargins(0, 0, 0, 0)
-        mode_segment_layout.setSpacing(0)
         mode_segment_layout.addWidget(self.mode_segment)
 
         self.persistent_controls = QWidget(self.top_bar_container)
@@ -511,7 +554,7 @@ class CountdownTimerPage(QWidget):
         persistent_layout.setSpacing(8)
 
         self.topmost_btn = ToolButton(
-            get_theme_icon("ic_fluent_pin_off_20_filled"), self
+            get_theme_icon("ic_fluent_pin_off_20_filled"), self.persistent_controls
         )
         self.topmost_btn.setToolTip(
             get_content_description_async("countdown_timer", "always_on_top")
@@ -519,25 +562,13 @@ class CountdownTimerPage(QWidget):
         self.topmost_btn.setCheckable(True)
         self.topmost_btn.toggled.connect(self._toggle_topmost)
 
-        self.fullscreen_btn = PushButton(
-            get_content_pushbutton_name_async("countdown_timer", "enter_fullscreen"),
-            self,
-        )
-        self.fullscreen_btn.setIcon(
-            get_theme_icon("ic_fluent_full_screen_maximize_20_filled")
-        )
-        self.fullscreen_btn.setToolTip(
-            get_content_description_async("countdown_timer", "toggle_fullscreen")
-        )
-        self.fullscreen_btn.clicked.connect(self._toggle_fullscreen)
-
-        self.opacity_slider = Slider(Qt.Horizontal, self)
+        self.opacity_slider = Slider(Qt.Horizontal, self.persistent_controls)
         self.opacity_slider.setFixedWidth(130)
         self.opacity_slider.setRange(30, 100)
         self.opacity_slider.setValue(100)
         self.opacity_slider.valueChanged.connect(self._apply_opacity)
         self.opacity_label = CaptionLabel(
-            get_content_name_async("countdown_timer", "opacity"), self
+            get_content_name_async("countdown_timer", "opacity"), self.persistent_controls
         )
 
         persistent_layout.addWidget(self.opacity_label)
@@ -550,22 +581,39 @@ class CountdownTimerPage(QWidget):
         root.addWidget(self.top_bar_container)
 
     def _build_left_panel(self):
-        self.ring = _ProgressRing(self)
-
         self.left_container = QWidget(self)
-        self.left_container.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        ring_layer = QGridLayout(self.left_container)
+        self.left_container.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        
+        # 使用简单的 QVBoxLayout 包裹一个居中的容器
+        outer_layout = QVBoxLayout(self.left_container)
+        outer_layout.setContentsMargins(0, 0, 0, 0)
+        outer_layout.setSpacing(0)
+        
+        # 使用 QGridLayout 来重叠 ring 和 digit_panel，但不使用 alignment 参数
+        center_widget = QWidget(self.left_container)
+        center_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        ring_layer = QGridLayout(center_widget)
         ring_layer.setContentsMargins(0, 0, 0, 0)
-        ring_layer.addWidget(self.ring, 0, 0, 1, 1, Qt.AlignCenter)
+        ring_layer.setSpacing(0)
 
-        self._build_digit_panel()
-        ring_layer.addWidget(self.digit_panel, 0, 0, 1, 1, Qt.AlignCenter)
+        self.ring = _ProgressRing(center_widget)
+        ring_layer.addWidget(self.ring, 0, 0, 1, 1)
 
-    def _build_digit_panel(self):
-        self.state_hint = CaptionLabel("", self)
+        self._build_digit_panel(center_widget)
+        ring_layer.addWidget(self.digit_panel, 0, 0, 1, 1)
+        
+        # 用 spacer 来居中 center_widget
+        outer_layout.addStretch(1)
+        outer_layout.addWidget(center_widget, 0, Qt.AlignCenter)
+        outer_layout.addStretch(1)
+
+    def _build_digit_panel(self, parent_widget=None):
+        if parent_widget is None:
+            parent_widget = self.left_container
+        self.digit_panel = QWidget(parent_widget)
+
+        self.state_hint = CaptionLabel("", self.digit_panel)
         self.state_hint.setAlignment(Qt.AlignCenter)
-
-        self.digit_panel = QWidget(self)
         self._digit_v = QVBoxLayout(self.digit_panel)
         digit_v = self._digit_v
         digit_v.setContentsMargins(0, 0, 0, 0)
@@ -694,9 +742,15 @@ class CountdownTimerPage(QWidget):
         return lab
 
     def _build_controls_panel(self):
-        self.controls_panel = QFrame(self)
+        # 使用 right_container 作为父对象
+        self.controls_panel = QFrame(self.right_container)
         self.controls_panel.setFrameShape(QFrame.NoFrame)
         self.controls_panel.setMaximumWidth(self._controls_expanded_width)
+        self.controls_panel.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+        
+        # 将 controls_panel 插入到 right_container 的布局中（在 _right_top_spacer 和 _right_bottom_spacer 之间）
+        self._right_v.insertWidget(1, self.controls_panel, 0, Qt.AlignLeft)
+        
         controls_layout = QVBoxLayout(self.controls_panel)
         controls_layout.setContentsMargins(0, 0, 0, 0)
         controls_layout.setSpacing(10)
@@ -824,8 +878,10 @@ class CountdownTimerPage(QWidget):
 
     def _build_right_panel(self):
         self.right_container = QWidget(self)
-        self.right_container.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
-        self.controls_panel.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.right_container.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        # 移除最小/最大宽度限制
+        # self.right_container.setMinimumWidth(200)
+        # self.right_container.setMaximumWidth(650)
         self._right_v = QVBoxLayout(self.right_container)
         self._right_v.setContentsMargins(0, 0, 0, 0)
         self._right_v.setSpacing(0)
@@ -836,7 +892,7 @@ class CountdownTimerPage(QWidget):
             0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding
         )
         self._right_v.addItem(self._right_top_spacer)
-        self._right_v.addWidget(self.controls_panel, 0, Qt.AlignLeft)
+        # controls_panel 将在 _build_controls_panel 中添加
         self._right_v.addItem(self._right_bottom_spacer)
 
     def _assemble_center_layout(self, center: QHBoxLayout):
@@ -851,27 +907,40 @@ class CountdownTimerPage(QWidget):
         )
 
         center.addItem(self._center_left_spacer)
-        center.addWidget(self.left_container, 0, Qt.AlignCenter)
+        center.addWidget(self.left_container, 0)  # 移除 AlignCenter，避免初始化时的布局问题
         center.addItem(self._center_between_spacer)
-        center.addWidget(self.right_container, 0, Qt.AlignVCenter)
+        center.addWidget(self.right_container, 0)  # 移除 AlignVCenter
         center.addItem(self._center_right_spacer)
 
     def _build_bottom_actions(self, root: QVBoxLayout):
+        self.bottom_actions_container = QWidget(self)
+        
         self.reset_btn = PushButton(
             get_content_pushbutton_name_async("countdown_timer", "reset"),
-            self,
+            self.bottom_actions_container,
         )
         self.reset_btn.setIcon(get_theme_icon("ic_fluent_arrow_sync_20_filled"))
         self.reset_btn.clicked.connect(self._handle_reset)
 
         self.start_btn = PrimaryPushButton(
             get_content_pushbutton_name_async("countdown_timer", "start"),
-            self,
+            self.bottom_actions_container,
         )
         self.start_btn.setIcon(get_theme_icon("ic_fluent_play_circle_20_filled"))
         self.start_btn.clicked.connect(self._toggle_start_pause)
 
-        self.bottom_actions_container = QWidget(self)
+        self.fullscreen_btn = PushButton(
+            get_content_pushbutton_name_async("countdown_timer", "enter_fullscreen"),
+            self.bottom_actions_container,
+        )
+        self.fullscreen_btn.setIcon(
+            get_theme_icon("ic_fluent_full_screen_maximize_20_filled")
+        )
+        self.fullscreen_btn.setToolTip(
+            get_content_description_async("countdown_timer", "toggle_fullscreen")
+        )
+        self.fullscreen_btn.clicked.connect(self._toggle_fullscreen)
+
         bottom_actions = QHBoxLayout(self.bottom_actions_container)
         bottom_actions.setContentsMargins(0, 0, 0, 0)
         bottom_actions.setSpacing(14)
@@ -977,14 +1046,12 @@ class CountdownTimerPage(QWidget):
                 self._center_left_spacer.changeSize(
                     0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum
                 )
-                self._center_between_spacer.changeSize(
-                    10, 0, QSizePolicy.Fixed, QSizePolicy.Minimum
-                )
                 self._center_right_spacer.changeSize(
                     0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum
                 )
-            self.left_container.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-            self.right_container.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+            # 根据当前模式同步各个组件的 SizePolicy，不要在全屏切换时强制 Fixed
+            self._sync_controls_state()
+            
             lay = self.layout()
             if lay is not None:
                 try:
@@ -1307,6 +1374,10 @@ class CountdownTimerPage(QWidget):
             self.start_btn.setEnabled(True)
 
     def _sync_controls_state(self):
+        # 如果 UI 还没有构建好，直接跳过，防止在构造过程中触发不完整的同步
+        if not hasattr(self, "_ui_built") or not self._ui_built:
+            return
+
         running = self._engine.is_running()
         paused = self._engine.is_paused()
         mode = self._engine.mode()
@@ -1320,8 +1391,24 @@ class CountdownTimerPage(QWidget):
 
         is_mini = bool(self._mini_floating)
 
-        desired_compact = ((mode == "countdown") and running and not paused) or is_mini
+        # 强制检测是否真正能放下左右面板
+        window_width = self.width()
+        
+        # 如果宽度真的太小，绝对不能显示右侧面板
+        # 阈值 820 是比较稳妥的，考虑到左右 margin (16*2) 和内部间距
+        force_compact_by_width = window_width < 820 and not is_mini
+
+        desired_compact = ((mode == "countdown") and running and not paused) or is_mini or force_compact_by_width
         self._set_compact_view(desired_compact)
+
+        # 设置左侧和右侧容器的 SizePolicy 为 Minimum
+        if not is_mini:
+            self.left_container.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+            self.right_container.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        else:
+            # 迷你模式下保持 Fixed 策略或根据需要调整
+            self.left_container.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+            self.right_container.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
 
         if mode == "clock":
             self._set_action_visible_animated(self.start_btn, False)
@@ -1362,7 +1449,7 @@ class CountdownTimerPage(QWidget):
         if self.controls_panel is not None:
             if mode == "countdown" and editing_enabled and not desired_compact:
                 self.controls_panel.setSizePolicy(
-                    QSizePolicy.Fixed, QSizePolicy.Preferred
+                    QSizePolicy.Minimum, QSizePolicy.Preferred
                 )
                 try:
                     self.controls_panel.setMaximumHeight(
@@ -1372,7 +1459,7 @@ class CountdownTimerPage(QWidget):
                     pass
             else:
                 self.controls_panel.setSizePolicy(
-                    QSizePolicy.Fixed, QSizePolicy.Expanding
+                    QSizePolicy.Minimum, QSizePolicy.Expanding
                 )
                 self.controls_panel.setMaximumHeight(16777215)
         if self._right_top_spacer is not None and self._right_bottom_spacer is not None:
@@ -1407,26 +1494,40 @@ class CountdownTimerPage(QWidget):
             and self._center_between_spacer is not None
             and self._center_right_spacer is not None
         ):
-            if mode == "stopwatch":
+            # 无论什么模式，左右两侧的 spacer 都应该是 Expanding 以保持整体居中
+            self._center_left_spacer.changeSize(
+                0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum
+            )
+            self._center_right_spacer.changeSize(
+                0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum
+            )
+            
+            # 如果是全屏或者最大化，适当增加侧边间距，让内容更紧凑
+            if w and (w.isFullScreen() or w.isMaximized()):
                 self._center_left_spacer.changeSize(
-                    0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum
-                )
-                self._center_between_spacer.changeSize(
-                    0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum
+                    20, 0, QSizePolicy.Expanding, QSizePolicy.Minimum
                 )
                 self._center_right_spacer.changeSize(
+                    20, 0, QSizePolicy.Expanding, QSizePolicy.Minimum
+                )
+            
+        # 中间的 spacer 在非紧凑模式下，如果有足够空间则保持 20px，空间不足时允许压缩
+            if not is_mini and not desired_compact:
+                # 显式计算是否真的有 20px 空间，如果宽度极其有限，强制为 0 以防溢出
+                # 左 300 + 右 200 + 中间 20 = 520
+                if window_width > 550:
+                    self._center_between_spacer.changeSize(
+                        20, 0, QSizePolicy.MinimumExpanding, QSizePolicy.Minimum
+                    )
+                else:
+                    self._center_between_spacer.changeSize(
+                        0, 0, QSizePolicy.Fixed, QSizePolicy.Minimum
+                    )
+            else:
+                self._center_between_spacer.changeSize(
                     0, 0, QSizePolicy.Fixed, QSizePolicy.Minimum
                 )
-            else:
-                self._center_left_spacer.changeSize(
-                    0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum
-                )
-                self._center_between_spacer.changeSize(
-                    10, 0, QSizePolicy.Fixed, QSizePolicy.Minimum
-                )
-                self._center_right_spacer.changeSize(
-                    0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum
-                )
+
             lay = self.layout()
             if lay is not None:
                 try:
@@ -1498,6 +1599,14 @@ class CountdownTimerPage(QWidget):
     def _set_compact_view(self, compact: bool):
         compact = bool(compact)
         if self._compact_view == compact:
+            # 即使状态相同，也确保可见性正确（防御性编程）
+            if hasattr(self, "controls_panel") and self.controls_panel:
+                if compact:
+                    self.controls_panel.setVisible(False)
+                    self.mode_segment_container.setVisible(False)
+                else:
+                    self.controls_panel.setVisible(True)
+                    self.mode_segment_container.setVisible(True)
             return
         self._compact_view = compact
 
@@ -1974,8 +2083,29 @@ class CountdownTimerPage(QWidget):
 
     def showEvent(self, event):
         super().showEvent(event)
+        # 延迟到事件循环空闲时再同步，确保 geometry 已经正确
+        QTimer.singleShot(0, self._delayed_layout_sync)
+
+    def _delayed_layout_sync(self):
+        """延迟布局同步，确保 widget 的 geometry 已经正确"""
+        # 强制触发窗口 resize 来修复布局问题
+        w = self.window()
+        if w:
+            size = w.size()
+            # 微调大小触发 resize 事件，然后恢复
+            w.resize(size.width() + 1, size.height())
+            w.resize(size)
+        
         self._sync_ui_from_engine()
         self._sync_controls_state()
+        
+        # 强制激活布局
+        lay = self.layout()
+        if lay:
+            lay.invalidate()
+            lay.activate()
+        self.updateGeometry()
+        self.update()
 
     def keyPressEvent(self, event):
         try:
