@@ -11,7 +11,7 @@ from datetime import datetime
 APPLY_NAME = "SecRandom"  # 软件名称
 VERSION = "v0.0.0"  # 软件当前版本
 NEXT_VERSION = "v2.3.0-beta.1"  # 软件下一个版本
-CODENAME = "Shirako"  # 软件代号
+CODENAME = "Shiroko"  # 软件代号
 SPECIAL_VERSION = VERSION if VERSION != "v0.0.0" else NEXT_VERSION
 
 

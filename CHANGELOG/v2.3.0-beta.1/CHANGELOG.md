@@ -1,6 +1,6 @@
 <img width="1800" height="766" alt="新版本" src="https://github.com/SECTL/SecRandom/blob/master/data/assets/icon/secrandom-beta.png" />
 
-v2.3 - Shirako (砂狼白子) beta 1
+v2.3 - Shiroko (砂狼白子) beta 1
 
 ## 🚀 主要更新
 
