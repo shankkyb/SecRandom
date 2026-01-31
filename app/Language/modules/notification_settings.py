@@ -7,6 +7,9 @@ notification_settings = {
             "description": "Notification settings",
         }
     },
+    "JA_JP": {
+        "title": {"name": "通知設定", "description": "通知機能設定"},
+    },
 }
 
 # 通用通知文本
@@ -26,6 +29,14 @@ notification_common = {
         },
         "auto_close_hint": "Auto close in {0}s\nClick 3 times to close window",
         "manual_close_hint": "Click 3 times to close window",
+    },
+    "JA_JP": {
+        "notification_result": {
+            "name": "通知結果",
+            "description": "汎用通知結果ウィンドウタイトル",
+        },
+        "auto_close_hint": "{0}秒後に自動的に閉じる\n3回連続クリックでウィンドウを閉じる",
+        "manual_close_hint": "3回連続クリックでウィンドウを閉じる",
     },
 }
 
@@ -209,6 +220,100 @@ roll_call_notification_settings = {
             "content": "Please ensure .NET 8 runtime is installed and SecRandom-Ci plugin is installed in ClassIsland",
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "点呼通知設定",
+            "description": "点呼通知機能設定",
+        },
+        "basic_settings": {
+            "name": "基本設定",
+            "description": "通知表示基本パラメータを設定",
+        },
+        "window_mode": {
+            "name": "ウィンドウモード",
+            "description": "汎用点呼通知ウィンドウ表示方法を設定",
+        },
+        "floating_window_mode": {
+            "name": "フローティングウィンドウモード",
+            "description": "汎用点呼通知フローティングウィンドウ動作モードを設定",
+        },
+        "call_notification_service": {
+            "name": "通知サービスを呼び出す",
+            "description": "有効にするとシステム通知サービスを呼び出して点呼結果を送信",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "animation": {
+            "name": "アニメーション",
+            "description": "点呼通知ウィンドウ表示アニメーション効果を設定",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "floating_window_enabled_monitor": {
+            "name": "モニター選択",
+            "description": "点呼通知フローティングウィンドウを表示するモニターを選択",
+        },
+        "floating_window_position": {
+            "name": "フローティングウィンドウ位置",
+            "description": "点呼通知フローティングウィンドウの画面表示位置を設定",
+            "combo_items": {
+                "0": "中央",
+                "1": "上部",
+                "2": "下部",
+                "3": "左側",
+                "4": "右側",
+                "5": "左上",
+                "6": "右上",
+                "7": "左下",
+                "8": "右下",
+            },
+        },
+        "floating_window_horizontal_offset": {
+            "name": "水平オフセット",
+            "description": "点呼通知フローティングウィンドウのデフォルト位置からの水平オフセット（ピクセル）を設定",
+        },
+        "floating_window_vertical_offset": {
+            "name": "垂直オフセット",
+            "description": "点呼通知フローティングウィンドウのデフォルト位置からの垂直オフセット（ピクセル）を設定",
+        },
+        "floating_window_transparency": {
+            "name": "透明度",
+            "description": "点呼通知フローティングウィンドウの透明度を設定、値が小さいほど透明（0-100）",
+        },
+        "floating_window_auto_close_time": {
+            "name": "フローティングウィンドウ自動クローズ時間",
+            "description": "フローティングウィンドウの自動クローズ時間を設定（秒）、0に設定すると自動クローズなし",
+        },
+        "use_main_window_when_exceed_threshold": {
+            "name": "閾値超過時にフローティングウィンドウ通知を表示しない",
+            "description": "抽出人数が設定閾値を超える場合、フローティングウィンドウ通知を表示せず、メインウィンドウのみに結果を表示",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "main_window_display_threshold": {
+            "name": "フローティングウィンドウ通知閾値",
+            "description": "フローティングウィンドウ通知をトリガーする人数閾値を設定、この数値を超えるとフローティングウィンドウ通知を表示しない、最小値は1",
+        },
+        "notification_service_type": {
+            "name": "通知サービスタイプ",
+            "description": "通知サービスタイプを選択、SecRandomまたはClassIsland",
+            "combo_items": [
+                "SecRandom",
+                "ClassIsland",
+                "SecRandom+ClassIsland",
+            ],
+        },
+        "notification_display_duration": {
+            "name": "通知表示時間",
+            "description": "ClassIsland通知表示時間を設定（秒）",
+        },
+        "do_not_steal_focus": {
+            "name": "フォーカスなしモード",
+            "description": "点呼完了後にフォーカスを奪わず、元のトップレベルソフトフォーカスを維持",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "classisland_notification_hint": {
+            "title": "ClassIsland通知サービス",
+            "content": ".NET 8ランタイムがインストールされ、ClassIslandにSecRandom-Ciプラグインがインストールされていることを確認してください",
+        },
+    },
 }
 
 # 闪抽通知设置
@@ -356,6 +461,81 @@ quick_draw_notification_settings = {
         "classisland_notification_hint": {
             "title": "ClassIsland Notification Service",
             "content": "Please ensure .NET 8 runtime is installed and SecRandom-Ci plugin is installed in ClassIsland",
+        },
+    },
+    "JA_JP": {
+        "title": {
+            "name": "クイックピック通知設定",
+            "description": "クイックピック結果通知表示方法とパラメータを設定",
+        },
+        "basic_settings": {
+            "name": "基本設定",
+            "description": "クイックピック通知基本表示パラメータを設定",
+        },
+        "window_mode": {
+            "name": "ウィンドウモード",
+            "description": "クイックピック通知ウィンドウ表示方法を設定",
+        },
+        "floating_window_mode": {
+            "name": "フローティングウィンドウモード",
+            "description": "クイックピック通知フローティングウィンドウ動作モードを設定",
+        },
+        "animation": {
+            "name": "アニメーション",
+            "description": "クイックピック通知ウィンドウ表示アニメーション効果を設定",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "floating_window_enabled_monitor": {
+            "name": "クイックピック通知表示モニターを選択",
+            "description": "クイックピック通知フローティングウィンドウモニターを選択",
+        },
+        "floating_window_position": {
+            "name": "フローティングウィンドウ位置",
+            "description": "クイックピック通知フローティングウィンドウ画面表示位置を設定",
+            "combo_items": {
+                "0": "中央",
+                "1": "上部",
+                "2": "下部",
+                "3": "左側",
+                "4": "右側",
+                "5": "左上",
+                "6": "右上",
+                "7": "左下",
+                "8": "右下",
+            },
+        },
+        "floating_window_horizontal_offset": {
+            "name": "水平オフセット",
+            "description": "クイックピック通知フローティングウィンドウのデフォルト位置からの水平オフセット（ピクセル）を設定",
+        },
+        "floating_window_vertical_offset": {
+            "name": "垂直オフセット",
+            "description": "クイックピック通知フローティングウィンドウのデフォルト位置からの垂直オフセット（ピクセル）を設定",
+        },
+        "floating_window_transparency": {
+            "name": "フローティングウィンドウ透明度",
+            "description": "クイックピック通知フローティングウィンドウの透明度を設定、値が小さいほど透明（0-100）",
+        },
+        "floating_window_auto_close_time": {
+            "name": "フローティングウィンドウ自動クローズ時間",
+            "description": "フローティングウィンドウの自動クローズ時間を設定（秒）、0に設定すると自動クローズなし",
+        },
+        "notification_service_type": {
+            "name": "通知サービスタイプ",
+            "description": "通知サービスタイプを選択、SecRandomまたはClassIsland",
+            "combo_items": [
+                "SecRandom",
+                "ClassIsland",
+                "SecRandom+ClassIsland",
+            ],
+        },
+        "notification_display_duration": {
+            "name": "通知表示時間",
+            "description": "ClassIsland通知表示時間を設定（秒）",
+        },
+        "classisland_notification_hint": {
+            "title": "ClassIsland通知サービス",
+            "content": ".NET 8ランタイムがインストールされ、ClassIslandにSecRandom-Ciプラグインがインストールされていることを確認してください",
         },
     },
 }
@@ -535,6 +715,95 @@ lottery_notification_settings = {
         "classisland_notification_hint": {
             "title": "ClassIsland Notification Service",
             "content": "Please ensure .NET 8 runtime is installed and SecRandom-Ci plugin is installed in ClassIsland",
+        },
+    },
+    "JA_JP": {
+        "title": {
+            "name": "抽選通知設定",
+            "description": "抽選結果通知表示方法とパラメータを設定",
+        },
+        "basic_settings": {
+            "name": "基本設定",
+            "description": "抽選通知基本表示パラメータを設定",
+        },
+        "window_mode": {
+            "name": "ウィンドウモード",
+            "description": "抽選通知ウィンドウ表示方法を設定",
+        },
+        "floating_window_mode": {
+            "name": "フローティングウィンドウモード",
+            "description": "抽選通知フローティングウィンドウ動作モードを設定",
+        },
+        "call_notification_service": {
+            "name": "通知サービスを呼び出す",
+            "description": "システム通知サービスを呼び出して抽選結果を送信するかどうか",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "animation": {
+            "name": "アニメーション",
+            "description": "抽選通知ウィンドウ表示アニメーション効果を設定",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "floating_window_enabled_monitor": {
+            "name": "抽選通知表示モニターを選択",
+            "description": "抽選通知フローティングウィンドウモニターを選択",
+        },
+        "floating_window_position": {
+            "name": "フローティングウィンドウ位置",
+            "description": "抽選通知フローティングウィンドウ画面表示位置を設定",
+            "combo_items": {
+                "0": "中央",
+                "1": "上部",
+                "2": "下部",
+                "3": "左側",
+                "4": "右側",
+                "5": "左上",
+                "6": "右上",
+                "7": "左下",
+                "8": "右下",
+            },
+        },
+        "floating_window_horizontal_offset": {
+            "name": "水平オフセット",
+            "description": "抽選通知フローティングウィンドウのデフォルト位置からの水平オフセット（ピクセル）を設定",
+        },
+        "floating_window_vertical_offset": {
+            "name": "垂直オフセット",
+            "description": "抽選通知フローティングウィンドウのデフォルト位置からの垂直オフセット（ピクセル）を設定",
+        },
+        "floating_window_transparency": {
+            "name": "フローティングウィンドウ透明度",
+            "description": "抽選通知フローティングウィンドウの透明度を設定、値が小さいほど透明（0-100）",
+        },
+        "floating_window_auto_close_time": {
+            "name": "フローティングウィンドウ自動クローズ時間",
+            "description": "フローティングウィンドウの自動クローズ時間を設定（秒）、0に設定すると自動クローズなし",
+        },
+        "use_main_window_when_exceed_threshold": {
+            "name": "閾値超過時にフローティングウィンドウ通知を表示しない",
+            "description": "抽選賞品数が設定閾値を超える場合、フローティングウィンドウ通知を表示せず、メインウィンドウのみに結果を表示",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "main_window_display_threshold": {
+            "name": "フローティングウィンドウ通知閾値",
+            "description": "フローティングウィンドウ通知をトリガーする賞品数閾値を設定、この数値を超えるとフローティングウィンドウ通知を表示しない、最小値は1",
+        },
+        "notification_service_type": {
+            "name": "通知サービスタイプ",
+            "description": "通知サービスタイプを選択、SecRandomまたはClassIsland",
+            "combo_items": [
+                "SecRandom",
+                "ClassIsland",
+                "SecRandom+ClassIsland",
+            ],
+        },
+        "notification_display_duration": {
+            "name": "通知表示時間",
+            "description": "ClassIsland通知表示時間を設定（秒）",
+        },
+        "classisland_notification_hint": {
+            "title": "ClassIsland通知サービス",
+            "content": ".NET 8ランタイムがインストールされ、ClassIslandにSecRandom-Ciプラグインがインストールされていることを確認してください",
         },
     },
 }

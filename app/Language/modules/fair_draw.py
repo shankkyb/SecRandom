@@ -257,4 +257,129 @@ fair_draw_settings = {
             "description": "Set the minimum number of students in the candidate pool under average-gap protection",
         },
     },
+    "JA_JP": {
+        "title": {"name": "公平抽選設定", "description": "公平抽選機能設定"},
+        "fair_draw_set": {
+            "name": "公平抽選",
+            "description": "公平抽選アルゴリズム関連設定を設定",
+        },
+        "basic_fair_settings": {
+            "name": "基本公平設定",
+            "description": "公平抽選の基本計算方法を設定",
+        },
+        "weight_range_settings": {
+            "name": "重み範囲設定",
+            "description": "重みの基本値と範囲を設定",
+        },
+        "shield_settings": {
+            "name": "抽選後ブロック",
+            "description": "抽選後のブロックルールを設定",
+        },
+        "frequency_settings": {
+            "name": "頻度関数設定",
+            "description": "頻度ペナルティの計算方法を設定",
+        },
+        "balance_weight_settings": {
+            "name": "バランス重み設定",
+            "description": "各バランス因子の重みを設定",
+        },
+        "cold_start_settings": {
+            "name": "コールドブート設定",
+            "description": "新しいクラスの初期段階のコールドスタートルールを設定",
+        },
+        "fair_draw": {
+            "name": "総抽選回数で公平抽選",
+            "description": "有効にすると総抽選回数に基づいて公平抽選を行う",
+        },
+        "fair_draw_group": {
+            "name": "グループで公平抽選",
+            "description": "有効にするとグループ参加で計算",
+        },
+        "fair_draw_gender": {
+            "name": "性別で公平抽選",
+            "description": "有効にすると性別参加で計算",
+        },
+        "fair_draw_time": {
+            "name": "時間で公平抽選",
+            "description": "有効にすると時間参加で公平抽選",
+        },
+        "base_weight": {
+            "name": "基本重み",
+            "description": "各オプションの基本重みを設定",
+        },
+        "min_weight": {
+            "name": "重み範囲最小値",
+            "description": "各オプションの重み最小値を設定",
+        },
+        "max_weight": {
+            "name": "重み範囲最大値",
+            "description": "各オプションの重み最大値を設定",
+        },
+        "frequency_function": {
+            "name": "頻度ペナルティ関数",
+            "description": "頻度ペナルティの計算関数タイプを選択",
+            "combo_items": {"0": "線形", "1": "平方根", "2": "指数"},
+        },
+        "frequency_weight": {
+            "name": "頻度ペナルティ重み",
+            "description": "総重みにおける頻度ペナルティの割合",
+        },
+        "group_weight": {
+            "name": "グループバランス重み",
+            "description": "総重みにおけるグループバランスの割合を調整",
+        },
+        "gender_weight": {
+            "name": "性別バランス重み",
+            "description": "総重みにおける性別バランスの割合を調整",
+        },
+        "time_weight": {
+            "name": "時間因子重み",
+            "description": "総重みにおける時間因子の割合を調整",
+        },
+        "cold_start_enabled": {
+            "name": "コールドブートモードを有効化",
+            "description": "新しいクラスまたは初期段階でコールドブートモードを使用",
+        },
+        "cold_start_rounds": {
+            "name": "コールドブートラウンド",
+            "description": "コールドブートモードのラウンド数を設定",
+        },
+        "shield_enabled": {
+            "name": "抽選後ブロックを有効化",
+            "description": "有効にすると、指定された時間内に抽選された学生は重複しない",
+        },
+        "shield_time": {
+            "name": "ブロック時間",
+            "description": "抽選後のブロック時間を設定",
+        },
+        "shield_time_unit": {
+            "name": "ブロック時間単位",
+            "description": "ブロック時間の時間単位を選択",
+            "combo_items": {"0": "秒", "1": "分", "2": "時間"},
+        },
+        "core_fair_mechanism": {
+            "name": "コア公平メカニズム",
+            "description": "頻度関数や平均ギャップ保護などのコアアルゴリズムを含む",
+        },
+        "draw_protection": {
+            "name": "抽選保護設定",
+            "description": "抽選後ブロックなどの保護メカニズムを含む",
+        },
+        "advanced_weight_settings": {
+            "name": "高度な重み設定",
+            "description": "重み範囲やバランス重みなどの高度な調整を含む",
+        },
+        "enable_avg_gap_protection": {
+            "name": "平均ギャップ保護を有効化",
+            "description": "有効にすると、平均フィルタリングと最大ギャップ保護が適用され、極端な不均衡を回避",
+        },
+        "gap_threshold": {
+            "name": "ギャップ閾値",
+            "description": "許容される最大回数差",
+        },
+        "min_pool_size": {
+            "name": "最小候補プールサイズ",
+            "description": "平均ギャップ保護下での候補プールの最小学生数を設定",
+        },
+    },
 }

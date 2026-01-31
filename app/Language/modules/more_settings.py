@@ -4,6 +4,7 @@ more_settings = {
         "title": {"name": "更多设置", "description": "更多功能设置"},
     },
     "EN_US": {"title": {"name": "More settings", "description": "More settings"}},
+    "JA_JP": {"title": {"name": "その他の設定", "description": "その他の機能設定"}},
 }
 
 settings = {
@@ -11,6 +12,7 @@ settings = {
         "title": {"name": "设置", "description": "设置窗口"},
     },
     "EN_US": {"title": {"name": "Settings", "description": "Settings window"}},
+    "JA_JP": {"title": {"name": "設定", "description": "設定ウィンドウ"}},
 }
 
 # 快捷键设置
@@ -54,6 +56,29 @@ shortcut_settings = {
         "decrease_lottery_count": {"name": "Decrease lottery count"},
         "start_roll_call": {"name": "Start roll call"},
         "start_lottery": {"name": "Start lottery"},
+    },
+    "JA_JP": {
+        "title": {
+            "name": "ショートカット設定",
+            "description": "ショートカット機能設定",
+        },
+        "function": {"name": "機能"},
+        "shortcut": {"name": "ショートカット"},
+        "press_shortcut": {"name": "ここをクリックしてショートカットを設定"},
+        "enable_shortcut": {
+            "name": "ショートカットを有効化",
+            "description": "有効にするとショートカットで高速操作が可能",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "open_roll_call_page": {"name": "点呼ページを開く"},
+        "use_quick_draw": {"name": "クイック抽選を使用"},
+        "open_lottery_page": {"name": "抽選ページを開く"},
+        "increase_roll_call_count": {"name": "点呼人数を増加"},
+        "decrease_roll_call_count": {"name": "点呼人数を減少"},
+        "increase_lottery_count": {"name": "抽選人数を増加"},
+        "decrease_lottery_count": {"name": "抽選人数を減少"},
+        "start_roll_call": {"name": "点呼を開始"},
+        "start_lottery": {"name": "抽選を開始"},
     },
 }
 
@@ -154,6 +179,67 @@ about = {
         "lottery_total_count": {"name": "Lottery Draws"},
         "copy_user_info": {"name": "Copy User Info"},
     },
+    "JA_JP": {
+        "title": {"name": "について", "description": "アプリについてページ情報"},
+        "github": {
+            "name": "Github",
+            "description": "プロジェクトコードリポジトリにアクセス",
+        },
+        "bilibili": {
+            "name": "Bilibili",
+            "description": "黎泽懿_AionfluxのBilibiliアカウントにアクセス",
+        },
+        "contributor": {
+            "name": "貢献者",
+            "description": "詳細な貢献者情報を表示するにはクリック",
+            "contributor_role_1": "デザイン、クリエイティブ、企画\nメンテナンス、ドキュメント、テスト",
+            "contributor_role_2": "メンテナンス",
+            "contributor_role_3": "レスポンシブフロントエンドページ\nデザイン及びメンテナンス、ドキュメント",
+            "contributor_role_4": "クリエイティブ、ドキュメント",
+            "contributor_role_5": "クリエイティブ、メンテナンス",
+            "contributor_role_6": "アプリテスト、ドキュメント、インストールパッケージ作成",
+            "contributor_role_7": "レスポンシブフロントエンドページ\nデザイン及びメンテナンス、ドキュメント",
+            "contributor_role_10": "ClassIsland プラグイン\nClassIsland 連動",
+        },
+        "donation": {
+            "name": "寄付",
+            "description": "プロジェクトの発展をサポート、ご寄付ありがとうございます",
+        },
+        "website": {
+            "name": "SecRandom 公式サイト",
+            "description": "SecRandomソフト公式サイトにアクセス",
+        },
+        "organization_website": {
+            "name": "SECTL 組織メインサイト",
+            "description": "SECTL組織公式サイトにアクセス",
+        },
+        "copyright": {
+            "name": "著作権",
+            "description": "SecRandomはGPL-3.0プロトコルに従います",
+        },
+        "version": {
+            "name": "バージョン",
+            "description": "現在のソフトウェアバージョン番号を表示",
+        },
+        "user_id": {
+            "name": "ユーザーID",
+            "description": "エラー追跡用のオフライン一意識別子",
+        },
+        "user_info": {
+            "name": "ユーザー情報",
+            "description": "ローカルと使用情報を表示",
+        },
+        "user_name": {"name": "現在のコンピューターユーザー名"},
+        "first_use_time": {"name": "初回使用時間"},
+        "runtime": {"name": "ソフトウェア実行時間"},
+        "runtime_years": {"name": "{value}年"},
+        "runtime_days": {"name": "{value}日"},
+        "runtime_hms": {"name": "{hours:02d}:{minutes:02d}:{seconds:02d}"},
+        "total_draw_count": {"name": "ソフトウェア総抽選回数"},
+        "roll_call_total_count": {"name": "点呼総回数"},
+        "lottery_total_count": {"name": "抽選総回数"},
+        "copy_user_info": {"name": "ユーザー情報をコピー"},
+    },
 }
 
 # 内幕设置语言配置
@@ -211,6 +297,40 @@ behind_scenes_settings = {
             "description": "Draw weight (0=Disabled, 1.0=Normal, ≥1000=Guaranteed)",
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "裏設定",
+            "description": "特定の人物の抽選確率を設定",
+        },
+        "select_mode": {
+            "name": "モード選択",
+            "description": "点呼または抽選モードを選択",
+        },
+        "mode_options": {"combo_items": {"0": "点呼", "1": "抽選"}},
+        "select_list": {
+            "name": "リスト選択",
+            "description": "確率を設定するリストを選択",
+        },
+        "select_class_name": {
+            "name": "クラス選択",
+            "description": "確率を設定するクラスを選択",
+        },
+        "select_pool_name": {
+            "name": "賞プール選択",
+            "description": "確率を設定する賞プールを選択",
+        },
+        "enabled": {
+            "name": "有効",
+            "description": "この人物の確率設定を有効にするかどうか",
+        },
+        "id": {"name": "学籍番号", "description": "学生学籍番号"},
+        "name": {"name": "氏名", "description": "学生氏名"},
+        "prize": {"name": "賞品", "description": "関連する賞品（抽選モード）"},
+        "probability": {
+            "name": "重み",
+            "description": "抽選重み（0=無効、1.0=通常、≥1000=必中）",
+        },
+    },
 }
 
 # 开发提示语言配置
@@ -229,6 +349,13 @@ dev_hint = {
         "build_info": {"name": "Build info"},
         "system_info": {"name": "System info"},
     },
+    "JA_JP": {
+        "hint_text": {"name": "開発中画面、最終品質を表しません"},
+        "version_info": {"name": "バージョン情報"},
+        "date_info": {"name": "日付情報"},
+        "build_info": {"name": "ビルド情報"},
+        "system_info": {"name": "システム情報"},
+    },
 }
 
 # 翻译文件信息
@@ -239,6 +366,10 @@ translate_JSON_file = {
     },
     "EN_US": {
         "name": "English",
+        "translated_personnel": "",
+    },
+    "JA_JP": {
+        "name": "日本語",
         "translated_personnel": "",
     },
 }

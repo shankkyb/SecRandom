@@ -2,6 +2,7 @@
 extraction_settings = {
     "ZH_CN": {"title": {"name": "抽取设置", "description": "抽取功能设置"}},
     "EN_US": {"title": {"name": "Pick settings", "description": "Pick settings"}},
+    "JA_JP": {"title": {"name": "抽選設定", "description": "抽選機能設定"}},
 }
 
 # 点名设置语言配置
@@ -260,6 +261,144 @@ roll_call_settings = {
             "description": "Set the default class to use for drawing",
         },
     },
+    "JA_JP": {
+        "title": {"name": "点呼設定", "description": "点呼機能設定"},
+        "extraction_function": {
+            "name": "抽選機能",
+            "description": "点呼抽選機能を設定",
+        },
+        "display_settings": {
+            "name": "表示設定",
+            "description": "点呼結果の表示方法を設定",
+        },
+        "basic_animation_settings": {
+            "name": "アニメーション設定",
+            "description": "点呼アニメーション効果を設定",
+        },
+        "color_theme_settings": {
+            "name": "カラーテーマ設定",
+            "description": "点呼結果のカラーテーマを設定",
+        },
+        "student_image_settings": {
+            "name": "学生アバター設定",
+            "description": "点呼結果の学生アバター表示を設定",
+        },
+        "music_settings": {
+            "name": "音楽設定",
+            "description": "点呼時に再生する音楽を設定",
+        },
+        "draw_mode": {
+            "name": "抽選モード",
+            "description": "点呼抽選モードを設定",
+            "combo_items": {
+                "0": "繰り返し抽選",
+                "1": "繰り返さない抽選",
+                "2": "半繰り返し抽選",
+            },
+        },
+        "clear_record": {
+            "name": "履歴消去方法",
+            "description": "抽選履歴を消去するタイミングを設定",
+            "combo_items": {"0": "再起動時に消去", "1": "全員抽選するまで"},
+            "combo_items_other": {
+                "0": "再起動時に消去",
+                "1": "全員抽選するまで",
+                "2": "消去しない",
+            },
+        },
+        "half_repeat": {
+            "name": "半繰り返し抽選回数",
+            "description": "各人が何回抽選された後に履歴を消去するかを設定",
+        },
+        "draw_type": {
+            "name": "抽選方法",
+            "description": "点呼抽選方法を設定",
+            "combo_items": {"0": "ランダム抽選", "1": "公平抽選"},
+        },
+        "font_size": {
+            "name": "フォントサイズ",
+            "description": "点呼結果のフォントサイズを設定",
+        },
+        "use_global_font": {
+            "name": "グローバルフォントを使用",
+            "description": "グローバルフォント設定を使用するかどうか",
+            "combo_items": {
+                "0": "グローバルフォントに従う",
+                "1": "カスタムフォントを使用",
+            },
+        },
+        "custom_font": {
+            "name": "カスタムフォント",
+            "description": "カスタムフォントを選択",
+        },
+        "display_format": {
+            "name": "結果表示フォーマット",
+            "description": "点呼結果の表示フォーマットを設定",
+            "combo_items": {"0": "学籍番号+氏名", "1": "氏名", "2": "学籍番号"},
+        },
+        "display_style": {
+            "name": "結果表示スタイル",
+            "description": "点呼結果の表示スタイルを設定",
+            "combo_items": {"0": "デフォルト", "1": "カード"},
+        },
+        "show_random": {
+            "name": "ランダムグループメンバー表示フォーマット",
+            "description": "ランダムグループメンバーの表示フォーマットを設定",
+            "combo_items": {
+                "0": "非表示",
+                "1": "グループ[改行]氏名",
+                "2": "グループ[ダッシュ]氏名",
+            },
+        },
+        "animation": {
+            "name": "アニメーションモード",
+            "description": "点呼アニメーションを設定",
+            "combo_items": {"0": "手動停止", "1": "自動再生", "2": "結果を直接表示"},
+        },
+        "animation_interval": {
+            "name": "アニメーション間隔",
+            "description": "点呼アニメーションの間隔を設定（ミリ秒）",
+        },
+        "autoplay_count": {
+            "name": "自動再生回数",
+            "description": "点呼アニメーションの自動再生回数を設定",
+        },
+        "result_flow_animation_style": {
+            "name": "結果レイアウトアニメーション",
+            "description": "点呼結果レイアウトの導入アニメーションを設定",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "result_flow_animation_duration": {
+            "name": "結果レイアウト時間",
+            "description": "点呼結果レイアウトアニメーションの時間を設定（ミリ秒）",
+        },
+        "animation_color_theme": {
+            "name": "アニメーション/結果カラーテーマ",
+            "description": "点呼アニメーション/結果のカラーテーマを設定",
+            "combo_items": {"0": "無効", "1": "ランダム色", "2": "固定色"},
+        },
+        "animation_fixed_color": {
+            "name": "アニメーション/結果固定色",
+            "description": "点呼アニメーション/結果の固定色を設定",
+        },
+        "student_image": {
+            "name": "学生画像を表示",
+            "description": "学生画像を表示するかどうかを設定",
+        },
+        "student_image_position": {
+            "name": "画像位置",
+            "description": "結果における学生画像の位置を設定",
+            "combo_items": {"0": "左", "1": "上", "2": "右", "3": "下"},
+        },
+        "open_student_image_folder": {
+            "name": "学生画像フォルダ",
+            "description": "学生画像ファイルを管理。画像ファイル名は学生氏名と一致する必要があります",
+        },
+        "default_class": {
+            "name": "デフォルトクラス",
+            "description": "抽選に使用するデフォルトクラスを設定",
+        },
+    },
 }
 
 # 闪抽设置
@@ -493,6 +632,133 @@ quick_draw_settings = {
         "draw_count": {
             "name": "Draw count",
             "description": "Set the number of students to draw in Quick Pick",
+        },
+    },
+    "JA_JP": {
+        "title": {"name": "クイック抽選設定", "description": "クイック抽選設定"},
+        "extraction_function": {
+            "name": "抽選機能",
+            "description": "クイック抽選機能を設定",
+        },
+        "display_settings": {
+            "name": "表示設定",
+            "description": "クイック抽選結果の表示方法を設定",
+        },
+        "basic_animation_settings": {
+            "name": "アニメーション設定",
+            "description": "クイック抽選アニメーションを設定",
+        },
+        "color_theme_settings": {
+            "name": "カラーテーマ設定",
+            "description": "クイック抽選結果のカラーテーマを設定",
+        },
+        "student_image_settings": {
+            "name": "学生アバター設定",
+            "description": "クイック抽選結果の学生アバター表示を設定",
+        },
+        "music_settings": {
+            "name": "音楽設定",
+            "description": "クイック抽選時に再生する音楽を設定",
+        },
+        "draw_mode": {
+            "name": "抽選モード",
+            "description": "クイック抽選モードを設定",
+            "combo_items": {
+                "0": "繰り返し抽選",
+                "1": "繰り返さない抽選",
+                "2": "半繰り返し抽選",
+            },
+        },
+        "half_repeat": {
+            "name": "半繰り返し抽選回数",
+            "description": "各人が何回抽選された後に履歴を消去するかを設定",
+        },
+        "draw_type": {
+            "name": "抽選方法",
+            "description": "クイック抽選方法を設定",
+            "combo_items": {"0": "ランダム抽選", "1": "公平抽選"},
+        },
+        "font_size": {
+            "name": "フォントサイズ",
+            "description": "クイック抽選結果のフォントサイズを設定",
+        },
+        "use_global_font": {
+            "name": "グローバルフォントを使用",
+            "description": "グローバルフォント設定を使用するかどうか",
+            "combo_items": {
+                "0": "グローバルフォントに従う",
+                "1": "カスタムフォントを使用",
+            },
+        },
+        "custom_font": {
+            "name": "カスタムフォント",
+            "description": "カスタムフォントを選択",
+        },
+        "display_format": {
+            "name": "結果表示フォーマット",
+            "description": "クイック抽選の表示フォーマットを設定",
+            "combo_items": {"0": "学籍番号+氏名", "1": "氏名", "2": "学籍番号"},
+        },
+        "show_random": {
+            "name": "ランダムグループメンバー表示フォーマット",
+            "description": "ランダムグループメンバーの表示フォーマットを設定",
+            "combo_items": {
+                "0": "非表示",
+                "1": "グループ[改行]氏名",
+                "2": "グループ[ダッシュ]氏名",
+            },
+        },
+        "animation": {
+            "name": "アニメーションモード",
+            "description": "クイック抽選アニメーションを設定",
+            "combo_items": {"0": "自動再生", "1": "結果を直接表示"},
+        },
+        "animation_interval": {
+            "name": "アニメーション間隔",
+            "description": "クイック抽選の間隔を設定（ミリ秒）",
+        },
+        "autoplay_count": {
+            "name": "自動再生回数",
+            "description": "クイック抽選アニメーションの自動再生回数を設定",
+        },
+        "animation_color_theme": {
+            "name": "アニメーションカラーテーマ",
+            "description": "クイック抽選のアニメーション/結果カラーテーマを設定",
+            "combo_items": {"0": "無効", "1": "ランダム色", "2": "固定色"},
+        },
+        "result_color_theme": {
+            "name": "結果カラーテーマ",
+            "description": "クイック抽選結果のカラーテーマを設定",
+            "combo_items": {"0": "無効", "1": "ランダム色", "2": "固定色"},
+        },
+        "animation_fixed_color": {
+            "name": "アニメーション固定色",
+            "description": "クイック抽選のアニメーション/結果の色を設定",
+        },
+        "student_image": {
+            "name": "学生画像を表示",
+            "description": "学生画像を表示するかどうかを設定",
+        },
+        "student_image_position": {
+            "name": "画像位置",
+            "description": "結果における学生画像の位置を設定",
+            "combo_items": {"0": "左", "1": "上", "2": "右", "3": "下"},
+        },
+        "open_student_image_folder": {
+            "name": "学生画像フォルダ",
+            "description": "学生画像ファイルを管理。画像ファイル名は学生氏名と一致する必要があります",
+        },
+        "default_class": {
+            "name": "デフォルトクラス",
+            "description": "抽選に使用するデフォルトクラスを設定",
+        },
+        "disable_after_click": {
+            "name": "クリック後無効化時間",
+            "description": "クイック抽選を1回クリックした後に無効化する時間を設定（秒）",
+        },
+        "draw_count": {
+            "name": "抽選人数",
+            "description": "クイック抽選で抽選する人数を設定",
         },
     },
 }
@@ -772,6 +1038,158 @@ lottery_settings = {
         "default_pool": {
             "name": "Default pool",
             "description": "Set the default pool to use for drawing",
+        },
+    },
+    "JA_JP": {
+        "title": {"name": "抽選設定", "description": "抽選機能設定"},
+        "extraction_function": {
+            "name": "抽選機能",
+            "description": "抽選抽選機能を設定",
+        },
+        "display_settings": {
+            "name": "表示設定",
+            "description": "抽選結果の表示方法を設定",
+        },
+        "basic_animation_settings": {
+            "name": "アニメーション設定",
+            "description": "抽選アニメーション効果を設定",
+        },
+        "color_theme_settings": {
+            "name": "カラーテーマ設定",
+            "description": "抽選結果のカラーテーマを設定",
+        },
+        "lottery_image_settings": {
+            "name": "賞品画像設定",
+            "description": "抽選結果の賞品画像表示を設定",
+        },
+        "music_settings": {
+            "name": "音楽設定",
+            "description": "抽選時に再生する音楽を設定",
+        },
+        "draw_mode": {
+            "name": "抽選モード",
+            "description": "抽選抽選モードを設定",
+            "combo_items": {
+                "0": "繰り返し抽選",
+                "1": "繰り返さない抽選",
+                "2": "半繰り返し抽選",
+            },
+        },
+        "clear_record": {
+            "name": "履歴消去方法",
+            "description": "抽選抽選履歴の消去方法を設定",
+            "combo_items": {"0": "再起動時に消去", "1": "全員抽選するまで"},
+            "combo_items_other": {
+                "0": "再起動時に消去",
+                "1": "全員抽選するまで",
+                "2": "消去しない",
+            },
+        },
+        "half_repeat": {
+            "name": "半繰り返し抽選回数",
+            "description": "各人が何回抽選された後に履歴を消去するかを設定",
+        },
+        "draw_type": {
+            "name": "抽選方法",
+            "description": "抽選機能を設定",
+            "combo_items": {"0": "ランダム抽選", "1": "公平抽選"},
+        },
+        "font_size": {
+            "name": "フォントサイズ",
+            "description": "抽選結果のフォントサイズを設定",
+        },
+        "use_global_font": {
+            "name": "グローバルフォントを使用",
+            "description": "グローバルフォント設定を使用するかどうか",
+            "combo_items": {
+                "0": "グローバルフォントに従う",
+                "1": "カスタムフォントを使用",
+            },
+        },
+        "custom_font": {
+            "name": "カスタムフォント",
+            "description": "カスタムフォントを選択",
+        },
+        "display_format": {
+            "name": "結果表示フォーマット",
+            "description": "抽選結果の表示フォーマットを設定",
+            "combo_items": {"0": "番号+名称", "1": "名称", "2": "番号"},
+        },
+        "display_style": {
+            "name": "結果表示スタイル",
+            "description": "抽選結果の表示スタイルを設定",
+            "combo_items": {"0": "デフォルト", "1": "カード"},
+        },
+        "show_random": {
+            "name": "ランダム学生表示フォーマット",
+            "description": "抽選結果のランダム学生表示フォーマットを設定",
+            "combo_items": {
+                "0": "賞品[改行]グループ[ダッシュ]氏名",
+                "1": "賞品[改行]グループ[改行]氏名",
+                "2": "賞品[ダッシュ]グループ[ダッシュ]氏名",
+                "3": "賞品[ダッシュ]氏名",
+                "4": "賞品[改行]氏名",
+                "5": "賞品[改行]グループ",
+                "6": "賞品[ダッシュ]グループ",
+                "7": "グループ[改行]賞品[改行]氏名",
+                "8": "グループ[ダッシュ]賞品[ダッシュ]氏名",
+                "9": "グループ[改行]氏名[改行]賞品",
+                "10": "氏名[改行]賞品",
+                "11": "氏名[ダッシュ]賞品",
+            },
+        },
+        "animation": {
+            "name": "アニメーションモード",
+            "description": "抽選アニメーションを設定",
+            "combo_items": {"0": "手動停止", "1": "自動再生", "2": "結果を直接表示"},
+        },
+        "animation_interval": {
+            "name": "アニメーション間隔",
+            "description": "抽選アニメーションの間隔を設定（ミリ秒）",
+        },
+        "autoplay_count": {
+            "name": "自動再生回数",
+            "description": "アニメーションの回数を設定",
+        },
+        "result_flow_animation_style": {
+            "name": "結果レイアウトアニメーション",
+            "description": "抽選結果レイアウトの導入アニメーションを設定",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "result_flow_animation_duration": {
+            "name": "結果レイアウト時間",
+            "description": "抽選結果レイアウトアニメーションの時間を設定（ミリ秒）",
+        },
+        "animation_color_theme": {
+            "name": "アニメーションカラーテーマ",
+            "description": "アニメーション/結果のカラーテーマを設定",
+            "combo_items": {"0": "無効", "1": "テーマ色", "2": "固定色"},
+        },
+        "result_color_theme": {
+            "name": "結果カラーテーマ",
+            "description": "抽選結果のカラーテーマを設定",
+            "combo_items": {"0": "無効", "1": "ランダム色", "2": "固定色"},
+        },
+        "animation_fixed_color": {
+            "name": "アニメーション固定色",
+            "description": "アニメーション/結果の色を設定",
+        },
+        "lottery_image": {
+            "name": "賞品画像を表示",
+            "description": "賞品画像を表示するかどうかを設定",
+        },
+        "lottery_image_position": {
+            "name": "画像位置",
+            "description": "結果における賞品画像の位置を設定",
+            "combo_items": {"0": "左", "1": "上", "2": "右", "3": "下"},
+        },
+        "open_lottery_image_folder": {
+            "name": "賞品画像フォルダ",
+            "description": "賞品画像ファイルを管理。画像ファイル名は賞品名と一致する必要があります",
+        },
+        "default_pool": {
+            "name": "デフォルトプール",
+            "description": "抽選に使用するデフォルトプールを設定",
         },
     },
 }

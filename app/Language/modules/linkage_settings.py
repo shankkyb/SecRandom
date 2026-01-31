@@ -251,8 +251,144 @@ linkage_settings = {
         },
         "data_source_function": {
             "name": "Data Source Selection",
-            "description": "Select the source of course data",
+            "description": "Select source of course data",
             "combo_items": ["No Data Source", "Use CSES Schedule", "Use ClassIsland"],
+        },
+    },
+    "JA_JP": {
+        "title": {
+            "name": "連動設定",
+            "description": "休み時間無効化と時間割インポートを設定",
+        },
+        "class_break_settings": {
+            "name": "休み時間無効化設定",
+            "description": "休み時間無効化機能を設定",
+        },
+        "cses_import_settings": {
+            "name": "CSES時間割インポート",
+            "description": "CSES形式ファイルから時間割をインポート",
+        },
+        "class_break_function": {
+            "name": "休み時間中に無効化",
+            "description": "有効にすると、休み時間中の抽選にセキュリティ認証が必要",
+        },
+        "pre_class_enable_time": {
+            "name": "授業前有効化時間",
+            "description": "授業開始前何秒で有効化するか（0-1440秒）",
+        },
+        "post_class_disable_delay": {
+            "name": "授業後無効化遅延",
+            "description": "授業終了後何秒で休み時間無効化を遅延させるか（0-1440秒）",
+        },
+        "cses_import": {
+            "name": "時間割インポート",
+            "description": "CSESファイルから授業時間帯をインポートし、休み時間無効化機能に使用",
+        },
+        "verification_function": {
+            "name": "認証フロー機能",
+            "description": "有効にすると、授業時間外でトリガーされた際にセキュリティ認証がポップアップ表示；無効にするとコントロールが直接無効化されます",
+        },
+        "pre_class_reset_settings": {
+            "name": "授業前リセット設定",
+            "description": "授業前一時記録リセット機能を設定",
+        },
+        "pre_class_reset_function": {
+            "name": "授業前リセット機能",
+            "description": "有効にすると、授業前指定秒数内で一時記録とインターフェース結果を自動的にクリア",
+        },
+        "pre_class_reset_time": {
+            "name": "授業前リセット時間",
+            "description": "授業前何秒で一時記録とインターフェース結果をクリアするか（1-1440秒）",
+        },
+        "import_from_file": {"name": "ファイルからインポート"},
+        "importing": {"name": "インポート中..."},
+        "view_current_config": {"name": "現在の設定を表示"},
+        "clear_cses_schedule": {"name": "時間割をクリア"},
+        "no_schedule_imported": {"name": "時間割がインポートされていません"},
+        "schedule_imported": {"name": "{}個の授業時間帯をインポートしました"},
+        "clear_cses_success": {"name": "クリア成功"},
+        "clear_cses_success_content": {"name": "{}個の時間割ファイルをクリアしました"},
+        "clear_cses_failed": {"name": "クリア失敗"},
+        "clear_cses_failed_content": {"name": "クリア失敗: {}"},
+        "copy_to_clipboard": {"name": "クリップボードにコピー"},
+        "save_as_file": {"name": "ファイルとして保存"},
+        "copy_success": {"name": "コピー成功"},
+        "template_copied": {"name": "テンプレートをクリップボードにコピーしました"},
+        "save_success": {"name": "保存成功"},
+        "template_saved": {"name": "テンプレートを保存しました: {}"},
+        "import_success": {"name": "時間割のインポートに成功: {}"},
+        "import_failed": {"name": "インポート失敗: {}"},
+        "import_error": {"name": "インポート中にエラーが発生: {}"},
+        "template_title": {"name": "CSES時間割テンプレート"},
+        "select_cses_file": {"name": "CSES時間割ファイルを選択"},
+        "yaml_files": {"name": "YAMLファイル (*.yaml *.yml)"},
+        "all_files": {"name": "すべてのファイル (*.*)"},
+        "save_template": {"name": "CSESテンプレートを保存"},
+        "cses_template": {"name": "cses_template.yaml"},
+        "save_failed": {"name": "保存失敗: {}"},
+        "copy_failed": {"name": "コピー失敗: {}"},
+        "cses_file_format_error": {
+            "name": "CSESファイル形式エラーまたはファイルを読み取れません"
+        },
+        "cses_content_format_error": {"name": "CSESコンテンツ形式エラー"},
+        "no_valid_time_periods": {
+            "name": "時間割から有効な時間帯情報を抽出できませんでした"
+        },
+        "save_settings_failed": {"name": "設定の保存に失敗"},
+        "no_cses_folder": {"name": "CSESフォルダが見つかりません"},
+        "no_schedule_file": {"name": "時間割ファイルがインポートされていません"},
+        "unknown": {"name": "不明"},
+        "unknown_course": {"name": "不明なコース"},
+        "parse_failed": {"name": "解析失敗"},
+        "load_config_failed": {"name": "設定の読み込みに失敗: {}"},
+        "table_headers": {
+            "name": {
+                "0": "曜日",
+                "1": "コース名",
+                "2": "開始時間",
+                "3": "終了時間",
+                "4": "教師",
+            }
+        },
+        "day_map": {
+            "1": "月曜日",
+            "2": "火曜日",
+            "3": "水曜日",
+            "4": "木曜日",
+            "5": "金曜日",
+            "6": "土曜日",
+            "7": "日曜日",
+        },
+        "subject_history_filter_settings": {
+            "name": "科目履歴フィルター",
+            "description": "科目履歴フィルター機能を設定",
+        },
+        "subject_history_filter_function": {
+            "name": "科目履歴フィルター",
+            "description": "有効にすると、重み計算時に現在の科目の履歴のみを使用",
+        },
+        "break_subject_name": {"name": "休み時間"},
+        "subject_history_break_assignment": {
+            "name": "休み時間の割り当て",
+            "description": "休み時間の科目履歴をどのカテゴリに割り当てるか",
+            "combo_items": {"0": "休み時間", "1": "前の授業", "2": "次の授業"},
+        },
+        "data_source_settings": {
+            "name": "データソース選択",
+            "description": "コースデータソースを設定",
+        },
+        "data_source_function": {
+            "name": "データソース選択",
+            "description": "コースデータのソースを選択",
+            "combo_items": {
+                "0": "データソースなし",
+                "1": "CSES時間割を使用",
+                "2": "ClassIslandを使用",
+            },
+        },
+        "hide_floating_window_on_class_end": {
+            "name": "授業終了時にフローティングウィンドウを非表示",
+            "description": "授業終了（授業時間外）を検出したときにフローティングウィンドウを自動的に非表示",
         },
     },
 }

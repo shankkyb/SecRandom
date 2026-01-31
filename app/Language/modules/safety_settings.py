@@ -7,6 +7,12 @@ safety_settings = {
             "description": "Configure app safety related settings",
         }
     },
+    "JA_JP": {
+        "title": {
+            "name": "セキュリティ設定",
+            "description": "アプリのセキュリティ関連設定を設定",
+        }
+    },
 }
 
 # 基础安全设置语言配置
@@ -283,6 +289,162 @@ basic_safety_settings = {
         "preview_settings_switch": {
             "name": "Preview settings switch",
             "description": "Enable preview settings switch",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+    },
+    "JA_JP": {
+        "title": {
+            "name": "基本セキュリティ設定",
+            "description": "基本セキュリティ認証機能を設定",
+        },
+        "verification_method": {
+            "name": "認証方法",
+            "description": "セキュリティ機能認証方法を設定",
+        },
+        "verification_process": {
+            "name": "セキュリティ認証手順",
+            "description": "セキュリティ認証の組み合わせ方法を選択",
+            "combo_items": {
+                "0": "単一ステップ認証（いずれか1つ選択）",
+                "1": "パスワードのみ",
+                "2": "TOTPのみ",
+                "3": "USBドライブのみ",
+                "4": "パスワード+TOTP",
+                "5": "パスワード+USBドライブ",
+                "6": "TOTP+USBドライブ",
+                "7": "パスワード+TOTP+USBドライブ",
+            },
+        },
+        "security_operations": {
+            "name": "セキュリティ操作",
+            "description": "セキュリティ認証が必要な操作を設定",
+        },
+        "safety_switch": {
+            "name": "セキュリティスイッチ",
+            "description": "有効にすると、すべてのセキュリティ操作にパスワード認証が必要",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "set_password": {
+            "name": "パスワードを設定/変更",
+            "description": "セキュリティ認証パスワードを設定または変更",
+        },
+        "password_rules": {
+            "name": "パスワード要件",
+            "description": "長さ≥8、かつ文字、数字、特殊文字のうち少なくとも2種類を含む（3種類推奨）",
+        },
+        "current_password": {"name": "現在のパスワード"},
+        "password_input_placeholder": {"name": "パスワードを入力して認証"},
+        "new_password": {"name": "新しいパスワード"},
+        "confirm_password": {"name": "新しいパスワードを確認"},
+        "password_strength_title": {"name": "パスワード強度"},
+        "strength_weak": {"name": "弱"},
+        "strength_medium": {"name": "中"},
+        "strength_strong": {"name": "強"},
+        "save_button": {"name": "保存"},
+        "cancel_button": {"name": "キャンセル"},
+        "error_current_password": {"name": "現在のパスワードが正しくありません"},
+        "error_mismatch": {"name": "新しいパスワードと確認が一致しません"},
+        "error_strength_insufficient": {"name": "パスワード強度が不足しています"},
+        "success_updated": {"name": "パスワードを更新しました"},
+        "remove_password": {
+            "name": "パスワードを削除",
+            "description": "現在のセキュリティ認証パスワードをキャンセル",
+        },
+        "remove_password_confirm_title": {"name": "パスワード削除の確認"},
+        "remove_password_confirm_content": {
+            "name": "パスワードを削除するとセキュリティスイッチが無効になります。続行しますか？"
+        },
+        "remove_password_success": {
+            "name": "パスワードを削除し、セキュリティスイッチを閉じました"
+        },
+        "error_title": {"name": "エラー"},
+        "dialog_yes_text": {"name": "確定"},
+        "dialog_cancel_text": {"name": "キャンセル"},
+        "totp_switch": {
+            "name": "TOTP認証",
+            "description": "有効にすると、セキュリティ操作でTOTP動的パスワードを使用可能",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "set_totp": {
+            "name": "TOTPを設定",
+            "description": "TOTPワンタイムパスワード認証を設定",
+        },
+        "generate_totp_secret": {"name": "秘密鍵を生成"},
+        "verify_totp_code": {"name": "認証コードを検証"},
+        "totp_input_placeholder": {"name": "TOTP認証コードを入力して検証"},
+        "totp_secret_prefix": {"name": "秘密鍵"},
+        "totp_uri_prefix": {"name": "URI"},
+        "totp_generated_saved": {"name": "TOTP秘密鍵を生成して保存しました"},
+        "totp_generated_error": {"name": "TOTPの生成に失敗しました"},
+        "totp_code_valid": {"name": "認証コードが有効です"},
+        "totp_code_invalid": {"name": "認証コードが無効です"},
+        "totp_save_success": {"name": "設定を保存しました"},
+        "totp_verify_before_save": {"name": "保存前に認証コードを検証してください"},
+        "totp_qr_unavailable": {
+            "name": "QRコードを表示できません。QRライブラリをインストールしてください"
+        },
+        "usb_switch": {
+            "name": "USBドライブ認証",
+            "description": "有効にすると、セキュリティ操作でUSBドライブ認証を使用可能",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "bind_usb": {
+            "name": "USBドライブをバインド",
+            "description": "認証用USBドライブデバイスをバインド",
+        },
+        "unbind_usb": {
+            "name": "USBドライブをアンバインド",
+            "description": "USBドライブデバイスのバインドを解除",
+        },
+        "usb_refresh": {"name": "更新"},
+        "usb_bind": {"name": "バインド"},
+        "usb_unbind_all": {"name": "すべてアンバインド"},
+        "usb_no_removable": {"name": "リムーバブルディスクが検出されません"},
+        "usb_bind_success": {"name": "USBドライブをバインドしました"},
+        "usb_unbind_all_success": {"name": "すべてのUSBドライブをアンバインドしました"},
+        "usb_require_key_file": {"name": ".keyファイル認証が必要です"},
+        "totp_secret_generated": {
+            "name": "秘密鍵を生成しました。保存前に認証を完了してください"
+        },
+        "error_set_password_first": {"name": "まずパスワードを設定してください"},
+        "error_set_totp_first": {"name": "まずTOTPを設定してください"},
+        "error_bind_usb_first": {"name": "まずUSBドライブをバインドしてください"},
+        "verify_in_progress": {"name": "認証中、お待ちください"},
+        "verify_failed_generic": {
+            "name": "認証が通過しませんでした。入力を確認してください"
+        },
+        "usb_unbind_selected": {"name": "選択をアンバインド"},
+        "usb_unbind_selected_success": {
+            "name": "選択したUSBドライブをアンバインドしました"
+        },
+        "usb_select_bound_hint": {"name": "バインド済みデバイスを1つ選択してください"},
+        "usb_bound_devices": {"name": "バインド済みデバイス"},
+        "usb_status_connected": {"name": "USBドライブが接続されています"},
+        "usb_status_disconnected": {"name": "USBドライブが接続されていません"},
+        "show_hide_floating_window_switch": {
+            "name": "フローティングウィンドウ表示/非表示認証",
+            "description": "有効にすると、フローティングウィンドウの表示または非表示時に認証が必要",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "restart_switch": {
+            "name": "再起動認証",
+            "description": "有効にすると、アプリの再起動時に認証が必要",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "exit_switch": {
+            "name": "終了認証",
+            "description": "有効にすると、アプリの終了時に認証が必要",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "open_settings_switch": {
+            "name": "設定を開く認証",
+            "description": "有効にすると、設定ウィンドウを開く時に認証が必要",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "preview_settings": {"name": "プレビュー設定"},
+        "preview_settings_switch": {
+            "name": "プレビュー設定スイッチ",
+            "description": "設定認証時にプレビュー設定を許可",
             "switchbutton_name": {"enable": "", "disable": ""},
         },
     },

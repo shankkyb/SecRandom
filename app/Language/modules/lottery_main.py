@@ -104,4 +104,56 @@ lottery = {
             "text_5": "Remain group count: {remaining_count}",
         },
     },
+    "JA_JP": {
+        "title": {"name": "抽選", "description": "抽選機能"},
+        "reset_button": {
+            "name": "リセット",
+            "description": "抽選回数をリセット",
+            "pushbutton_name": "リセット",
+        },
+        "start_button": {
+            "name": "開始",
+            "description": "抽選を開始",
+            "pushbutton_name": "開始",
+        },
+        "stop_button": {
+            "name": "停止",
+            "description": "抽選を停止",
+            "pushbutton_name": "停止",
+        },
+        "default_empty_item": {
+            "name": "リストなし",
+            "description": "リストがない場合のデフォルトオプション",
+        },
+        "list_combobox": {
+            "name": "クラス",
+            "description": "クラスを選択",
+            "combo_items": ["学生を抽出しない"],
+        },
+        "range_combobox": {
+            "name": "範囲",
+            "description": "抽出範囲を選択",
+            "combo_items": ["全学生を抽出", "全グループを抽出"],
+        },
+        "gender_combobox": {
+            "name": "性別",
+            "description": "性別範囲を選択",
+            "combo_items": ["全性別を抽出"],
+        },
+        "remaining_button": {
+            "name": "残りリストを表示",
+            "description": "残りリストウィンドウを表示",
+            "pushbutton_name": "残りリストを表示",
+        },
+        "many_count_label": {
+            "name": "合計/残り回数",
+            "description": "合計回数と残り回数を表示",
+            "text_0": "合計回数: {total_count} | 残り回数: {remaining_count}",
+            "text_1": "合計回数: {total_count}",
+            "text_2": "残り回数: {remaining_count}",
+            "text_3": "合計グループ数: {total_count} | 残りグループ数: {remaining_count}",
+            "text_4": "合計グループ数: {total_count}",
+            "text_5": "残りグループ数: {remaining_count}",
+        },
+    },
 }

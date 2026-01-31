@@ -19,6 +19,14 @@ list_management = {
             "description": "Manage the list of prizes",
         },
     },
+    "JA_JP": {
+        "title": {"name": "リスト管理", "description": "点呼、抽選のリストを管理"},
+        "roll_call_list": {
+            "name": "点呼リスト",
+            "description": "点呼用学生リストを管理",
+        },
+        "lottery_list": {"name": "抽選リスト", "description": "抽選用賞品リストを管理"},
+    },
 }
 
 # 点名名单语言配置
@@ -73,6 +81,34 @@ roll_call_list = {
             "description": "Export student list to file",
         },
     },
+    "JA_JP": {
+        "title": {"name": "点呼リスト", "description": "点呼用学生リストの表示と管理"},
+        "set_class_name": {
+            "name": "クラス名を設定",
+            "description": "現在のクラス名を設定",
+        },
+        "select_class_name": {
+            "name": "クラスを選択",
+            "description": "既存のクラスから選択",
+        },
+        "import_student_name": {
+            "name": "学生リストをインポート",
+            "description": "ファイルから学生リストをインポート",
+        },
+        "name_setting": {"name": "氏名設定", "description": "学生の氏名を設定"},
+        "gender_setting": {
+            "name": "性別設定",
+            "description": "学生の性別を設定",
+        },
+        "group_setting": {
+            "name": "グループ設定",
+            "description": "学生の所属グループを設定",
+        },
+        "export_student_name": {
+            "name": "学生リストをエクスポート",
+            "description": "学生リストをファイルにエクスポート",
+        },
+    },
 }
 
 # 点名表格语言配置
@@ -103,6 +139,17 @@ roll_call_table = {
                 "4": "Group",
             },
             "description": "The column title of the picking table",
+        },
+    },
+    "JA_JP": {
+        "title": {"name": "点呼テーブル", "description": "点呼リストの表示と管理"},
+        "select_class_name": {
+            "name": "クラスを選択",
+            "description": "表示する点呼クラスを選択",
+        },
+        "HeaderLabels": {
+            "name": ["存在", "学籍番号", "氏名", "性別", "グループ"],
+            "description": "点呼テーブルの列タイトル",
         },
     },
 }
@@ -151,6 +198,30 @@ lottery_list = {
             "description": "Export prize list to file",
         },
     },
+    "JA_JP": {
+        "title": {"name": "抽選リスト", "description": "抽選用賞品リストを管理"},
+        "set_pool_name": {
+            "name": "賞プール名を設定",
+            "description": "現在の賞プール名を設定",
+        },
+        "select_pool_name": {
+            "name": "賞プールを選択",
+            "description": "既存の賞プールから選択",
+        },
+        "import_prize_name": {
+            "name": "賞品リストをインポート",
+            "description": "ファイルから賞品リストをインポート",
+        },
+        "prize_setting": {"name": "賞品設定", "description": "賞品名を設定"},
+        "prize_weight_setting": {
+            "name": "重み設定",
+            "description": "賞品の当選重みを設定",
+        },
+        "export_prize_name": {
+            "name": "賞品リストをエクスポート",
+            "description": "賞品リストをファイルにエクスポート",
+        },
+    },
 }
 
 # 抽奖表格语言配置
@@ -175,6 +246,17 @@ lottery_table = {
         "HeaderLabels": {
             "name": {"0": "Exist", "1": "Serial", "2": "Prize", "3": "Weight"},
             "description": "The column title of the lottery table",
+        },
+    },
+    "JA_JP": {
+        "title": {"name": "抽選テーブル", "description": "抽選リストの表示と管理"},
+        "select_pool_name": {
+            "name": "賞プールを選択",
+            "description": "表示する抽選賞プールを選択",
+        },
+        "HeaderLabels": {
+            "name": ["存在", "番号", "賞品", "重み"],
+            "description": "抽選テーブルの列タイトル",
         },
     },
 }
@@ -501,6 +583,32 @@ qfiledialog = {
                 "filter": {
                     "name": "Excel files (*.xlsx);;CSV files (*.csv);;TXT files (only prizes) (*.txt)",
                     "description": "Save prize list dialog filter",
+                },
+            }
+        },
+    },
+    "JA_JP": {
+        "roll_call": {
+            "export_student_list": {
+                "caption": {
+                    "name": "学生リストを保存",
+                    "description": "学生リスト保存ダイアログタイトル",
+                },
+                "filter": {
+                    "name": "Excelファイル (*.xlsx);;CSVファイル (*.csv);;TXTファイル（氏名のみ） (*.txt)",
+                    "description": "学生リスト保存ダイアログフィルター",
+                },
+            }
+        },
+        "lottery": {
+            "export_prize_name": {
+                "caption": {
+                    "name": "賞品リストを保存",
+                    "description": "賞品リスト保存ダイアログタイトル",
+                },
+                "filter": {
+                    "name": "Excelファイル (*.xlsx);;CSVファイル (*.csv);;TXTファイル（賞品名のみ） (*.txt)",
+                    "description": "賞品リスト保存ダイアログフィルター",
                 },
             }
         },

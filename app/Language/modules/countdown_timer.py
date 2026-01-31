@@ -1,3 +1,4 @@
+# 倒计时计时器语言配置
 countdown_timer = {
     "ZH_CN": {
         "title": {"name": "计时器", "description": "倒计时与秒表"},
@@ -147,5 +148,101 @@ countdown_timer = {
         "time_up": {"name": "Time's up", "description": "Countdown finished hint"},
         "running": {"name": "Running", "description": "Timer is running"},
         "paused": {"name": "Paused", "description": "Timer is paused"},
+    },
+    "JA_JP": {
+        "title": {
+            "name": "タイマー",
+            "description": "カウントダウンとストップウォッチ",
+        },
+        "tab_countdown": {
+            "name": "カウントダウン",
+            "description": "カウントダウンモード",
+        },
+        "tab_stopwatch": {
+            "name": "ストップウォッチ",
+            "description": "ストップウォッチモード",
+        },
+        "tab_clock": {"name": "時計", "description": "時計モード"},
+        "clock_weekdays": {
+            "name": "曜日",
+            "description": "時計モード曜日リスト",
+            "items": ["月", "火", "水", "木", "金", "土", "日"],
+        },
+        "clock_date_format": {
+            "name": "日付形式",
+            "description": "時計モード日付形式",
+            "format": "yyyy年MM月dd日",
+        },
+        "always_on_top": {
+            "name": "常に手前",
+            "description": "ウィンドウを常に手前に表示",
+        },
+        "toggle_fullscreen": {"name": "全画面", "description": "全画面表示を切替"},
+        "enter_fullscreen": {
+            "name": "全画面",
+            "description": "全画面に入る",
+            "pushbutton_name": "全画面",
+        },
+        "exit_fullscreen": {
+            "name": "全画面を終了",
+            "description": "全画面を終了",
+            "pushbutton_name": "全画面を終了",
+        },
+        "opacity": {"name": "不透明度", "description": "ウィンドウの不透明度を調整"},
+        "presets": {
+            "name": "プリセット",
+            "description": "よく使うカウントダウンプリセット",
+        },
+        "preset_common": {"name": "よく使う", "description": "よく使うプリセット"},
+        "preset_recent": {"name": "最近", "description": "最近使用"},
+        "hours": {"name": "時間", "description": "時間を調整"},
+        "minutes": {"name": "分", "description": "分を調整"},
+        "seconds": {"name": "秒", "description": "秒を調整"},
+        "minus_10s": {
+            "name": "-10秒",
+            "description": "10秒減らす",
+            "pushbutton_name": "-10秒",
+        },
+        "plus_10s": {
+            "name": "+10秒",
+            "description": "10秒増やす",
+            "pushbutton_name": "+10秒",
+        },
+        "reset": {
+            "name": "リセット",
+            "description": "タイマーをリセット",
+            "pushbutton_name": "リセット",
+        },
+        "start": {
+            "name": "開始",
+            "description": "タイマーを開始",
+            "pushbutton_name": "開始",
+        },
+        "pause": {
+            "name": "一時停止",
+            "description": "タイマーを一時停止",
+            "pushbutton_name": "一時停止",
+        },
+        "resume": {
+            "name": "再開",
+            "description": "タイマーを再開",
+            "pushbutton_name": "再開",
+        },
+        "lap": {
+            "name": "ラップ",
+            "description": "ラップを記録",
+            "pushbutton_name": "ラップ",
+        },
+        "clear_laps": {
+            "name": "ラップをクリア",
+            "description": "ストップウォッチのラップ記録をクリア",
+            "pushbutton_name": "クリア",
+        },
+        "lap_index": {"name": "回数", "description": "何回目のラップ"},
+        "lap_delta": {"name": "差", "description": "前回のラップとの差"},
+        "lap_time": {"name": "時間点", "description": "ラップ時のストップウォッチ時間"},
+        "time_up": {"name": "時間到", "description": "カウントダウン終了のヒント"},
+        "running": {"name": "実行中", "description": "タイマー実行中"},
+        "paused": {"name": "一時停止中", "description": "タイマー一時停止中"},
     },
 }

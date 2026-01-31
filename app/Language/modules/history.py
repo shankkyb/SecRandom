@@ -6,9 +6,10 @@ history = {
     "EN_US": {
         "title": {
             "name": "History",
-            "description": "View and manage the pick and lottery history",
+            "description": "View and manage pick and lottery history",
         }
     },
+    "JA_JP": {"title": {"name": "履歴", "description": "点呼、抽選の履歴を表示・管理"}},
 }
 
 # 历史记录管理语言配置
@@ -106,6 +107,53 @@ history_management = {
             "success_message": "Lottery history for pool '{name}' has been cleared.",
             "error_message": "Failed to clear lottery history: {error}",
             "button_text": {"confirm": "Confirm", "cancel": "Cancel"},
+        },
+    },
+    "JA_JP": {
+        "title": {"name": "履歴管理", "description": "点呼、抽選の履歴を管理"},
+        "roll_call": {
+            "name": "点呼履歴",
+            "description": "点呼の履歴を表示・管理",
+        },
+        "lottery_history": {
+            "name": "抽選履歴",
+            "description": "抽選の履歴を表示・管理",
+        },
+        "show_roll_call_history": {
+            "name": "点呼履歴を有効化",
+            "description": "点呼履歴機能を有効にするかどうかを制御",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "select_class_name": {
+            "name": "クラスを選択",
+            "description": "履歴を表示するクラスを選択",
+        },
+        "clear_roll_call_history": {
+            "name": "点呼履歴をクリア",
+            "description": "選択したクラスの点呼履歴をクリア",
+            "pushbutton_name": "クリア",
+            "confirm_message": "クラス '{name}' の点呼履歴をクリアしてもよろしいか？この操作は取り消せません。",
+            "success_message": "クラス '{name}' の点呼履歴が正常にクリアされました。",
+            "error_message": "点呼履歴のクリアに失敗しました: {error}",
+            "button_text": {"confirm": "確定", "cancel": "キャンセル"},
+        },
+        "show_lottery_history": {
+            "name": "抽選履歴を有効化",
+            "description": "抽選履歴機能を有効にするかどうかを制御",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "select_pool_name": {
+            "name": "賞プールを選択",
+            "description": "履歴を表示する賞プールを選択",
+        },
+        "clear_lottery_history": {
+            "name": "抽選履歴をクリア",
+            "description": "選択した賞プールの抽選履歴をクリア",
+            "pushbutton_name": "クリア",
+            "confirm_message": "賞プール '{name}' の抽選履歴をクリアしてもよろしいか？この操作は取り消せません。",
+            "success_message": "賞プール '{name}' の抽選履歴が正常にクリアされました。",
+            "error_message": "抽選履歴のクリアに失敗しました: {error}",
+            "button_text": {"confirm": "確定", "cancel": "キャンセル"},
         },
     },
 }
@@ -278,6 +326,105 @@ roll_call_history_table = {
             "switchbutton_name": {"enable": "Show", "disable": "Hide"},
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "点呼履歴テーブル",
+            "description": "点呼履歴をテーブル形式で表示",
+        },
+        "select_class_name": {
+            "name": "クラスを選択",
+            "description": "履歴を表示するクラスを選択",
+        },
+        "select_mode": {
+            "name": "表示モード",
+            "description": "履歴の表示方法を選択",
+            "combo_items": {"0": "すべての記録", "1": "時間順に表示"},
+        },
+        "select_subject": {
+            "name": "授業を選択",
+            "description": "表示する授業を選択",
+            "combo_items": {"0": "すべての授業"},
+        },
+        "HeaderLabels_all_not_weight": {
+            "name": {
+                "0": "学籍番号",
+                "1": "氏名",
+                "2": "性別",
+                "3": "グループ",
+                "4": "点呼回数",
+            },
+            "description": "点呼履歴テーブルの列タイトル（重みを含まない）",
+        },
+        "HeaderLabels_all_weight": {
+            "name": {
+                "0": "学籍番号",
+                "1": "氏名",
+                "2": "性別",
+                "3": "グループ",
+                "4": "点呼回数",
+                "5": "重み",
+            },
+            "description": "点呼履歴テーブルの列タイトル（重みを含む）",
+        },
+        "HeaderLabels_time_not_weight": {
+            "name": {
+                "0": "点呼時刻",
+                "1": "学籍番号",
+                "2": "氏名",
+                "3": "性別",
+                "4": "グループ",
+            },
+            "description": "点呼履歴テーブルの列タイトル（時間順に表示、重みを含まない）",
+        },
+        "HeaderLabels_time_weight": {
+            "name": {
+                "0": "点呼時刻",
+                "1": "学籍番号",
+                "2": "氏名",
+                "3": "性別",
+                "4": "グループ",
+                "5": "授業",
+                "6": "重み",
+            },
+            "description": "点呼履歴テーブルの列タイトル（時間順に表示、重みを含む）",
+        },
+        "HeaderLabels_Individual_not_weight": {
+            "name": {
+                "0": "点呼時刻",
+                "1": "点呼モード",
+                "2": "点呼人数",
+                "3": "性別制限",
+                "4": "グループ制限",
+                "5": "授業",
+            },
+            "description": "点呼履歴テーブルの列タイトル（個人記録、重みを含まない）",
+        },
+        "HeaderLabels_Individual_weight": {
+            "name": {
+                "0": "点呼時刻",
+                "1": "点呼モード",
+                "2": "点呼人数",
+                "3": "性別制限",
+                "4": "グループ制限",
+                "5": "授業",
+                "6": "重み",
+            },
+            "description": "点呼履歴テーブルの列タイトル（個人記録、重みを含む）",
+        },
+        "draw_method_random": {
+            "name": "ランダム抽出",
+            "description": "ランダム抽出モード",
+        },
+        "draw_method_weight": {
+            "name": "公平抽出",
+            "description": "公平抽出モード",
+        },
+        "select_weight": {
+            "name": "重みを表示",
+            "description": "テーブルに重みを表示するかどうか",
+            "switchbutton_name": {"enable": "表示", "disable": "非表示"},
+        },
+    },
 }
 
 # 抽奖历史记录表格语言配置
@@ -360,6 +507,54 @@ lottery_history_table = {
                 "3": "Weight",
             },
             "description": "Lottery history table title column header weight (individual)",
+        },
+    },
+    "JA_JP": {
+        "title": {
+            "name": "抽選履歴テーブル",
+            "description": "抽選履歴をテーブル形式で表示",
+        },
+        "select_pool_name": {
+            "name": "賞プールを選択",
+            "description": "履歴を表示する賞プールを選択",
+        },
+        "select_mode": {
+            "name": "表示モード",
+            "description": "履歴の表示方法を選択",
+            "combo_items": {"0": "すべての記録", "1": "時間順に表示"},
+        },
+        "select_subject": {
+            "name": "授業を選択",
+            "description": "表示する授業を選択",
+            "combo_items": {"0": "すべての授業"},
+        },
+        "HeaderLabels_all_weight": {
+            "name": {
+                "0": "番号",
+                "1": "名称",
+                "2": "当選回数",
+                "3": "重み",
+            },
+            "description": "抽選履歴テーブルの列タイトル（すべての記録）",
+        },
+        "HeaderLabels_time_weight": {
+            "name": {
+                "0": "抽選時刻",
+                "1": "番号",
+                "2": "名称",
+                "3": "授業",
+                "4": "重み",
+            },
+            "description": "抽選履歴テーブルの列タイトル（時間順に表示）",
+        },
+        "HeaderLabels_Individual_weight": {
+            "name": {
+                "0": "抽選時刻",
+                "1": "抽出数",
+                "2": "授業",
+                "3": "重み",
+            },
+            "description": "抽選履歴テーブルの列タイトル（単一記録）",
         },
     },
 }

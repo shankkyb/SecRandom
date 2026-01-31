@@ -225,8 +225,134 @@ set_class_name = {
             "description": "Class disappear tips",
         },
         "multiple_classes_disappeared_message": {
-            "name": "Detected that the following {count} classes have been removed from the input box. Please save your changes to permanently delete them:\n{class_names}",
+            "name": "Detected that following {count} classes have been removed from input box. Please save your changes to permanently delete them:\n{class_names}",
             "description": "Multiple classes disappear tips",
+        },
+    },
+    "JA_JP": {
+        "title": {
+            "name": "クラス名設定",
+            "description": "クラス名ウィンドウのタイトルを設定",
+        },
+        "description": {
+            "name": "このウィンドウでクラス名を設定できます\n1行に1つのクラス名を入力すると、システムはクラス名簿ファイルに保存します\n\n1行に1つのクラス名のみを入力してください。例：\n1年1組\n1年2組\n1年3組",
+            "description": "クラス名設定ウィンドウの説明",
+        },
+        "input_title": {
+            "name": "クラス名リスト",
+            "description": "クラス名入力エリアのタイトル",
+        },
+        "input_placeholder": {
+            "name": "クラス名を入力してください、1行に1つのクラス名",
+            "description": "クラス名入力ボックスのプレースホルダー",
+        },
+        "save_button": {"name": "保存", "description": "保存ボタンのテキスト"},
+        "cancel_button": {
+            "name": "キャンセル",
+            "description": "キャンセルボタンのテキスト",
+        },
+        "error_title": {"name": "エラー", "description": "エラーメッセージのタイトル"},
+        "success_title": {"name": "成功", "description": "成功メッセージのタイトル"},
+        "info_title": {"name": "プロンプト", "description": "情報メッセージのタイトル"},
+        "invalid_names_error": {
+            "name": "以下のクラス名に不正な文字または予約語が含まれています: {names}",
+            "description": "クラス名検証失敗時のエラーヒント",
+        },
+        "save_error": {
+            "name": "クラス名の保存に失敗しました",
+            "description": "クラス名保存時のエラーヒント",
+        },
+        "success_message": {
+            "name": "{count}個の新しいクラスを作成しました",
+            "description": "クラス作成成功時のプロンプトメッセージ",
+        },
+        "no_new_classes_message": {
+            "name": "すべてのクラス名が既に存在するため、新しいクラスは作成されませんでした",
+            "description": "新しいクラスが作成されなかった場合のプロンプトメッセージ",
+        },
+        "unsaved_changes_title": {
+            "name": "未保存の変更",
+            "description": "未保存変更ダイアログのタイトル",
+        },
+        "unsaved_changes_message": {
+            "name": "未保存の変更があります。ウィンドウを閉じますか？",
+            "description": "未保存変更ダイアログの内容",
+        },
+        "discard_button": {
+            "name": "変更を破棄",
+            "description": "変更を破棄ボタンのテキスト",
+        },
+        "continue_editing_button": {
+            "name": "編集を続ける",
+            "description": "編集を続けるボタンのテキスト",
+        },
+        "delete_class_title": {
+            "name": "クラスを削除",
+            "description": "クラス削除ダイアログのタイトル",
+        },
+        "delete_class_message": {
+            "name": "クラス '{class_name}' を削除しますか？この操作はこのクラスのすべての学生データを削除し、復元できません",
+            "description": "クラス削除確認ダイアログの内容",
+        },
+        "delete_class_button": {
+            "name": "クラスを削除",
+            "description": "クラス削除ボタンのテキスト",
+        },
+        "delete_multiple_classes_title": {
+            "name": "複数のクラスを削除",
+            "description": "複数のクラス削除ダイアログのタイトル",
+        },
+        "delete_multiple_classes_message": {
+            "name": "以下の{count}個のクラスを削除しますか？この操作はこれらのクラスのすべての学生データを削除し、復元できません\n\n{class_names}",
+            "description": "複数のクラス削除確認ダイアログの内容",
+        },
+        "delete_success_title": {
+            "name": "削除成功",
+            "description": "削除成功通知のタイトル",
+        },
+        "delete_success_message": {
+            "name": "{count}個のクラスを削除しました",
+            "description": "削除成功通知の内容",
+        },
+        "delete_cancel_button": {
+            "name": "削除をキャンセル",
+            "description": "削除キャンセルボタンのテキスト",
+        },
+        "no_deletable_classes": {
+            "name": "削除可能なクラスがありません",
+            "description": "削除可能なクラスがない場合のヒント",
+        },
+        "select_class_to_delete": {
+            "name": "削除するクラスを選択してください",
+            "description": "削除クラス選択のヒント",
+        },
+        "select_class_dialog_title": {
+            "name": "削除するクラスを選択",
+            "description": "削除クラス選択ダイアログのタイトル",
+        },
+        "select_class_dialog_message": {
+            "name": "削除するクラスを選択してください：",
+            "description": "削除クラス選択ダイアログの内容",
+        },
+        "delete_selected_button": {
+            "name": "選択を削除",
+            "description": "選択削除ボタンのテキスト",
+        },
+        "delete_class_error": {
+            "name": "クラスの削除に失敗しました: {error}",
+            "description": "クラス削除失敗エラー情報",
+        },
+        "class_disappeared_title": {
+            "name": "クラス消失ヒント",
+            "description": "クラス消失ヒントのタイトル",
+        },
+        "class_disappeared_message": {
+            "name": "クラス '{class_name}' が入力ボックスから削除されたことが検出されました。変更を保存して永久に削除してください",
+            "description": "単一クラス消失ヒントの内容",
+        },
+        "multiple_classes_disappeared_message": {
+            "name": "以下の{count}個のクラスが入力ボックスから削除されたことが検出されました。変更を保存して永久に削除してください：\n{class_names}",
+            "description": "複数クラス消失ヒントの内容",
         },
     },
 }
@@ -521,6 +647,180 @@ import_student_name = {
             "description": "Option of Cancel import",
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "学生氏名をインポート",
+            "description": "ExcelまたはCSVファイルから学生氏名をインポート",
+        },
+        "initial_subtitle": {
+            "name": "インポート先：",
+            "description": "クラスにインポート中のプロンプト",
+        },
+        "file_selection_title": {
+            "name": "ファイル選択",
+            "description": "ファイル選択エリアのタイトル",
+        },
+        "no_file_selected": {
+            "name": "ファイルが選択されていません",
+            "description": "ファイルが選択されていない場合のプロンプトテキスト",
+        },
+        "select_file": {
+            "name": "ファイルを選択",
+            "description": "ファイル選択ボタンのテキスト",
+        },
+        "supported_formats": {
+            "name": "サポートする形式: Excel (.xlsx, .xls) と CSV (.csv)",
+            "description": "サポートするファイル形式の説明",
+        },
+        "file_filter": {
+            "name": "Excelファイル (*.xlsx *.xls);;CSVファイル (*.csv)",
+            "description": "ファイル選択ダイアログのファイルフィルター",
+        },
+        "dialog_title": {
+            "name": "ファイルを選択",
+            "description": "ファイル選択ダイアログのタイトル",
+        },
+        "column_mapping_title": {
+            "name": "列マッピング",
+            "description": "列マッピングエリアのタイトル",
+        },
+        "column_mapping_description": {
+            "name": "学生情報を含む列を選択してください",
+            "description": "列マッピングエリアの説明",
+        },
+        "column_mapping_id_column": {
+            "name": "学籍番号列（必須）:",
+            "description": "学籍番号列ラベル",
+        },
+        "column_mapping_name_column": {
+            "name": "氏名列（必須）:",
+            "description": "氏名列ラベル",
+        },
+        "column_mapping_gender_column": {
+            "name": "性別列（オプション）:",
+            "description": "性別列ラベル",
+        },
+        "column_mapping_group_column": {
+            "name": "グループ列（オプション）:",
+            "description": "グループ列ラベル",
+        },
+        "column_mapping_none": {
+            "name": "なし",
+            "description": "なしオプションのテキスト",
+        },
+        "data_preview_title": {
+            "name": "データプレビュー",
+            "description": "データプレビューエリアのタイトル",
+        },
+        "student_id": {
+            "name": "学籍番号",
+            "description": "学籍番号列タイトル",
+        },
+        "name": {
+            "name": "氏名",
+            "description": "氏名列タイトル",
+        },
+        "gender": {
+            "name": "性別",
+            "description": "性別列タイトル",
+        },
+        "group": {
+            "name": "グループ",
+            "description": "グループ列タイトル",
+        },
+        "buttons_import": {
+            "name": "インポート",
+            "description": "インポートボタンのテキスト",
+        },
+        "file_loaded_title": {
+            "name": "ファイルがロードされました",
+            "description": "ファイルロード成功ダイアログのタイトル",
+        },
+        "file_loaded_content": {
+            "name": "ファイルが正常にロードされました",
+            "description": "ファイルロード成功ダイアログの内容",
+        },
+        "file_loaded_notification_title": {
+            "name": "ファイルが正常にロードされました",
+            "description": "ファイルロード成功通知のタイトル",
+        },
+        "file_loaded_notification_content": {
+            "name": "ファイルが正常にロードされました、データプレビューを確認してください",
+            "description": "ファイルロード成功通知の内容",
+        },
+        "error_title": {
+            "name": "エラー",
+            "description": "エラーダイアログのタイトル",
+        },
+        "load_failed": {
+            "name": "ファイルのロードに失敗しました",
+            "description": "ファイルロード失敗エラー情報",
+        },
+        "load_failed_notification_title": {
+            "name": "ファイルのロードに失敗しました",
+            "description": "ファイルロード失敗通知のタイトル",
+        },
+        "load_failed_notification_content": {
+            "name": "ファイルをロードできません、ファイル形式と内容を確認してください",
+            "description": "ファイルロード失敗通知の内容",
+        },
+        "import_failed": {
+            "name": "データのインポートに失敗しました",
+            "description": "データインポート失敗エラー情報",
+        },
+        "import_failed_notification_title": {
+            "name": "データのインポートに失敗しました",
+            "description": "データインポート失敗通知のタイトル",
+        },
+        "import_failed_notification_content": {
+            "name": "データのインポートエラー、データ形式と内容を確認してください",
+            "description": "データインポート失敗通知の内容",
+        },
+        "unsupported_format": {
+            "name": "サポートされていないファイル形式",
+            "description": "サポートされていないファイル形式エラー情報",
+        },
+        "no_name_column": {
+            "name": "氏名列を選択してください",
+            "description": "氏名列が選択されていないエラー情報",
+        },
+        "no_id_column": {
+            "name": "学籍番号列を選択してください",
+            "description": "学籍番号列が選択されていないエラー情報",
+        },
+        "import_success_title": {
+            "name": "インポート成功",
+            "description": "インポート成功ダイアログのタイトル",
+        },
+        "import_success_content_template": {
+            "name": "{count}人の学生情報をクラス '{class_name}' にインポートしました",
+            "description": "インポート成功ダイアログの内容テンプレート",
+        },
+        "import_success_notification_title": {
+            "name": "インポート成功",
+            "description": "インポート成功通知のタイトル",
+        },
+        "import_success_notification_content_template": {
+            "name": "{count}人の学生情報をクラス '{class_name}' にインポートしました",
+            "description": "インポート成功通知の内容テンプレート",
+        },
+        "existing_data_title": {
+            "name": "クラスに既にデータが存在します",
+            "description": "クラスに既にデータが存在するダイアログのタイトル",
+        },
+        "existing_data_prompt": {
+            "name": "クラス '{class_name}' は既に{count}人の学生を含んでいます、処理方法を選択してください：",
+            "description": "クラスに既にデータが存在するダイアログのヒントテキスト",
+        },
+        "existing_data_option_overwrite": {
+            "name": "既存のデータを上書き",
+            "description": "既存のデータを上書きオプション",
+        },
+        "existing_data_option_cancel": {
+            "name": "インポートをキャンセル",
+            "description": "インポートキャンセルオプション",
+        },
+    },
 }
 
 # 姓名设置窗口
@@ -739,6 +1039,129 @@ name_setting = {
         "name_deleted_message": {
             "name": "Detected that the name '{name}' have been removed from the input box. Please save your changes to permanently delete it",
             "description": "Delete name hint",
+        },
+    },
+    "JA_JP": {
+        "title": {
+            "name": "氏名設定",
+            "description": "氏名ウィンドウのタイトルを設定",
+        },
+        "description": {
+            "name": "このウィンドウで学生氏名を設定できます\n1行に1つの学生氏名を入力すると、システムはクラス名簿ファイルに保存します\n\n1行に1つの氏名のみを入力してください。例：\n田中\n鈴木\n山田",
+            "description": "氏名設定ウィンドウの説明",
+        },
+        "input_title": {
+            "name": "氏名リスト",
+            "description": "氏名入力エリアのタイトル",
+        },
+        "input_placeholder": {
+            "name": "氏名を入力してください、1行に1つの氏名",
+            "description": "氏名入力ボックスのプレースホルダー",
+        },
+        "save_button": {"name": "保存", "description": "保存ボタンのテキスト"},
+        "cancel_button": {
+            "name": "キャンセル",
+            "description": "キャンセルボタンのテキスト",
+        },
+        "error_title": {"name": "エラー", "description": "エラーメッセージのタイトル"},
+        "success_title": {"name": "成功", "description": "成功メッセージのタイトル"},
+        "info_title": {"name": "プロンプト", "description": "情報メッセージのタイトル"},
+        "no_names_error": {
+            "name": "少なくとも1つの氏名を入力してください",
+            "description": "氏名が入力されていない場合のエラーヒント",
+        },
+        "invalid_names_error": {
+            "name": "以下の氏名に不正な文字または予約語が含まれています: {names}",
+            "description": "氏名検証失敗時のエラーヒント",
+        },
+        "save_error": {
+            "name": "氏名の保存に失敗しました",
+            "description": "氏名保存時のエラーヒント",
+        },
+        "success_message": {
+            "name": "{count}個の新しい氏名を作成しました",
+            "description": "氏名作成成功時のプロンプトメッセージ",
+        },
+        "no_new_names_message": {
+            "name": "すべての氏名が既に存在するため、新しい氏名は作成されませんでした",
+            "description": "新しい氏名が作成されなかった場合のプロンプトメッセージ",
+        },
+        "unsaved_changes_title": {
+            "name": "未保存の変更",
+            "description": "未保存変更ダイアログのタイトル",
+        },
+        "unsaved_changes_message": {
+            "name": "未保存の変更があります。ウィンドウを閉じますか？",
+            "description": "未保存変更ダイアログの内容",
+        },
+        "discard_button": {
+            "name": "変更を破棄",
+            "description": "変更を破棄ボタンのテキスト",
+        },
+        "continue_editing_button": {
+            "name": "編集を続ける",
+            "description": "編集を続けるボタンのテキスト",
+        },
+        "delete_button": {"name": "削除", "description": "削除ボタンのテキスト"},
+        "delete_name_title": {
+            "name": "氏名を削除",
+            "description": "氏名削除ダイアログのタイトル",
+        },
+        "delete_name_message": {
+            "name": "氏名 '{name}' を削除しますか？この操作はこの氏名のすべての情報を削除し、復元できません",
+            "description": "氏名削除確認ダイアログの内容",
+        },
+        "delete_multiple_names_title": {
+            "name": "複数の氏名を削除",
+            "description": "複数の氏名削除ダイアログのタイトル",
+        },
+        "delete_multiple_names_message": {
+            "name": "以下の{count}個の氏名を削除しますか？この操作はこれらの氏名のすべての情報を削除し、復元できません\n\n{names}",
+            "description": "複数の氏名削除確認ダイアログの内容",
+        },
+        "delete_name_success_title": {
+            "name": "削除成功",
+            "description": "氏名削除成功通知のタイトル",
+        },
+        "delete_name_success_message": {
+            "name": "{count}個の氏名を削除しました",
+            "description": "氏名削除成功通知の内容",
+        },
+        "delete_name_cancel_button": {
+            "name": "削除をキャンセル",
+            "description": "氏名削除キャンセルボタンのテキスト",
+        },
+        "no_deletable_names": {
+            "name": "削除可能な氏名がありません",
+            "description": "削除可能な氏名がない場合のヒント",
+        },
+        "select_name_to_delete": {
+            "name": "削除する氏名を選択してください",
+            "description": "削除氏名選択のヒント",
+        },
+        "select_name_dialog_title": {
+            "name": "削除する氏名を選択",
+            "description": "削除氏名選択ダイアログのタイトル",
+        },
+        "select_name_dialog_message": {
+            "name": "削除する氏名を選択してください：",
+            "description": "削除氏名選択ダイアログの内容",
+        },
+        "delete_selected_names_button": {
+            "name": "選択を削除",
+            "description": "選択削除ボタンのテキスト",
+        },
+        "delete_name_error": {
+            "name": "氏名の削除に失敗しました: {error}",
+            "description": "氏名削除失敗エラー情報",
+        },
+        "name_deleted_title": {
+            "name": "氏名が削除されました",
+            "description": "氏名削除ヒントのタイトル",
+        },
+        "name_deleted_message": {
+            "name": "氏名 '{name}' が入力ボックスから削除されたことが検出されました。変更を保存して永久に削除してください",
+            "description": "氏名削除ヒントの内容",
         },
     },
 }
@@ -976,6 +1399,129 @@ gender_setting = {
             "description": "Delete gender option hint",
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "性別設定",
+            "description": "性別ウィンドウのタイトルを設定",
+        },
+        "description": {
+            "name": "このウィンドウで学生性別を設定できます\n1行に1つの性別を入力すると、システムはクラス名簿ファイルに保存します\n\n1行に1つの性別のみを入力してください。例：\n男性\n女性\nその他",
+            "description": "性別設定ウィンドウの説明",
+        },
+        "input_title": {
+            "name": "性別リスト",
+            "description": "性別入力エリアのタイトル",
+        },
+        "input_placeholder": {
+            "name": "性別を入力してください、1行に1つの性別",
+            "description": "性別入力ボックスのプレースホルダー",
+        },
+        "save_button": {"name": "保存", "description": "保存ボタンのテキスト"},
+        "cancel_button": {
+            "name": "キャンセル",
+            "description": "キャンセルボタンのテキスト",
+        },
+        "error_title": {"name": "エラー", "description": "エラーメッセージのタイトル"},
+        "success_title": {"name": "成功", "description": "成功メッセージのタイトル"},
+        "info_title": {"name": "プロンプト", "description": "情報メッセージのタイトル"},
+        "no_genders_error": {
+            "name": "少なくとも1つの性別を入力してください",
+            "description": "性別が入力されていない場合のエラーヒント",
+        },
+        "invalid_genders_error": {
+            "name": "以下の性別に不正な文字または予約語が含まれています: {genders}",
+            "description": "性別検証失敗時のエラーヒント",
+        },
+        "save_error": {
+            "name": "性別オプションの保存に失敗しました",
+            "description": "性別オプション保存時のエラーヒント",
+        },
+        "success_message": {
+            "name": "{count}個の新しい性別オプションを作成しました",
+            "description": "性別オプション作成成功時のプロンプトメッセージ",
+        },
+        "no_new_genders_message": {
+            "name": "すべての性別オプションが既に存在するため、新しい性別オプションは作成されませんでした",
+            "description": "新しい性別オプションが作成されなかった場合のプロンプトメッセージ",
+        },
+        "unsaved_changes_title": {
+            "name": "未保存の変更",
+            "description": "未保存変更ダイアログのタイトル",
+        },
+        "unsaved_changes_message": {
+            "name": "未保存の変更があります。ウィンドウを閉じますか？",
+            "description": "未保存変更ダイアログの内容",
+        },
+        "discard_button": {
+            "name": "変更を破棄",
+            "description": "変更を破棄ボタンのテキスト",
+        },
+        "continue_editing_button": {
+            "name": "編集を続ける",
+            "description": "編集を続けるボタンのテキスト",
+        },
+        "delete_button": {"name": "削除", "description": "削除ボタンのテキスト"},
+        "delete_gender_title": {
+            "name": "性別オプションを削除",
+            "description": "性別オプション削除ダイアログのタイトル",
+        },
+        "delete_gender_message": {
+            "name": "性別オプション '{gender}' を削除しますか？この操作はこの性別オプションのすべての情報を削除し、復元できません",
+            "description": "性別オプション削除確認ダイアログの内容",
+        },
+        "delete_multiple_genders_title": {
+            "name": "複数の性別オプションを削除",
+            "description": "複数の性別オプション削除ダイアログのタイトル",
+        },
+        "delete_multiple_genders_message": {
+            "name": "以下の{count}個の性別オプションを削除しますか？この操作はこれらの性別オプションのすべての情報を削除し、復元できません\n\n{genders}",
+            "description": "複数の性別オプション削除確認ダイアログの内容",
+        },
+        "delete_gender_success_title": {
+            "name": "削除成功",
+            "description": "性別オプション削除成功通知のタイトル",
+        },
+        "delete_gender_success_message": {
+            "name": "{count}個の性別オプションを削除しました",
+            "description": "性別オプション削除成功通知の内容",
+        },
+        "delete_gender_cancel_button": {
+            "name": "削除をキャンセル",
+            "description": "性別オプション削除キャンセルボタンのテキスト",
+        },
+        "no_deletable_genders": {
+            "name": "削除可能な性別オプションがありません",
+            "description": "削除可能な性別オプションがない場合のヒント",
+        },
+        "select_gender_to_delete": {
+            "name": "削除する性別オプションを選択してください",
+            "description": "削除性別オプション選択のヒント",
+        },
+        "select_gender_dialog_title": {
+            "name": "削除する性別オプションを選択",
+            "description": "削除性別オプション選択ダイアログのタイトル",
+        },
+        "select_gender_dialog_message": {
+            "name": "削除する性別オプションを選択してください：",
+            "description": "削除性別オプション選択ダイアログの内容",
+        },
+        "delete_selected_genders_button": {
+            "name": "選択を削除",
+            "description": "選択削除ボタンのテキスト",
+        },
+        "delete_gender_error": {
+            "name": "性別オプションの削除に失敗しました: {error}",
+            "description": "性別オプション削除失敗エラー情報",
+        },
+        "gender_deleted_title": {
+            "name": "性別オプションが削除されました",
+            "description": "性別オプション削除ヒントのタイトル",
+        },
+        "gender_deleted_message": {
+            "name": "性別オプション '{gender}' が入力ボックスから削除されたことが検出されました。変更を保存して永久に削除してください",
+            "description": "性別オプション削除ヒントの内容",
+        },
+    },
 }
 
 # 小组设置窗口
@@ -1206,6 +1752,129 @@ group_setting = {
         "group_deleted_message": {
             "name": "Detected that the group option '{group}' have been removed from the input box. Please save your changes to permanently delete it",
             "description": "Delete group options hint",
+        },
+    },
+    "JA_JP": {
+        "title": {
+            "name": "グループ設定",
+            "description": "グループウィンドウのタイトルを設定",
+        },
+        "description": {
+            "name": "このウィンドウで学生グループを設定できます\n1行に1つのグループを入力すると、システムはクラス名簿ファイルに保存します\n\n1行に1つのグループのみを入力してください。例：\nAグループ\nBグループ\nCグループ",
+            "description": "グループ設定ウィンドウの説明",
+        },
+        "input_title": {
+            "name": "グループリスト",
+            "description": "グループ入力エリアのタイトル",
+        },
+        "input_placeholder": {
+            "name": "グループを入力してください、1行に1つのグループ",
+            "description": "グループ入力ボックスのプレースホルダー",
+        },
+        "save_button": {"name": "保存", "description": "保存ボタンのテキスト"},
+        "cancel_button": {
+            "name": "キャンセル",
+            "description": "キャンセルボタンのテキスト",
+        },
+        "error_title": {"name": "エラー", "description": "エラーメッセージのタイトル"},
+        "success_title": {"name": "成功", "description": "成功メッセージのタイトル"},
+        "info_title": {"name": "プロンプト", "description": "情報メッセージのタイトル"},
+        "no_groups_error": {
+            "name": "少なくとも1つのグループを入力してください",
+            "description": "グループが入力されていない場合のエラーヒント",
+        },
+        "invalid_groups_error": {
+            "name": "以下のグループに不正な文字または予約語が含まれています: {groups}",
+            "description": "グループ検証失敗時のエラーヒント",
+        },
+        "save_error": {
+            "name": "グループオプションの保存に失敗しました",
+            "description": "グループオプション保存時のエラーヒント",
+        },
+        "success_message": {
+            "name": "{count}個の新しいグループオプションを作成しました",
+            "description": "グループオプション作成成功時のプロンプトメッセージ",
+        },
+        "no_new_groups_message": {
+            "name": "すべてのグループオプションが既に存在するため、新しいグループオプションは作成されませんでした",
+            "description": "新しいグループオプションが作成されなかった場合のプロンプトメッセージ",
+        },
+        "unsaved_changes_title": {
+            "name": "未保存の変更",
+            "description": "未保存変更ダイアログのタイトル",
+        },
+        "unsaved_changes_message": {
+            "name": "未保存の変更があります。ウィンドウを閉じますか？",
+            "description": "未保存変更ダイアログの内容",
+        },
+        "discard_button": {
+            "name": "変更を破棄",
+            "description": "変更を破棄ボタンのテキスト",
+        },
+        "continue_editing_button": {
+            "name": "編集を続ける",
+            "description": "編集を続けるボタンのテキスト",
+        },
+        "delete_button": {"name": "削除", "description": "削除ボタンのテキスト"},
+        "delete_group_title": {
+            "name": "グループオプションを削除",
+            "description": "グループオプション削除ダイアログのタイトル",
+        },
+        "delete_group_message": {
+            "name": "グループオプション '{group}' を削除しますか？この操作はこのグループオプションのすべての情報を削除し、復元できません",
+            "description": "グループオプション削除確認ダイアログの内容",
+        },
+        "delete_multiple_groups_title": {
+            "name": "複数のグループオプションを削除",
+            "description": "複数のグループオプション削除ダイアログのタイトル",
+        },
+        "delete_multiple_groups_message": {
+            "name": "以下の{count}個のグループオプションを削除しますか？この操作はこれらのグループオプションのすべての情報を削除し、復元できません\n\n{groups}",
+            "description": "複数のグループオプション削除確認ダイアログの内容",
+        },
+        "delete_group_success_title": {
+            "name": "削除成功",
+            "description": "グループオプション削除成功通知のタイトル",
+        },
+        "delete_group_success_message": {
+            "name": "{count}個のグループオプションを削除しました",
+            "description": "グループオプション削除成功通知の内容",
+        },
+        "delete_group_cancel_button": {
+            "name": "削除をキャンセル",
+            "description": "グループオプション削除キャンセルボタンのテキスト",
+        },
+        "no_deletable_groups": {
+            "name": "削除可能なグループオプションがありません",
+            "description": "削除可能なグループオプションがない場合のヒント",
+        },
+        "select_group_to_delete": {
+            "name": "削除するグループオプションを選択してください",
+            "description": "削除グループオプション選択のヒント",
+        },
+        "select_group_dialog_title": {
+            "name": "削除するグループオプションを選択",
+            "description": "削除グループオプション選択ダイアログのタイトル",
+        },
+        "select_group_dialog_message": {
+            "name": "削除するグループオプションを選択してください：",
+            "description": "削除グループオプション選択ダイアログの内容",
+        },
+        "delete_selected_groups_button": {
+            "name": "選択を削除",
+            "description": "選択削除ボタンのテキスト",
+        },
+        "delete_group_error": {
+            "name": "グループオプションの削除に失敗しました: {error}",
+            "description": "グループオプション削除失敗エラー情報",
+        },
+        "group_deleted_title": {
+            "name": "グループオプションが削除されました",
+            "description": "グループオプション削除ヒントのタイトル",
+        },
+        "group_deleted_message": {
+            "name": "グループオプション '{group}' が入力ボックスから削除されたことが検出されました。変更を保存して永久に削除してください",
+            "description": "グループオプション削除ヒントの内容",
         },
     },
 }

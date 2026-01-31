@@ -7,6 +7,9 @@ voice_settings = {
             "description": "Configure voice playback related functions",
         }
     },
+    "JA_JP": {
+        "title": {"name": "音声設定", "description": "音声再生関連機能を設定"},
+    },
 }
 
 # 基础语音设置语言配置
@@ -116,8 +119,74 @@ basic_voice_settings = {
             "switchbutton_name": {"enable": "Enabled", "disable": "Disabled"},
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "基本音声設定",
+            "description": "基本音声再生機能を設定",
+        },
+        "voice_engine_group": {
+            "name": "音声エンジン",
+            "description": "音声合成エンジンタイプを選択",
+        },
+        "volume_group": {
+            "name": "音声設定",
+            "description": "音声再生関連設定を調整",
+        },
+        "system_volume_group": {
+            "name": "システム音量制御",
+            "description": "制御する音量タイプを選択",
+        },
+        "voice_engine": {
+            "name": "音声エンジン",
+            "description": "音声合成エンジンタイプを選択",
+            "combo_items": {"0": "システムTTS", "1": "Edge TTS"},
+        },
+        "edge_tts_voice_name": {
+            "name": "Edge TTS音声キャラクター",
+            "description": "Edge TTSの音声再生キャラクターを選択",
+            "combo_items": {
+                "0": "zh-CN-XiaoxiaoNeural",
+                "1": "zh-CN-YunxiNeural",
+                "2": "zh-CN-XiaoyiNeural",
+                "3": "en-US-JennyNeural",
+                "4": "en-US-GuyNeural",
+            },
+        },
+        "voice_playback": {
+            "name": "音声再生デバイス",
+            "description": "音声再生デバイスを選択",
+            "combo_items": {
+                "0": "システムデフォルト",
+                "1": "スピーカー",
+                "2": "ヘッドフォン",
+                "3": "Bluetoothデバイス",
+            },
+        },
+        "volume_size": {"name": "再生音量", "description": "音声再生の音量を調整"},
+        "speech_rate": {"name": "再生速度", "description": "音声再生の速度を調整"},
+        "system_volume_control": {
+            "name": "システム音量制御",
+            "description": "システム音量自動制御を有効にするかどうか",
+            "combo_items": {
+                "0": "メイン音量",
+                "1": "アプリ音量",
+                "2": "システムサウンド",
+                "3": "マイク音量",
+            },
+        },
+        "system_volume_size": {
+            "name": "システム音量",
+            "description": "システム音量を調整",
+        },
+        "voice_enable": {
+            "name": "音声スイッチ",
+            "description": "音声再生を有効または無効にする",
+            "switchbutton_name": {"enable": "有効", "disable": "無効"},
+        },
+    },
 }
 
+# 特定播报设置语言配置
 specific_announcements = {
     "ZH_CN": {
         "title": {"name": "特定播报设置", "description": "配置特定结果的语音播报"},
@@ -219,6 +288,58 @@ specific_announcements = {
         "tts_alias": {
             "name": "Replacement",
             "description": "Replacement names for TTS pronunciation. Leave a blank to use default pronunciation",
+        },
+    },
+    "JA_JP": {
+        "title": {
+            "name": "特定音声設定",
+            "description": "特定結果の音声再生を設定",
+        },
+        "enabled": {
+            "name": "特定音声を有効化",
+            "description": "特定結果の音声再生を完全に有効化",
+        },
+        "header": {"name": "有効"},
+        "mode": {
+            "name": "アナウンスモード",
+            "description": "音声モードを選択",
+            "combo_items": {"0": "点呼", "1": "抽選"},
+        },
+        "roll_call_title": {
+            "name": "点呼モード設定",
+            "description": "点呼モードでの音声再生を設定",
+        },
+        "select_class_name": {
+            "name": "クラス/賞プールを選択",
+            "description": "TTSを管理するクラスまたは賞プールを選択",
+        },
+        "id_field": {"name": "学籍番号"},
+        "name_field": {"name": "氏名"},
+        "prefix_field": {
+            "name": "音声接頭辞",
+            "description": "音声コンテンツの前にテキストを追加",
+        },
+        "suffix_field": {
+            "name": "音声接尾辞",
+            "description": "音声コンテンツの後にテキストを追加",
+        },
+        "lottery_title": {
+            "name": "抽選モード設定",
+            "description": "抽選モードでの音声再生を設定",
+        },
+        "lottery_id_field": {"name": "番号"},
+        "lottery_name_field": {"name": "名称"},
+        "lottery_prefix_field": {
+            "name": "抽選接頭辞",
+            "description": "抽選音声コンテンツの前にテキストを追加",
+        },
+        "lottery_suffix_field": {
+            "name": "抽選接尾辞",
+            "description": "抽選音声コンテンツの後にテキストを追加",
+        },
+        "tts_alias": {
+            "name": "置換",
+            "description": "TTS発音用の置換名。空白の場合はデフォルト発音を使用",
         },
     },
 }

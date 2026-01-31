@@ -1,11 +1,16 @@
 # 个性设置页面的语言文件
-
 custom_settings = {
     "ZH_CN": {"title": {"name": "个性设置", "description": "个性化设置选项"}},
     "EN_US": {
         "title": {
             "name": "Personal Settings",
             "description": "Personalized Settings Options",
+        }
+    },
+    "JA_JP": {
+        "title": {
+            "name": "パーソナル設定",
+            "description": "パーソナライズ設定オプション",
         }
     },
 }
@@ -264,6 +269,157 @@ page_management = {
         "lottery_roll_call_gender": {
             "name": "Dropdown box of Gender range in Lottery",
             "description": "Controls whether to show a gender naming box for students in lottery",
+        },
+    },
+    "JA_JP": {
+        "title": {"name": "ページ管理", "description": "ページ管理設定オプション"},
+        "roll_call": {"name": "点呼設定", "description": "点呼機能設定"},
+        "lottery": {"name": "抽選設定", "description": "抽選機能設定"},
+        "custom": {
+            "name": "カスタム抽選設定",
+            "description": "カスタム抽選機能設定",
+        },
+        "roll_call_method": {
+            "name": "点呼コントロールパネル位置",
+            "description": "点呼コントロールパネルの表示位置を設定",
+            "combo_items": {"0": "左", "1": "右"},
+        },
+        "show_name": {
+            "name": "名前設定ボタン",
+            "description": "有効にすると、名前設定ボタンが表示されます",
+            "switchbutton_name": {"enable": "表示", "disable": "非表示"},
+        },
+        "reset_roll_call": {
+            "name": "点呼リセットボタン",
+            "description": "有効にすると、点呼リセットボタンが表示されます",
+            "switchbutton_name": {"enable": "表示", "disable": "非表示"},
+        },
+        "roll_call_quantity_control": {
+            "name": "点呼数量コントロールバー",
+            "description": "点呼数量調整コントロールバーの表示を制御",
+        },
+        "roll_call_start_button": {
+            "name": "開始ボタン",
+            "description": "点呼開始ボタンの表示を制御",
+        },
+        "roll_call_list": {
+            "name": "点呼リスト切り替えドロップダウン",
+            "description": "点呼リスト切り替えドロップダウンの表示を制御",
+        },
+        "roll_call_range": {
+            "name": "点呼範囲ドロップダウン",
+            "description": "点呼範囲選択ドロップダウンの表示を制御",
+        },
+        "roll_call_gender": {
+            "name": "点呼性別範囲ドロップダウン",
+            "description": "点呼性別範囲選択ドロップダウンの表示を制御",
+        },
+        "roll_call_quantity_label": {
+            "name": "数量ラベル",
+            "description": "点呼人数/グループ数ラベルの表示モードを設定",
+            "combo_items": {"0": "総数+残数", "1": "総数", "2": "残数", "3": "非表示"},
+        },
+        "roll_call_remaining_button": {
+            "name": "残りリスト表示ボタン",
+            "description": "残りリスト表示ボタンの表示を制御",
+        },
+        "lottery_method": {
+            "name": "抽選コントロールパネル位置",
+            "description": "抽選コントロールパネルの表示位置を設定",
+            "combo_items": {"0": "左", "1": "右"},
+        },
+        "show_lottery_name": {
+            "name": "名前設定ボタン",
+            "description": "賞品名設定ボタンの表示を制御",
+            "switchbutton_name": {"enable": "表示", "disable": "非表示"},
+        },
+        "reset_lottery": {
+            "name": "抽選リセットボタン",
+            "description": "抽選リセットボタンの表示を制御",
+            "switchbutton_name": {"enable": "表示", "disable": "非表示"},
+        },
+        "lottery_quantity_control": {
+            "name": "抽選数量コントロールバー",
+            "description": "抽選数量調整コントロールバーの表示を制御",
+        },
+        "lottery_start_button": {
+            "name": "開始ボタン",
+            "description": "抽選開始ボタンの表示を制御",
+        },
+        "lottery_list": {
+            "name": "抽選リスト切り替えドロップダウン",
+            "description": "抽選リスト切り替えドロップダウンの表示を制御",
+        },
+        "lottery_quantity_label": {
+            "name": "数量ラベル",
+            "description": "賞品数ラベルの表示モードを設定",
+            "combo_items": {"0": "総数+残数", "1": "総数", "2": "残数", "3": "非表示"},
+        },
+        "lottery_remaining_button": {
+            "name": "残りリスト表示ボタン",
+            "description": "残りリスト表示ボタンの表示を制御",
+        },
+        "custom_method": {
+            "name": "カスタム抽選コントロールパネル位置",
+            "description": "カスタム抽選コントロールパネルの表示位置を設定",
+            "combo_items": {"0": "左", "1": "右"},
+        },
+        "reset_custom": {
+            "name": "カスタム抽選リセットボタン",
+            "description": "カスタム抽選リセットボタンの表示を制御",
+            "switchbutton_name": {"enable": "表示", "disable": "非表示"},
+        },
+        "custom_quantity_control": {
+            "name": "カスタム抽選数量コントロールバー",
+            "description": "カスタム抽選数量調整コントロールバーの表示を制御",
+        },
+        "custom_start_button": {
+            "name": "開始ボタン",
+            "description": "カスタム抽選開始ボタンの表示を制御",
+        },
+        "custom_list": {
+            "name": "カスタム抽選リスト切り替えドロップダウン",
+            "description": "カスタム抽選リスト切り替えドロップダウンの表示を制御",
+        },
+        "custom_range_start": {
+            "name": "カスタム抽選ドロップダウン",
+            "description": "カスタム抽選範囲選択ボックスの表示を制御",
+        },
+        "custom_range_end": {
+            "name": "カスタム抽選性別範囲ドロップダウン",
+            "description": "カスタム抽選性別範囲選択ボックスの表示を制御",
+        },
+        "draw_custom_method": {
+            "name": "カスタム抽選コントロールパネル位置",
+            "description": "カスタム抽選コントロールパネル位置の表示を制御",
+        },
+        "custom_quantity_label": {
+            "name": "数量ラベル",
+            "description": "カスタム抽選人数/グループ数ラベルの表示を制御",
+        },
+        "custom_remaining_button": {
+            "name": "残りリスト表示ボタン",
+            "description": "残りリスト表示ボタンの表示を制御",
+        },
+        "roll_call_reset_button": {
+            "name": "点呼リセットボタン",
+            "description": "有効にすると点呼リセットボタンが表示されます",
+        },
+        "lottery_reset_button": {
+            "name": "抽選リセットボタン",
+            "description": "抽選リセットボタンの表示を制御",
+        },
+        "lottery_roll_call_list": {
+            "name": "抽選内の学生リスト切り替えドロップダウン",
+            "description": "抽選内の学生リスト切り替えボックスの表示を制御",
+        },
+        "lottery_roll_call_range": {
+            "name": "抽選内の学生点呼範囲ドロップダウン",
+            "description": "抽選内の学生名選択ボックスの表示を制御",
+        },
+        "lottery_roll_call_gender": {
+            "name": "抽選内の学生性別範囲ドロップダウン",
+            "description": "抽選内の学生性別選択ボックスの表示を制御",
         },
     },
 }

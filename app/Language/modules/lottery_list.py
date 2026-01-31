@@ -221,8 +221,134 @@ set_prize_name = {
             "description": "Dismiss prompt content for individual prizes",
         },
         "multiple_prizes_disappeared_message": {
-            "name": "Detected that the following {count} prize pools have been removed from the input box. Please save your changes to permanently delete them:\n{prize_names}",
+            "name": "Detected that following {count} prize pools have been removed from the input box. Please save your changes to permanently delete them:\n{prize_names}",
             "description": "Multiple pool disappear tips",
+        },
+    },
+    "JA_JP": {
+        "title": {
+            "name": "賞プール名設定",
+            "description": "賞プール名ウィンドウのタイトルを設定",
+        },
+        "description": {
+            "name": "このウィンドウで賞プール名を設定できます\n1行に1つの賞プール名を入力すると、システムは賞プール名簿ファイルに保存します\n\n1行に1つの賞プール名のみを入力してください。例：\n賞プール一\n賞プール二\n賞プール三",
+            "description": "賞プール名設定ウィンドウの説明",
+        },
+        "input_title": {
+            "name": "賞プール名リスト",
+            "description": "賞プール名入力エリアのタイトル",
+        },
+        "input_placeholder": {
+            "name": "賞プール名を入力してください、1行に1つの賞プール名",
+            "description": "賞プール名入力ボックスのプレースホルダー",
+        },
+        "save_button": {"name": "保存", "description": "保存ボタンのテキスト"},
+        "cancel_button": {
+            "name": "キャンセル",
+            "description": "キャンセルボタンのテキスト",
+        },
+        "error_title": {"name": "エラー", "description": "エラーメッセージのタイトル"},
+        "success_title": {"name": "成功", "description": "成功メッセージのタイトル"},
+        "info_title": {"name": "プロンプト", "description": "情報メッセージのタイトル"},
+        "invalid_names_error": {
+            "name": "以下の賞プール名に不正な文字または予約語が含まれています: {names}",
+            "description": "賞プール名検証失敗時のエラーヒント",
+        },
+        "save_error": {
+            "name": "賞プール名の保存に失敗しました",
+            "description": "賞プール名保存時のエラーヒント",
+        },
+        "success_message": {
+            "name": "{count}個の新しい賞プールを作成しました",
+            "description": "賞プール作成成功時のプロンプトメッセージ",
+        },
+        "no_new_prizes_message": {
+            "name": "すべての賞プール名が既に存在するため、新しい賞プールは作成されませんでした",
+            "description": "新しい賞プールが作成されなかった場合のプロンプトメッセージ",
+        },
+        "unsaved_changes_title": {
+            "name": "未保存の変更",
+            "description": "未保存変更ダイアログのタイトル",
+        },
+        "unsaved_changes_message": {
+            "name": "未保存の変更があります。ウィンドウを閉じますか？",
+            "description": "未保存変更ダイアログの内容",
+        },
+        "discard_button": {
+            "name": "変更を破棄",
+            "description": "変更を破棄ボタンのテキスト",
+        },
+        "continue_editing_button": {
+            "name": "編集を続ける",
+            "description": "編集を続けるボタンのテキスト",
+        },
+        "delete_prize_title": {
+            "name": "賞プールを削除",
+            "description": "賞プール削除ダイアログのタイトル",
+        },
+        "delete_prize_message": {
+            "name": "賞プール '{prize_name}' を削除しますか？この操作はこの賞プールのすべてのデータを削除し、復元できません",
+            "description": "賞プール削除確認ダイアログの内容",
+        },
+        "delete_prize_button": {
+            "name": "賞プールを削除",
+            "description": "賞プール削除ボタンのテキスト",
+        },
+        "delete_multiple_prizes_title": {
+            "name": "複数の賞プールを削除",
+            "description": "複数の賞プール削除ダイアログのタイトル",
+        },
+        "delete_multiple_prizes_message": {
+            "name": "以下の{count}個の賞プールを削除しますか？この操作はこれらの賞プールのすべてのデータを削除し、復元できません\n\n{prize_names}",
+            "description": "複数の賞プール削除確認ダイアログの内容",
+        },
+        "delete_success_title": {
+            "name": "削除成功",
+            "description": "削除成功通知のタイトル",
+        },
+        "delete_success_message": {
+            "name": "{count}個の賞プールを削除しました",
+            "description": "削除成功通知の内容",
+        },
+        "delete_cancel_button": {
+            "name": "削除をキャンセル",
+            "description": "削除キャンセルボタンのテキスト",
+        },
+        "no_deletable_prizes": {
+            "name": "削除可能な賞プールがありません",
+            "description": "削除可能な賞プールがない場合のヒント",
+        },
+        "select_prize_to_delete": {
+            "name": "削除する賞プールを選択してください",
+            "description": "削除賞プール選択のヒント",
+        },
+        "select_prize_dialog_title": {
+            "name": "削除する賞プールを選択",
+            "description": "削除賞プール選択ダイアログのタイトル",
+        },
+        "select_prize_dialog_message": {
+            "name": "削除する賞プールを選択してください：",
+            "description": "削除賞プール選択ダイアログの内容",
+        },
+        "delete_selected_button": {
+            "name": "選択を削除",
+            "description": "選択削除ボタンのテキスト",
+        },
+        "delete_prize_error": {
+            "name": "賞プールの削除に失敗しました: {error}",
+            "description": "賞プール削除失敗エラー情報",
+        },
+        "prize_disappeared_title": {
+            "name": "賞プール消失ヒント",
+            "description": "賞プール消失ヒントのタイトル",
+        },
+        "prize_disappeared_message": {
+            "name": "賞プール '{prize_name}' が入力ボックスから削除されたことが検出されました。変更を保存して永久に削除してください",
+            "description": "単一賞プール消失ヒントの内容",
+        },
+        "multiple_prizes_disappeared_message": {
+            "name": "以下の{count}個の賞プールが入力ボックスから削除されたことが検出されました。変更を保存して永久に削除してください：\n{prize_names}",
+            "description": "複数賞プール消失ヒントの内容",
         },
     },
 }
@@ -504,6 +630,160 @@ import_prize_name = {
             "description": "Option of Cancel import",
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "賞プール名をインポート",
+            "description": "ExcelまたはCSVファイルから賞プール名をインポート",
+        },
+        "initial_subtitle": {
+            "name": "インポート先：",
+            "description": "賞プールにインポート中のプロンプト",
+        },
+        "file_selection_title": {
+            "name": "ファイル選択",
+            "description": "ファイル選択エリアのタイトル",
+        },
+        "no_file_selected": {
+            "name": "ファイルが選択されていません",
+            "description": "ファイルが選択されていない場合のプロンプトテキスト",
+        },
+        "select_file": {
+            "name": "ファイルを選択",
+            "description": "ファイル選択ボタンのテキスト",
+        },
+        "supported_formats": {
+            "name": "サポートする形式: Excel (.xlsx, .xls) と CSV (.csv)",
+            "description": "サポートするファイル形式の説明",
+        },
+        "file_filter": {
+            "name": "Excelファイル (*.xlsx *.xls);;CSVファイル (*.csv)",
+            "description": "ファイル選択ダイアログのファイルフィルター",
+        },
+        "dialog_title": {
+            "name": "ファイルを選択",
+            "description": "ファイル選択ダイアログのタイトル",
+        },
+        "column_mapping_title": {
+            "name": "列マッピング",
+            "description": "列マッピングエリアのタイトル",
+        },
+        "column_mapping_description": {
+            "name": "賞プール情報を含む列を選択してください",
+            "description": "列マッピングエリアの説明",
+        },
+        "column_mapping_id_column": {
+            "name": "番号列（必須）:",
+            "description": "番号列ラベル",
+        },
+        "column_mapping_name_column": {
+            "name": "賞プール名列（必須）:",
+            "description": "賞プール名列ラベル",
+        },
+        "column_mapping_weight_column": {
+            "name": "重み列（オプション）:",
+            "description": "重み列ラベル",
+        },
+        "column_mapping_none": {
+            "name": "なし",
+            "description": "なしオプションのテキスト",
+        },
+        "data_preview_title": {
+            "name": "データプレビュー",
+            "description": "データプレビューエリアのタイトル",
+        },
+        "prize_id": {"name": "番号", "description": "番号列タイトル"},
+        "prize_name": {"name": "賞プール名", "description": "賞プール名列タイトル"},
+        "weight": {"name": "重み", "description": "重み列タイトル"},
+        "buttons_import": {
+            "name": "インポート",
+            "description": "インポートボタンのテキスト",
+        },
+        "file_loaded_title": {
+            "name": "ファイルがロードされました",
+            "description": "ファイルロード成功ダイアログのタイトル",
+        },
+        "file_loaded_content": {
+            "name": "ファイルが正常にロードされました",
+            "description": "ファイルロード成功ダイアログの内容",
+        },
+        "file_loaded_notification_title": {
+            "name": "ファイルが正常にロードされました",
+            "description": "ファイルロード成功通知のタイトル",
+        },
+        "file_loaded_notification_content": {
+            "name": "ファイルが正常にロードされました、データプレビューを確認してください",
+            "description": "ファイルロード成功通知の内容",
+        },
+        "error_title": {"name": "エラー", "description": "エラーダイアログのタイトル"},
+        "load_failed": {
+            "name": "ファイルのロードに失敗しました",
+            "description": "ファイルロード失敗エラー情報",
+        },
+        "load_failed_notification_title": {
+            "name": "ファイルのロードに失敗しました",
+            "description": "ファイルロード失敗通知のタイトル",
+        },
+        "load_failed_notification_content": {
+            "name": "ファイルをロードできません、ファイル形式と内容を確認してください",
+            "description": "ファイルロード失敗通知の内容",
+        },
+        "import_failed": {
+            "name": "データのインポートに失敗しました",
+            "description": "データインポート失敗エラー情報",
+        },
+        "import_failed_notification_title": {
+            "name": "データのインポートに失敗しました",
+            "description": "データインポート失敗通知のタイトル",
+        },
+        "import_failed_notification_content": {
+            "name": "データのインポートエラー、データ形式と内容を確認してください",
+            "description": "データインポート失敗通知の内容",
+        },
+        "unsupported_format": {
+            "name": "サポートされていないファイル形式",
+            "description": "サポートされていないファイル形式エラー情報",
+        },
+        "no_name_column": {
+            "name": "賞プール名列を選択してください",
+            "description": "賞プール名列が選択されていないエラー情報",
+        },
+        "no_id_column": {
+            "name": "番号列を選択してください",
+            "description": "番号列が選択されていないエラー情報",
+        },
+        "import_success_title": {
+            "name": "インポート成功",
+            "description": "インポート成功ダイアログのタイトル",
+        },
+        "import_success_content_template": {
+            "name": "{count}個の賞プール情報を賞プール '{prize_name}' にインポートしました",
+            "description": "インポート成功ダイアログの内容テンプレート",
+        },
+        "import_success_notification_title": {
+            "name": "インポート成功",
+            "description": "インポート成功通知のタイトル",
+        },
+        "import_success_notification_content_template": {
+            "name": "{count}個の賞プール情報を賞プール '{prize_name}' にインポートしました",
+            "description": "インポート成功通知の内容テンプレート",
+        },
+        "existing_data_title": {
+            "name": "賞プールに既にデータが存在します",
+            "description": "賞プールに既にデータが存在するダイアログのタイトル",
+        },
+        "existing_data_prompt": {
+            "name": "賞プール '{prize_name}' は既に{count}個の賞プール情報を含んでいます、処理方法を選択してください：",
+            "description": "賞プールに既にデータが存在するダイアログのヒントテキスト",
+        },
+        "existing_data_option_overwrite": {
+            "name": "既存のデータを上書き",
+            "description": "既存のデータを上書きオプション",
+        },
+        "existing_data_option_cancel": {
+            "name": "インポートをキャンセル",
+            "description": "インポートキャンセルオプション",
+        },
+    },
 }
 
 # 名称设置窗口
@@ -739,6 +1019,129 @@ lottery_name_setting = {
             "description": "Delete prize name hint",
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "賞品名設定",
+            "description": "賞品名ウィンドウのタイトルを設定",
+        },
+        "description": {
+            "name": "このウィンドウで賞品名を設定できます\n1行に1つの賞品名を入力すると、システムは賞品名簿ファイルに保存します\n\n1行に1つの賞品名のみを入力してください。例：\n一等賞\n二等賞\n三等賞",
+            "description": "賞品名設定ウィンドウの説明",
+        },
+        "input_title": {
+            "name": "賞品名リスト",
+            "description": "賞品名入力エリアのタイトル",
+        },
+        "input_placeholder": {
+            "name": "賞品名を入力してください、1行に1つの賞品名",
+            "description": "賞品名入力ボックスのプレースホルダー",
+        },
+        "save_button": {"name": "保存", "description": "保存ボタンのテキスト"},
+        "cancel_button": {
+            "name": "キャンセル",
+            "description": "キャンセルボタンのテキスト",
+        },
+        "error_title": {"name": "エラー", "description": "エラーメッセージのタイトル"},
+        "success_title": {"name": "成功", "description": "成功メッセージのタイトル"},
+        "info_title": {"name": "プロンプト", "description": "情報メッセージのタイトル"},
+        "no_names_error": {
+            "name": "少なくとも1つの賞品名を入力してください",
+            "description": "賞品名が入力されていない場合のエラーヒント",
+        },
+        "invalid_names_error": {
+            "name": "以下の賞品名に不正な文字または予約語が含まれています: {names}",
+            "description": "賞品名検証失敗時のエラーヒント",
+        },
+        "save_error": {
+            "name": "賞品名の保存に失敗しました",
+            "description": "賞品名保存時のエラーヒント",
+        },
+        "success_message": {
+            "name": "{count}個の新しい賞品名を作成しました",
+            "description": "賞品名作成成功時のプロンプトメッセージ",
+        },
+        "no_new_names_message": {
+            "name": "すべての賞品名が既に存在するため、新しい賞品名は作成されませんでした",
+            "description": "新しい賞品名が作成されなかった場合のプロンプトメッセージ",
+        },
+        "unsaved_changes_title": {
+            "name": "未保存の変更",
+            "description": "未保存変更ダイアログのタイトル",
+        },
+        "unsaved_changes_message": {
+            "name": "未保存の変更があります。ウィンドウを閉じますか？",
+            "description": "未保存変更ダイアログの内容",
+        },
+        "discard_button": {
+            "name": "変更を破棄",
+            "description": "変更を破棄ボタンのテキスト",
+        },
+        "continue_editing_button": {
+            "name": "編集を続ける",
+            "description": "編集を続けるボタンのテキスト",
+        },
+        "delete_button": {"name": "削除", "description": "削除ボタンのテキスト"},
+        "delete_name_title": {
+            "name": "賞品名を削除",
+            "description": "賞品名削除ダイアログのタイトル",
+        },
+        "delete_name_message": {
+            "name": "賞品名 '{name}' を削除しますか？この操作はこの賞品名のすべての情報を削除し、復元できません",
+            "description": "賞品名削除確認ダイアログの内容",
+        },
+        "delete_multiple_names_title": {
+            "name": "複数の賞品名を削除",
+            "description": "複数の賞品名削除ダイアログのタイトル",
+        },
+        "delete_multiple_names_message": {
+            "name": "以下の{count}個の賞品名を削除しますか？この操作はこれらの賞品名のすべての情報を削除し、復元できません\n\n{names}",
+            "description": "複数の賞品名削除確認ダイアログの内容",
+        },
+        "delete_name_success_title": {
+            "name": "削除成功",
+            "description": "賞品名削除成功通知のタイトル",
+        },
+        "delete_name_success_message": {
+            "name": "{count}個の賞品名を削除しました",
+            "description": "賞品名削除成功通知の内容",
+        },
+        "delete_name_cancel_button": {
+            "name": "削除をキャンセル",
+            "description": "賞品名削除キャンセルボタンのテキスト",
+        },
+        "no_deletable_names": {
+            "name": "削除可能な賞品名がありません",
+            "description": "削除可能な賞品名がない場合のヒント",
+        },
+        "select_name_to_delete": {
+            "name": "削除する賞品名を選択してください",
+            "description": "削除賞品名選択のヒント",
+        },
+        "select_name_dialog_title": {
+            "name": "削除する賞品名を選択",
+            "description": "削除賞品名選択ダイアログのタイトル",
+        },
+        "select_name_dialog_message": {
+            "name": "削除する賞品名を選択してください：",
+            "description": "削除賞品名選択ダイアログの内容",
+        },
+        "delete_selected_names_button": {
+            "name": "選択を削除",
+            "description": "選択削除ボタンのテキスト",
+        },
+        "delete_name_error": {
+            "name": "賞品名の削除に失敗しました: {error}",
+            "description": "賞品名削除失敗エラー情報",
+        },
+        "name_deleted_title": {
+            "name": "賞品名が削除されました",
+            "description": "賞品名削除ヒントのタイトル",
+        },
+        "name_deleted_message": {
+            "name": "賞品名 '{name}' が入力ボックスから削除されたことが検出されました。変更を保存して永久に削除してください",
+            "description": "賞品名削除ヒントの内容",
+        },
+    },
 }
 
 # 权重设置窗口
@@ -972,6 +1375,129 @@ weight_setting = {
         "weight_deleted_message": {
             "name": "Detected that the weight option '{weight}' have been removed from the input box. Please save your changes to permanently delete it",
             "description": "Remove the weight selection tips",
+        },
+    },
+    "JA_JP": {
+        "title": {
+            "name": "重み設定",
+            "description": "重みウィンドウのタイトルを設定",
+        },
+        "description": {
+            "name": "このウィンドウで賞品の重みを設定できます\n1行に1つの重みを入力すると、システムは賞品名簿ファイルに保存します\n\n1行に1つの重みのみを入力してください。例：\n10\n20\n30",
+            "description": "重み設定ウィンドウの説明",
+        },
+        "input_title": {
+            "name": "重みリスト",
+            "description": "重み入力エリアのタイトル",
+        },
+        "input_placeholder": {
+            "name": "重みを入力してください、1行に1つの重み",
+            "description": "重み入力ボックスのプレースホルダー",
+        },
+        "save_button": {"name": "保存", "description": "保存ボタンのテキスト"},
+        "cancel_button": {
+            "name": "キャンセル",
+            "description": "キャンセルボタンのテキスト",
+        },
+        "error_title": {"name": "エラー", "description": "エラーメッセージのタイトル"},
+        "success_title": {"name": "成功", "description": "成功メッセージのタイトル"},
+        "info_title": {"name": "プロンプト", "description": "情報メッセージのタイトル"},
+        "no_genders_error": {
+            "name": "少なくとも1つの重みを入力してください",
+            "description": "重みが入力されていない場合のエラーヒント",
+        },
+        "invalid_weights_error": {
+            "name": "以下の重みに不正な文字または予約語が含まれています: {weights}",
+            "description": "重み検証失敗時のエラーヒント",
+        },
+        "save_error": {
+            "name": "重みオプションの保存に失敗しました",
+            "description": "重みオプション保存時のエラーヒント",
+        },
+        "success_message": {
+            "name": "{count}個の新しい重みオプションを作成しました",
+            "description": "重みオプション作成成功時のプロンプトメッセージ",
+        },
+        "no_new_weights_message": {
+            "name": "すべての重みオプションが既に存在するため、新しい重みオプションは作成されませんでした",
+            "description": "新しい重みオプションが作成されなかった場合のプロンプトメッセージ",
+        },
+        "unsaved_changes_title": {
+            "name": "未保存の変更",
+            "description": "未保存変更ダイアログのタイトル",
+        },
+        "unsaved_changes_message": {
+            "name": "未保存の変更があります。ウィンドウを閉じますか？",
+            "description": "未保存変更ダイアログの内容",
+        },
+        "discard_button": {
+            "name": "変更を破棄",
+            "description": "変更を破棄ボタンのテキスト",
+        },
+        "continue_editing_button": {
+            "name": "編集を続ける",
+            "description": "編集を続けるボタンのテキスト",
+        },
+        "delete_button": {"name": "削除", "description": "削除ボタンのテキスト"},
+        "delete_weight_title": {
+            "name": "重みオプションを削除",
+            "description": "重みオプション削除ダイアログのタイトル",
+        },
+        "delete_weight_message": {
+            "name": "重みオプション '{weight}' を削除しますか？この操作はこの重みオプションのすべての情報を削除し、復元できません",
+            "description": "重みオプション削除確認ダイアログの内容",
+        },
+        "delete_multiple_weights_title": {
+            "name": "複数の重みオプションを削除",
+            "description": "複数の重みオプション削除ダイアログのタイトル",
+        },
+        "delete_multiple_weights_message": {
+            "name": "以下の{count}個の重みオプションを削除しますか？この操作はこれらの重みオプションのすべての情報を削除し、復元できません\n\n{weights}",
+            "description": "複数の重みオプション削除確認ダイアログの内容",
+        },
+        "delete_weight_success_title": {
+            "name": "削除成功",
+            "description": "重みオプション削除成功通知のタイトル",
+        },
+        "delete_weight_success_message": {
+            "name": "{count}個の重みオプションを削除しました",
+            "description": "重みオプション削除成功通知の内容",
+        },
+        "delete_weight_cancel_button": {
+            "name": "削除をキャンセル",
+            "description": "重みオプション削除キャンセルボタンのテキスト",
+        },
+        "no_deletable_weights": {
+            "name": "削除可能な重みオプションがありません",
+            "description": "削除可能な重みオプションがない場合のヒント",
+        },
+        "select_weight_to_delete": {
+            "name": "削除する重みオプションを選択してください",
+            "description": "削除重みオプション選択のヒント",
+        },
+        "select_weight_dialog_title": {
+            "name": "削除する重みオプションを選択",
+            "description": "削除重みオプション選択ダイアログのタイトル",
+        },
+        "select_weight_dialog_message": {
+            "name": "削除する重みオプションを選択してください：",
+            "description": "削除重みオプション選択ダイアログの内容",
+        },
+        "delete_selected_weights_button": {
+            "name": "選択を削除",
+            "description": "選択削除ボタンのテキスト",
+        },
+        "delete_weight_error": {
+            "name": "重みオプションの削除に失敗しました: {error}",
+            "description": "重みオプション削除失敗エラー情報",
+        },
+        "weight_deleted_title": {
+            "name": "重みオプションが削除されました",
+            "description": "重みオプション削除ヒントのタイトル",
+        },
+        "weight_deleted_message": {
+            "name": "重みオプション '{weight}' が入力ボックスから削除されたことが検出されました。変更を保存して永久に削除してください",
+            "description": "重みオプション削除ヒントの内容",
         },
     },
 }

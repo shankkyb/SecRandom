@@ -790,4 +790,433 @@ basic_settings = {
             "name": "Disabled displaying main window when launching"
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "基本設定",
+            "description": "ソフトウェアの基本機能と外観を設定",
+        },
+        "basic_function": {
+            "name": "基本機能",
+            "description": "ソフトウェアのコア機能オプションを設定",
+        },
+        "data_management": {
+            "name": "データ管理",
+            "description": "ソフトウェアのデータのインポートとエクスポートを管理",
+        },
+        "personalised": {
+            "name": "パーソナライズ",
+            "description": "ソフトウェアの外観とユーザー体験をカスタマイズ",
+        },
+        "simplified_mode": {
+            "name": "簡易設定モード",
+            "description": "高度な設定項目を非表示にし、推奨設定のみを表示",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "simplified_mode_notification": {
+            "enable": "簡易設定モードを有効にしました",
+            "disable": "簡易設定モードを無効にしました",
+        },
+        "autostart": {
+            "name": "起動時に自動実行",
+            "description": "システム起動時にソフトウェアを自動実行するかどうかを設定",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "show_startup_window": {
+            "name": "起動時にメインウィンドウを表示",
+            "description": "ソフトウェア起動時にメインウィンドウを自動表示するかどうかを設定",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "main_window_topmost_mode": {
+            "name": "メインウィンドウ最前面",
+            "description": "メインウィンドウの最前面方式を選択（UIA最前面は管理者権限で実行が必要）",
+            "combo_items": ["最前面を無効", "最前面", "UIA最前面"],
+        },
+        "uia_topmost_restart_dialog_title": {
+            "name": "再起動が必要です",
+            "description": "UIA最前面切替後の再起動プロンプトタイトル",
+        },
+        "uia_topmost_restart_dialog_content": {
+            "name": "UIA最前面モードに切り替えました。有効にするには再起動が必要です。今すぐ再起動しますか？",
+            "description": "UIA最前面切替後の再起動プロンプト内容",
+        },
+        "uia_topmost_disable_restart_dialog_content": {
+            "name": "UIA最前面モードを無効にしました。完全にソフトウェアを終了して再起動すると有効になります",
+            "description": "UIA最前面無効後のプロンプト内容",
+        },
+        "uia_topmost_disable_restart_dialog_ok_btn": {
+            "name": "了解しました",
+            "description": "UIA最前面無効後のプロンプトボタンテキスト",
+        },
+        "uia_topmost_restart_dialog_restart_btn": {
+            "name": "再起動",
+            "description": "UIA最前面切替後の再起動ボタンテキスト",
+        },
+        "uia_topmost_restart_dialog_cancel_btn": {
+            "name": "キャンセル",
+            "description": "UIA最前面切替後のキャンセルボタンテキスト",
+        },
+        "background_resident": {
+            "name": "バックグラウンド常駐",
+            "description": "すべてのウィンドウを閉じた後もバックグラウンドで常駐するかどうか",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "auto_save_window_size": {
+            "name": "ウィンドウサイズを自動保存",
+            "description": "ウィンドウサイズを自動保存するかどうか",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "url_protocol": {
+            "name": "URLプロトコル登録&IPCサービス",
+            "description": "カスタムURLプロトコル(secrandom://)を登録し、IPC通信を有効にして、リンク起動と外部連携をサポート",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "autostart_notification": {
+            "enable": "起動時に自動実行を有効にしました",
+            "disable": "起動時に自動実行を無効にしました",
+            "failure": "起動時に自動実行の設定に失敗しました",
+        },
+        "background_resident_notification": {
+            "enable": "バックグラウンド常駐を有効にしました",
+            "disable": "バックグラウンド常駐を無効にしました",
+        },
+        "auto_save_window_size_notification": {
+            "enable": "ウィンドウサイズの自動保存を有効にしました",
+            "disable": "ウィンドウサイズの自動保存を無効にしました",
+        },
+        "url_protocol_notification": {
+            "enable": "URLプロトコル登録とIPCサービスを有効にしました",
+            "disable": "URLプロトコル登録とIPCサービスを無効にしました",
+            "register_failure": "URLプロトコル&IPCサービスの登録に失敗しました",
+            "unregister_failure": "URLプロトコル&IPCサービスの登録解除に失敗しました",
+            "error": "URLプロトコル&IPCサービス設定エラー: {error}",
+        },
+        "export_diagnostic_data": {
+            "name": "診断データをエクスポート",
+            "description": "ソフトウェア終了時に診断情報をエクスポートし、問題のトラブルシューティングに使用",
+            "pushbutton_name": "診断データをエクスポート",
+        },
+        "export_settings": {
+            "name": "設定をエクスポート",
+            "description": "現在の設定を設定ファイルとしてエクスポートし、バックアップと移行に使用",
+            "pushbutton_name": "設定をエクスポート",
+        },
+        "import_settings": {
+            "name": "設定をインポート",
+            "description": "設定ファイルから設定をインポートし、現在の設定情報を上書き",
+            "pushbutton_name": "設定をインポート",
+        },
+        "export_all_data": {
+            "name": "すべてのデータをエクスポート",
+            "description": "ソフトウェア終了時にすべてのデータと設定をエクスポート",
+            "pushbutton_name": "すべてのデータをエクスポート",
+        },
+        "import_all_data": {
+            "name": "すべてのデータをインポート",
+            "description": "ソフトウェア起動時にバックアップファイルからすべてのデータを復元",
+            "pushbutton_name": "すべてのデータをインポート",
+        },
+        "log_viewer": {
+            "name": "ログを表示",
+            "description": "プログラムログファイルを表示・管理",
+            "pushbutton_name": "ログを表示",
+        },
+        "backup_manager": {
+            "name": "バックアップ管理",
+            "description": "自動バックアップと手動バックアップを管理",
+            "pushbutton_name": "バックアップ管理",
+        },
+        "backup_auto_settings": {
+            "name": "自動バックアップ",
+            "description": "自動バックアップ戦略を設定",
+        },
+        "backup_manual_settings": {
+            "name": "手動バックアップ",
+            "description": "すぐにバックアップを作成し、バックアップファイルを管理",
+        },
+        "backup_auto_enabled": {
+            "name": "有効にするかどうか",
+            "description": "自動バックアップを有効にするかどうか",
+            "switchbutton_name": {"enable": "有効", "disable": "無効"},
+        },
+        "backup_auto_interval_days": {
+            "name": "自動バックアップ間隔",
+            "description": "自動バックアップ間隔を設定（日）",
+        },
+        "backup_auto_max_count": {
+            "name": "自動バックアップ上限",
+            "description": "自動バックアップの最大保持数を設定（個）、0は制限なし",
+        },
+        "backup_last_success": {
+            "name": "前回の成功したバックアップ",
+            "description": "前回の成功したバックアップ時刻を表示",
+        },
+        "backup_now": {
+            "name": "すぐにバックアップ",
+            "description": "すぐにフルバックアップを作成",
+            "pushbutton_name": "すぐにバックアップ",
+        },
+        "backup_open_folder": {
+            "name": "バックアップファイルを表示",
+            "description": "バックアップフォルダを開く",
+            "pushbutton_name": "バックアップファイルを表示",
+        },
+        "backup_folder_size": {
+            "name": "占有サイズ",
+            "description": "バックアップフォルダの占有サイズ",
+        },
+        "backup_content_settings": {
+            "name": "バックアップ内容",
+            "description": "バックアップファイルに含めるデータを選択",
+        },
+        "backup_content_tip": {
+            "text": "項目をオフにすると、そのフォルダはバックアップファイルにパッケージされません。",
+        },
+        "backup_restore_settings": {
+            "name": "バックアップを復元",
+            "description": "バックアップファイルを選択して復元（再起動後に有効）",
+        },
+        "backup_restore_tip": {
+            "text": "復元は現在のデータを上書きします。復元完了後、変更を有効にするためにアプリケーションを再起動してください。",
+        },
+        "backup_restore_file_list": {
+            "name": "バックアップファイルリスト",
+            "description": "復元するバックアップファイルを選択",
+        },
+        "backup_restore_refresh": {
+            "name": "リストを更新",
+            "description": "バックアップファイルリストを更新",
+            "pushbutton_name": "更新",
+        },
+        "backup_restore_start": {
+            "name": "復元を開始",
+            "description": "選択したバックアップファイルを使用してデータを復元",
+            "pushbutton_name": "復元",
+        },
+        "backup_restore_delete": {
+            "name": "バックアップを削除",
+            "description": "選択したバックアップファイルを削除",
+            "pushbutton_name": "削除",
+        },
+        "backup_restore_no_selection": {
+            "text": "復元するバックアップファイルを先に選択してください",
+        },
+        "backup_restore_confirm": {
+            "title": "バックアップを復元",
+            "content": "バックアップファイル「{file}」からデータを復元しますか？\n\nこの操作は現在のすべての設定とデータを上書きし、元に戻すことはできません。",
+            "confirm_button": "復元",
+            "cancel_button": "キャンセル",
+        },
+        "backup_restore_delete_confirm": {
+            "title": "削除の確認",
+            "content": "このバックアップファイルを削除しますか？\n\n{file}\n\nこの操作は取り消せません。",
+            "pushbutton_name": "削除",
+        },
+        "backup_restore_delete_cancel": {
+            "name": "キャンセル",
+            "description": "削除操作をキャンセル",
+            "pushbutton_name": "キャンセル",
+        },
+        "backup_restore_refresh_result": {
+            "success": "更新しました、合計 {count} 個のバックアップファイル",
+            "empty": "更新しました、バックアップファイルが見つかりませんでした",
+            "failure": "更新に失敗しました：{error}",
+        },
+        "backup_restore_delete_result": {
+            "success": "削除しました：{file}",
+            "failure": "削除に失敗しました：{error}",
+        },
+        "backup_restore_table_headers": [
+            "バックアップファイル",
+            "作成時刻",
+            "サイズ",
+            "操作",
+        ],
+        "include_config": {
+            "name": "設定ファイル",
+            "description": "ソフトウェア設定と設定ファイル（config）",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "include_list": {
+            "name": "リストデータ",
+            "description": "点呼/抽選リストなどのデータ（list）",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "include_language": {
+            "name": "言語ファイル",
+            "description": "多言語テキスト設定（Language）",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "include_history": {
+            "name": "履歴記録",
+            "description": "抽選履歴データ（history）",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "include_audio": {
+            "name": "オーディオリソース",
+            "description": "オーディオリソースファイル（audio）",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "include_cses": {
+            "name": "CSES連携",
+            "description": "CSES関連連携データ（CSES）",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "include_images": {
+            "name": "画像リソース",
+            "description": "学生/賞品画像リソース（images）",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "include_themes": {
+            "name": "テーマリソース",
+            "description": "インストール済みのテーマリソース（theme）",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "include_logs": {
+            "name": "実行ログ",
+            "description": "プログラム実行ログ、機密情報が含まれる可能性があります（logs）",
+            "switchbutton_name": {"enable": "", "disable": ""},
+        },
+        "backup_tabs": {
+            "auto": "自動バックアップ",
+            "manual": "手動バックアップ",
+            "restore": "バックアップを復元",
+            "content": "バックアップ内容",
+        },
+        "backup_last_success_text": {"none": "前回のバックアップ記録がありません"},
+        "backup_now_result": {
+            "success": "バックアップ成功:\n{path}",
+            "failure": "バックアップ失敗:\n{error}",
+        },
+        "dpiScale": {
+            "name": "DPIスケーリング",
+            "description": "ソフトウェアインターフェースのスケーリング比率を調整（ソフトウェア再起動後に有効）",
+            "combo_items": ["100%", "125%", "150%", "175%", "200%", "自動"],
+        },
+        "font": {
+            "name": "フォント",
+            "description": "ソフトウェアインターフェース表示フォントを設定（ソフトウェア再起動後に有効）",
+        },
+        "font_weight": {
+            "name": "フォント太さ",
+            "description": "ソフトウェアインターフェースフォント太さを設定（ソフトウェア再起動後に有効）",
+            "combo_items": [
+                "極細",
+                "特細",
+                "細体",
+                "標準",
+                "中太",
+                "半太",
+                "太字",
+                "特太",
+                "極太",
+            ],
+        },
+        "theme": {
+            "name": "テーマモード",
+            "description": "ソフトウェアインターフェーステーマスタイルを選択",
+            "combo_items": ["ライト", "ダーク", "システムに従う"],
+        },
+        "theme_color": {
+            "name": "テーマカラー",
+            "description": "ソフトウェアインターフェーステーマカラーを設定",
+        },
+        "open_theme_management": {
+            "name": "テーマ管理",
+            "description": "テーマ管理と背景設定を開く",
+            "pushbutton_name": "開く",
+        },
+        "language": {
+            "name": "表示言語",
+            "description": "ソフトウェアインターフェース言語を切り替え（ソフトウェア再起動後に有効）",
+        },
+        "settings_import_export": {
+            "export_success_title": {"name": "設定をエクスポート"},
+            "export_success_content": {
+                "name": "設定を正常にエクスポートしました:\n{path}"
+            },
+            "export_failure_title": {"name": "設定をエクスポート"},
+            "export_failure_content": {
+                "name": "設定のエクスポートに失敗しました:\n{error}"
+            },
+            "import_confirm_title": {"name": "設定をインポート"},
+            "import_confirm_content": {
+                "name": "これらの設定をインポートしますか？これにより現在の設定が上書きされます"
+            },
+            "import_confirm_button": {"name": "インポートを確認"},
+            "import_cancel_button": {"name": "インポートをキャンセル"},
+            "import_success_title": {"name": "設定をインポート"},
+            "import_success_content": {
+                "name": "設定を正常にインポートしました\n変更を有効にするにはアプリケーションを再起動してください"
+            },
+            "import_success_button": {"name": "了解しました"},
+            "export_success_button": {"name": "了解しました"},
+            "import_failure_title": {"name": "設定をインポート"},
+            "import_failure_content": {
+                "name": "設定のインポートに失敗しました:\n{error}"
+            },
+        },
+        "success_enable_content": {
+            "name": "起動時にメインウィンドウを表示を有効にしました"
+        },
+        "info_disable_content": {
+            "name": "起動時にメインウィンドウを表示を無効にしました"
+        },
+        "data_import_export": {
+            "export_success_title": {"name": "すべてのデータをエクスポート"},
+            "export_success_content": {
+                "name": "すべてのデータを正常にエクスポートしました:\n{path}"
+            },
+            "export_failure_title": {"name": "すべてのデータをエクスポート"},
+            "export_failure_content": {
+                "name": "すべてのデータのエクスポートに失敗しました:\n{error}"
+            },
+            "import_confirm_title": {"name": "すべてのデータをインポート"},
+            "import_confirm_content": {
+                "name": "これらのデータをインポートしますか？これにより現在のデータが上書きされます"
+            },
+            "import_confirm_button": {"name": "インポートを確認"},
+            "import_cancel_button": {"name": "インポートをキャンセル"},
+            "import_success_title": {"name": "すべてのデータをインポート"},
+            "import_success_content": {
+                "name": "データを正常にインポートしました\n変更を有効にするにはアプリケーションを再起動してください"
+            },
+            "import_success_content_skipped": {
+                "name": "データを正常にインポートしました（{count} 個の使用中ファイルをスキップ）\n変更を有効にするにはアプリケーションを再起動してください"
+            },
+            "import_success_button": {"name": "了解しました"},
+            "import_failure_title": {"name": "すべてのデータをインポート"},
+            "import_failure_content": {
+                "name": "すべてのデータのインポートに失敗しました:\n{error}"
+            },
+            "existing_files_count": {"name": "\n... まだ {len} 個のファイルがあります"},
+            "existing_files_title": {"name": "ファイルが既に存在します"},
+            "existing_files_content": {
+                "name": "以下のファイルが既に存在します:\n{files}\n\nこれらのファイルを上書きしますか？"
+            },
+            "version_mismatch_title": {"name": "バージョン不一致"},
+            "version_mismatch_content": {
+                "name": "インポートデータのソフトウェアバージョンと現在のバージョンが一致しません:\n\nインポートデータのソフトウェア: {software_name} {version}\n現在のソフトウェア: SecRandom {current_version}\n\nインポートを続行しますか？"
+            },
+            "export_warning_title": {"name": "すべてのデータをエクスポート"},
+            "export_warning_content": {
+                "name": "まもなくすべてのデータをエクスポートします、以下を含みます:\n\nソフトウェアバージョン、設定\n点呼リスト、抽選リスト\n履歴記録、ログファイル\n\n注意: エクスポートされたデータは機密情報を含む可能性があるため、適切に保管してください。\n\nエクスポートを続行しますか?"
+            },
+        },
+        "diagnostic_data_export": {
+            "export_confirm_button": {"name": "エクスポートを確認"},
+            "export_cancel_button": {"name": "エクスポートをキャンセル"},
+            "export_success_title": {"name": "診断データをエクスポート"},
+            "export_success_content": {
+                "name": "診断データを正常にエクスポートしました:\n{path}"
+            },
+            "export_failure_title": {"name": "診断データをエクスポート"},
+            "export_failure_content": {
+                "name": "診断データのエクスポートに失敗しました:\n{error}"
+            },
+            "export_warning_title": {"name": "診断データをエクスポート"},
+            "export_warning_content": {
+                "name": "まもなく診断データをエクスポートします、以下を含みます:\n\nソフトウェア情報、設定\n点呼リスト、抽選リスト\n履歴記録、ログファイル\n\n注意: エクスポートされたデータは機密情報を含む可能性があるため、適切に保管してください。\n\nエクスポートを続行しますか?"
+            },
+        },
+    },
 }

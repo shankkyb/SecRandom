@@ -141,4 +141,81 @@ update = {
             "name": "New version available:{version}\nClick to see details "
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "更新設定",
+            "description": "ソフトウェアの更新を確認・インストール",
+        },
+        "secrandom_update_text": {"name": "SecRandom 更新"},
+        "current_version": {"name": "現在のバージョン"},
+        "latest_version_label": {"name": "最新バージョン"},
+        "latest_version": {"name": "最新バージョンです"},
+        "new_version_available": {"name": "新しいバージョンが見つかりました"},
+        "last_check_time": {"name": "最終更新確認時刻"},
+        "check_update": {"name": "更新を確認"},
+        "force_check": {"name": "強制的に更新を確認"},
+        "check_for_updates": {"name": "更新を確認"},
+        "never_checked": {"name": "未確認"},
+        "checking_update": {"name": "更新を確認中..."},
+        "update_notification_title": {"name": "SecRandom 更新通知"},
+        "update_notification_content": {
+            "name": "新しいバージョンが見つかりました: {version}\nクリックして詳細を表示"
+        },
+        "check_update_failed": {"name": "更新の確認に失敗しました"},
+        "failed_to_get_version_info": {"name": "バージョン情報の取得に失敗しました"},
+        "download_and_install": {"name": "ダウンロードしてインストール"},
+        "downloading_update": {"name": "更新をダウンロード中..."},
+        "download_failed": {"name": "ダウンロードに失敗しました"},
+        "failed_to_download_update": {"name": "更新のダウンロードに失敗しました"},
+        "already_downloaded_same_version": {
+            "name": "最新バージョンがダウンロード済みです"
+        },
+        "update_confirmation_title": {"name": "更新確認"},
+        "update_confirmation_content": {
+            "name": "更新のダウンロードが完了しました。今すぐインストールしますか？"
+        },
+        "yes_update_now": {"name": "今すぐ更新"},
+        "no_update_later": {"name": "後で更新"},
+        "installing_update": {"name": "更新をインストール中..."},
+        "update_progress": {"name": "更新の進捗"},
+        "update_installed": {"name": "更新のインストールが成功しました"},
+        "update_installed_successfully": {"name": "更新のインストールが成功しました!"},
+        "install_failed": {"name": "インストールに失敗しました"},
+        "failed_to_install_update": {"name": "更新のインストールに失敗しました"},
+        "cancel_update": {"name": "更新をキャンセル"},
+        "update_cancelled": {"name": "更新がキャンセルされました"},
+        "update_cancelled_by_user": {"name": "更新がキャンセルされました"},
+        "cancelling_update": {"name": "更新をキャンセル中..."},
+        "already_latest_version": {"name": "既に最新バージョンです!"},
+        "auto_update_mode": {
+            "name": "自動的に更新を確認・インストール",
+            "description": "アプリの自動更新モードを設定",
+            "combo_items": [
+                "自動更新なし",
+                "自動的に更新を確認して通知",
+                "自動的に更新を確認してダウンロード",
+                "自動的に更新を確認してインストール",
+            ],
+        },
+        "update_channel": {
+            "name": "更新チャンネル選択",
+            "description": "ソフトウェア更新のリリースチャンネルを選択",
+            "combo_items": [
+                "安定版チャンネル",
+                "テストチャンネル",
+                "プレビューチャンネル",
+            ],
+        },
+        "update_source": {
+            "name": "更新ソース選択",
+            "description": "ソフトウェア更新のダウンロードソースを選択",
+            "combo_items": [
+                "自動検出",
+                "GitHub",
+                "ghproxy.sectl",
+                "ghfast",
+                "gh-proxy",
+            ],
+        },
+    },
 }

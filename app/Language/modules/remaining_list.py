@@ -70,4 +70,42 @@ remaining_list = {
             "description": "Summary text for grouped members",
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "未抽出学生リスト",
+            "description": "残りリストページタイトル",
+        },
+        "windows_title": {
+            "name": "未抽出リスト",
+            "description": "残りリストウィンドウタイトル",
+        },
+        "title_with_class": {
+            "name": "{class_name}",
+            "description": "クラス名付きのページタイトル",
+        },
+        "count_label": {
+            "name": "残り人数：{count}",
+            "description": "残り人数を表示するラベルテキスト",
+        },
+        "prizes_count_label": {
+            "name": "残り回数：{count}",
+            "description": "残り回数を表示するラベルテキスト",
+        },
+        "group_count_label": {
+            "name": "残りグループ数：{count}",
+            "description": "残りグループ数を表示するラベルテキスト",
+        },
+        "group_summary": {
+            "name": "と{members}名のメンバ",
+            "description": "抽出人数と未抽出人数のまとめテキスト",
+        },
+        "no_students": {
+            "name": "未抽出学生なし",
+            "description": "残り学生がいない場合のヒントテキスト",
+        },
+        "student_info": {
+            "name": "学籍番号: {id}\n性別: {gender}\nグループ: {group}",
+            "description": "学生情報カードの表示形式",
+        },
+    },
 }

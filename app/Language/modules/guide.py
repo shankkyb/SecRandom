@@ -657,4 +657,199 @@ This disclaimer is a supplement to the project's open source license (GNU Genera
             "finish_btn": "Get Started",
         },
     },
+    "JA_JP": {
+        "title": {
+            "name": "SecRandomへようこそ",
+            "description": "数ステップで初期設定を完了",
+        },
+        "next": "次へ",
+        "previous": "前へ",
+        "finish": "完了",
+        "skip": "スキップ",
+        "exit_confirm": {
+            "title": "セットアップを終了",
+            "content": "セットアップウィンドウを閉じるとアプリケーションが終了します。続行しますか？",
+            "exit_button": "終了",
+            "cancel_button": "続行",
+        },
+        "steps": {
+            "license": "ライセンス",
+            "migration": "データ移行",
+            "theme": "テーマ",
+            "list": "リスト",
+            "extraction": "抽出",
+            "advanced": "詳細設定",
+            "enhanced": "拡張機能",
+            "test": "テスト",
+            "links": "完了",
+        },
+        "welcome_page": {
+            "title": "SecRandom",
+            "subtitle": "開始をクリックして初期設定を完了",
+            "start_btn": "開始",
+        },
+        "language_page": {
+            "title": "言語設定",
+            "subtitle": "インターフェース言語を選択",
+            "language": "言語",
+            "restart_hint": "言語の変更にはソフトウェアの再起動が必要です",
+            "restart_dialog_title": "再起動が必要",
+            "restart_dialog_content": "言語設定が変更されました。今すぐ再起動しますか？",
+            "restart_btn": "再起動",
+            "cancel_btn": "キャンセル",
+        },
+        "basic_settings_page": {
+            "title": "基本設定",
+            "subtitle": "起動と表示オプションを設定",
+            "startup_window": "スタートアップウィンドウを表示",
+            "tray_icon": "トレイに最小化",
+            "float_window": "起動時にフローティングウィンドウを表示",
+        },
+        "license_page": {
+            "title": "ライセンス & 免責事項",
+            "subtitle": "以下の条項をお読みいただき、同意してください",
+            "tab_license": "GPLv3 ライセンス",
+            "tab_disclaimer": "免責事項",
+            "license_content": """
+### GNU GENERAL PUBLIC LICENSE
+
+#### Version 3, 29 June 2007
+
+**Copyright (C) 2007 Free Software Foundation, Inc.**
+
+Everyone is permitted to copy and distribute verbatim copies of this license document, but changing it is not allowed.
+
+---
+
+#### Preamble
+
+The GNU General Public License (GPL) is a free, copyleft license for software and other kinds of works. Unlike most licenses, GPL is designed to ensure that users have the freedom to share and change all versions of a program, maintaining its status as free software.
+
+**Key Principles:**""",
+            "agree_license_checkbox": "GPLv3ライセンスを読んで同意しました",
+            "agree_disclaimer_checkbox": "免責事項を読んで同意しました",
+            "agree_checkbox": "GPLv3ライセンスと免責事項を読んで同意しました",
+            "disclaimer_content": """# 免責事項 (Disclaimer)
+
+**最終更新日：** 2026年1月17日
+
+**SecRandom**（以下「本ソフトウェア」）を使用する前に、必ずこの免責事項を注意深くお読みください。本ソフトウェアのダウンロード、インストール、使用、または配布は、本声明のすべての条項を読み、理解し、同意したことを示します。以下の条項に同意しない場合は、直ちに本ソフトウェアの使用を中止してください。
+
+## 1. ソフトウェアの「現状」提供と保証なしの声明
+
+1.1 **「現状のまま」提供**：
+本ソフトウェアは [GPL-3.0](./LICENSE) ライセンスの下でオープンソースとして公開され、「現状のまま」(AS IS)で提供され、明示または黙示の保証は一切付随しません。
+
+1.2 **適合性の保証なし**：
+開発者は本ソフトウェアが特定のニーズを満たすこと、中断やエラーなく動作すること、または欠陥が修正されることを保証しません。本ソフトウェアを使用するすべてのリスクはユーザーが負担します。
+
+1.3 **免責範囲**：
+法律で許容される最大限の範囲で、開発者およびその貢献者は、本ソフトウェアの使用または使用不能により生じるいかなる直接的、間接的、付随的、特別、懲罰的、または結果的な損害（データの損失、業務の中断、利益の損失、コンピュータの故障、またはその他の商業的損害または損失を含むがこれらに限定されない）についても責任を負いません。たとえ開発者がそのような損害の可能性について通知されていたとしても同様です。
+
+## 2. Sentryデータ収集とプライバシーについて
+
+2.1 **サードパーティサービスの使用**：
+本ソフトウェアは、ソフトウェアの実行状態のリアルタイム監視、クラッシュログのキャプチャ、およびパフォーマンスボトルネックの分析のために **Sentry** SDKを統合しています。
+
+2.2 **データ収集の承認**：
+本ソフトウェアを使用することで、異常またはクラッシュが発生した際に、以下の情報を含む診断レポートをSentryサーバーに自動的に送信することを許可したものとみなします：
+* **技術スタック情報**：エラー発生時のコールスタック。
+* **デバイス環境概要**：オペレーティングシステムのバージョン、Python/ランタイム環境のバージョン、デバイスモデルなどの個人識別可能でない情報。
+* **ログの断片**：クラッシュ前後のシステムログ（コードレベルで可能な限り匿名化しますが、一部の非機密コンテキスト情報が含まれる可能性を排除しません）。
+
+2.3 **データ使用の制限**：
+Sentryを通じて収集されたデータは**技術診断、バグ修正、およびソフトウェアの最適化**のみに使用され、第三者に販売されたり、広告追跡に使用されたりすることはありません。
+
+2.4 **サードパーティポリシー**：
+Sentryのデータ処理は独自のプライバシーポリシーに従います。詳細は `https://sentry.io/privacy/` を参照してください。
+
+## 3. ランダム性とアルゴリズムに関する特別声明
+
+3.1 **疑似乱数性**：
+本ソフトウェアが生成する乱数または抽出結果は、コンピュータアルゴリズム（疑似乱数生成器）に基づいています。ほとんどの一般的なシナリオでは十分にランダムですが、真の乱数（True Randomness）の物理的特性を**持ちません**。
+
+3.2 **結果の予測不可能性と公平性**：
+開発者は、生成された乱数結果が統計的に絶対に一様分布であることを保証しません。乱数結果に起因するいかなる紛争（抽選結果、教室での点呼、意思決定支援など）についても、開発者は**いかなる責任も負いません**。
+
+3.3 **高リスクシナリオでの使用禁止**：
+本ソフトウェアを**ギャンブル、暗号化セキュリティキーの生成、高額金融取引の決定**、またはランダム性について厳格な法的または技術的要件があるその他の重要なタスクシナリオに使用することは厳禁です。このようなシナリオでは、専門的に認定されたハードウェア乱数生成器を使用してください。
+
+## 4. ユーザー行動とコンプライアンス
+
+4.1 **合法的使用**：
+ユーザーは、所在する国または地域の法律および規制に従ってのみ本ソフトウェアを使用することを約束します。
+
+4.2 **悪用の禁止**：
+ユーザーは、本ソフトウェアを使用していかなる違法または規制違反活動も行わず、本ソフトウェアを悪意のあるリバースエンジニアリングまたは既知の脆弱性を利用して他者のシステムを攻撃することも禁止されています。
+
+## 5. ライセンスの優先権
+
+本免責事項は、プロジェクトのオープンソースライセンス（GNU General Public License v3.0）の補足です。本声明のいかなる条項がGPL-3.0ライセンスの強制条項と競合する場合、GPL-3.0ライセンスの規定が優先されます。
+
+---
+
+*SecRandom開発チームは、事前の通知なしに本免責事項をいつでも変更する権利を留保します。*""",
+            "migration_title": "データ移行",
+            "migration_desc": "SecRandom V2以上のバージョンで「基本設定 - すべてのデータをエクスポート」からエクスポートされたデータファイル（.zip）のみをサポート",
+            "detect_old_data": "古いバージョンのデータが検出されました",
+            "no_old_data": "古いバージョンのデータは検出されませんでした",
+            "start_migration": "移行を開始",
+            "skip_migration": "移行をスキップ",
+            "migration_success": "移行が成功しました",
+            "migration_fail": "移行に失敗しました",
+            "manual_import": "データファイルを選択",
+        },
+        "theme_page": {
+            "title": "テーマ設定",
+            "subtitle": "お好みのテーマスタイルを選択",
+            "light_mode": "ライトモード",
+            "dark_mode": "ダークモード",
+            "follow_system": "システムに従う",
+        },
+        "list_page": {
+            "title": "リスト設定",
+            "subtitle": "クラスリストをインポートまたは新規作成",
+            "import_btn": "リストをインポート",
+            "new_btn": "新規リスト",
+            "desc": "後で設定でより多くのリストを管理できます",
+        },
+        "advanced_page": {
+            "title": "詳細設定",
+            "subtitle": "詳細設定オプションを有効にするかどうか",
+            "simplified_mode": "シンプルモード",
+            "advanced_mode": "詳細モード",
+            "desc": "シンプルモードは複雑な設定項目を非表示にし、コア機能のみを残します。詳細モードを有効にすると、より多くのカスタマイズ設定が可能になります。",
+        },
+        "enhanced_page": {
+            "title": "拡張機能",
+            "subtitle": "TTS、音楽、連携を設定",
+            "tts_music": "TTS / 音楽設定",
+            "classisland": "連携設定",
+            "break_disable": "休み時間中は無効",
+            "result_push": "抽出結果のプッシュ通知",
+            "tts_settings": "TTS設定",
+            "music_settings": "音楽設定",
+        },
+        "test_page": {
+            "title": "機能テスト",
+            "subtitle": "拡張機能をワンクリックでテスト",
+            "test_tts": "TTSをテスト",
+            "test_music": "音楽をテスト",
+            "test_classisland": "サービスチャンネルプッシュをテスト",
+            "start_test": "テスト開始",
+            "success": "テスト成功",
+            "failure": "テスト失敗",
+            "testing": "テスト中...",
+        },
+        "links_page": {
+            "title": "初期設定が完了しました",
+            "subtitle": "初期設定の完了おめでとうございます！以下は、すぐに使い始めたり問題を報告したりするのに役立つ推奨リンクです",
+            "github": "GitHubリポジトリ",
+            "bilibili": "Bilibili",
+            "docs": "使用ドキュメント",
+            "organization_website": "組織メインサイト",
+            "issues": "問題を報告",
+            "finish_btn": "使用を開始",
+        },
+    },
 }
