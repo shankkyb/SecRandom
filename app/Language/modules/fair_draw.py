@@ -233,25 +233,28 @@ fair_draw_settings = {
             "combo_items": {"0": "Seconds", "1": "Minutes", "2": "Hours"},
         },
         "core_fair_mechanism": {
-            "name": "核心公平机制",
-            "description": "包括频率函数、平均值差值保护等核心算法",
+            "name": "Core fairness mechanism",
+            "description": "Includes core algorithms such as frequency functions and average-gap protection",
         },
         "draw_protection": {
-            "name": "抽取保护设置",
-            "description": "包括抽取后屏蔽等保护机制",
+            "name": "Draw protection settings",
+            "description": "Includes protection mechanisms such as post-draw blocking",
         },
         "advanced_weight_settings": {
-            "name": "高级权重设置",
-            "description": "包括权重范围、平衡权重等高级调整",
+            "name": "Advanced weight settings",
+            "description": "Includes advanced tuning such as weight range and balance weights",
         },
         "enable_avg_gap_protection": {
-            "name": "启用平均值差值保护",
-            "description": "启用后，将应用平均值过滤和最大差距保护，避免极端不均抽取",
+            "name": "Enable average-gap protection",
+            "description": "When enabled, average filtering and maximum gap protection are applied to avoid extreme imbalance",
         },
-        "gap_threshold": {"name": "差值阈值", "description": "允许的最大次数差距"},
+        "gap_threshold": {
+            "name": "Gap threshold",
+            "description": "Maximum allowed difference in counts",
+        },
         "min_pool_size": {
-            "name": "候选池最少人数",
-            "description": "设置平均值差值保护机制下候选池中的最少学生人数",
+            "name": "Minimum candidate pool size",
+            "description": "Set the minimum number of students in the candidate pool under average-gap protection",
         },
     },
 }

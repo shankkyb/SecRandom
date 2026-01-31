@@ -57,14 +57,17 @@ remaining_list = {
             "name": "Student ID: {id}\nGender: {gender}\nGroup: {group}",
             "description": "Student info card style",
         },
-        "windows_title": {"name": "未抽取名单", "description": "剩余名单窗口标题"},
+        "windows_title": {
+            "name": "Unpicked list",
+            "description": "Window title of remaining list",
+        },
         "prizes_count_label": {
-            "name": "剩余奖数：{count}",
-            "description": "显示剩余奖数的标签文本",
+            "name": "Remaining prizes: {count}",
+            "description": 'Showing the "Remaining prizes" label text',
         },
         "group_summary": {
-            "name": "等{members}名成员",
-            "description": "已抽取人数和未抽取人数的总结文本",
+            "name": "and {members} other members",
+            "description": "Summary text for grouped members",
         },
     },
 }

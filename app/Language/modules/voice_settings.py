@@ -111,8 +111,8 @@ basic_voice_settings = {
             "description": "Adjust system volume",
         },
         "voice_enable": {
-            "name": "语音功能开关",
-            "description": "开启或关闭语音播报功能",
+            "name": "Voice toggle",
+            "description": "Enable or disable voice announcements",
             "switchbutton_name": {"enable": "Enabled", "disable": "Disabled"},
         },
     },

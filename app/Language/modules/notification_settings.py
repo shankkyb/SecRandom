@@ -180,12 +180,12 @@ roll_call_notification_settings = {
             "description": "Set the time to close the floating window automatically (second), set to 0 to not close automatically",
         },
         "use_main_window_when_exceed_threshold": {
-            "name": "超过阈值时使用主窗口",
-            "description": "当抽取人数超过设定阈值时，只在主窗口显示结果，不显示浮窗通知",
+            "name": "Use main window when exceeding threshold",
+            "description": "When the picked count exceeds the threshold, show results in the main window only (no floating notification)",
         },
         "main_window_display_threshold": {
-            "name": "主窗口显示阈值",
-            "description": "设置触发主窗口显示结果的人数阈值，最小值为1",
+            "name": "Main window threshold",
+            "description": "Set the picked count threshold for showing results in the main window (minimum: 1)",
         },
         "notification_service_type": {
             "name": "Notification service type",
@@ -512,12 +512,12 @@ lottery_notification_settings = {
             "description": "Set the time to close the floating window automatically (seconds), set to 0 to not close automatically",
         },
         "use_main_window_when_exceed_threshold": {
-            "name": "超过阈值时使用主窗口",
-            "description": "当抽取奖数超过设定阈值时，只在主窗口显示结果，不显示浮窗通知",
+            "name": "Use main window when exceeding threshold",
+            "description": "When the drawn prize count exceeds the threshold, show results in the main window only (no floating notification)",
         },
         "main_window_display_threshold": {
-            "name": "主窗口显示阈值",
-            "description": "设置触发主窗口显示结果的奖数阈值，最小值为1",
+            "name": "Main window threshold",
+            "description": "Set the prize count threshold for showing results in the main window (minimum: 1)",
         },
         "notification_service_type": {
             "name": "Notification service type",

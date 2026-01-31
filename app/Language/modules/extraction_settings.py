@@ -255,7 +255,10 @@ roll_call_settings = {
             "name": "Student image folder",
             "description": "Manage student image files. Picture file names must match student name",
         },
-        "default_class": {"name": "默认抽取名单", "description": "设置默认抽取名单"},
+        "default_class": {
+            "name": "Default class",
+            "description": "Set the default class to use for drawing",
+        },
     },
 }
 
@@ -480,8 +483,8 @@ quick_draw_settings = {
             "description": "Manage student image files. Picture file names must match student name",
         },
         "default_class": {
-            "name": "默认抽取名单",
-            "description": "设置默认使用的抽取名单",
+            "name": "Default class",
+            "description": "Set the default class to use for drawing",
         },
         "disable_after_click": {
             "name": "Disable after click",
@@ -767,8 +770,8 @@ lottery_settings = {
             "description": "Set the prize image to display in lottery results",
         },
         "default_pool": {
-            "name": "默认抽取名单",
-            "description": "设置默认使用的抽取名单",
+            "name": "Default pool",
+            "description": "Set the default pool to use for drawing",
         },
     },
 }
